@@ -29,15 +29,21 @@ import org.amity.element.Event;
  */
 public interface IComponent
 {
+    /**
+     * Access event information for events that passed through component
+     * 
+     * @return chronological list of events passing through the component
+     */
     List<Event> getLocalEvents();
 
     /**
      * Process a simulation of events passing through the component model,
      * marking the arrival, start of processing and completion of processing for
-     * the event, as well as tracking other details such as total lifespan of
+     * each event, as well as tracking other details such as total lifespan of
      * the event.
      * 
-     * @param events list of events traveling through the system model
+     * @param events chronological list of events passing through the system
+     * model
      */
     void simulate(final List<Event> events);
 }

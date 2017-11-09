@@ -95,6 +95,10 @@ public class ProcessorTest
             assertTrue(event.getStart() == tick);
             final double completeTick = tick + period;
             assertTrue(event.getComplete() == completeTick);
+            final double elapsed = completeTick - sourceTick;
+            assertTrue(event.getElapsed() == elapsed);
+            final double executed = completeTick - tick;
+            assertTrue(event.getExecuted() == executed);
             tick = completeTick;
         }
     }

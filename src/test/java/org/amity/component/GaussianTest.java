@@ -69,9 +69,9 @@ public class GaussianTest
     {
         System.out.println("generate");
         final int eventTotal = 1000000;
-        final double offset = 5;
-        final double deviation = 1;
-        IFunction instance = new Gaussian(offset, deviation);
+        final double maximum = 3;
+        final double minimum = 1;
+        IFunction instance = new Gaussian(minimum, maximum);
         final List<Double> result = instance.generate(eventTotal);
         final DescriptiveStatistics statistics = new DescriptiveStatistics();
         result.stream().forEach((value) ->
@@ -80,10 +80,15 @@ public class GaussianTest
         });
         final double mean = statistics.getMean();
         final double sd = statistics.getStandardDeviation();
-        final double error = 0.005;
+        final double max = statistics.getMax();
+        final double min = statistics.getMin();
+        final double error = 0.001;
         System.out.println("  Mean:" + mean);
         System.out.println("  Standard Deviation:" + sd);
-        assertTrue(Math.abs(mean - offset) < error);
-        assertTrue(Math.abs(sd - deviation) < error);
+        System.out.println("  Maximum: " + max);
+        System.out.println("  Minimum: " + min);
+        assertTrue(Math.abs(mean - (maximum + minimum)/2) < error);
+        assertTrue(min >= minimum);
+        assertTrue(max <= maximum);
     }
 }

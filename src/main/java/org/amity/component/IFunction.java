@@ -35,8 +35,8 @@ public interface IFunction
      * being used - currently supports uniform random distribution, Gaussian
      * distribution or constant value.
      *
-     * @param eventTotal number of event timing values to be generated
-     * @return list of event timings based on the generation model
+     * @param eventTotal number of events to pass through system
+     * @return list of component timings based on the generation model
      */
     List<Double> generate(final int eventTotal);
 }

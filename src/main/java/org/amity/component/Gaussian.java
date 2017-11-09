@@ -26,7 +26,7 @@ import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
 
 /**
- * Implements generation of values that have a Gaussian distribution.
+ * Implements generation of values that have a Gaussian random distribution.
  * 
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
@@ -35,20 +35,37 @@ public class Gaussian implements IFunction
 
     private final double offset;
     private final double deviation;
+    private final double minimum;
+    private final double maximum;
     private final RandomGenerator generator = new JDKRandomGenerator();
     private final GaussianRandomGenerator gaussian
             = new GaussianRandomGenerator(generator);
 
+    /**
+     * Hidden default constructor to avoid implicit creation
+     */
     private Gaussian()
     {
-        this.offset = 0;
         this.deviation = 0;
+        this.offset = 0;
+        this.minimum = 0;
+        this.maximum = 0;
     }
 
-    public Gaussian(final double offset, final double deviation)
+    /**
+     * Construct Gaussian distribution generator
+     * 
+     * @param minimum smallest time interval to be produced
+     * @param maximum largest time interval to be produced
+     */
+    public Gaussian(final double minimum, final double maximum)
     {
-        this.offset = offset != 0 ? ( offset < 0 ? -offset : offset) : 1.0;
-        this.deviation = deviation < 0 ? -deviation : deviation;
+        final double max = Math.abs(maximum);
+        final double min = Math.abs(minimum);
+        this.minimum = Math.min(max, min);
+        this.maximum = Math.max(max, min);
+        this.deviation = Math.abs(max - min) / 10;
+        this.offset = Math.min(max, min) + deviation * 5;
     }
 
     @Override
@@ -61,9 +78,13 @@ public class Gaussian implements IFunction
             {
                 final double value = gaussian.nextNormalizedDouble() * deviation
                         + offset;
-                if (value < 0)
+                if (value > this.maximum)
                 {
-                    values.add(-value);
+                    values.add(maximum);
+                }
+                else if (value < minimum)
+                {
+                    values.add(minimum);
                 }
                 else
                 {

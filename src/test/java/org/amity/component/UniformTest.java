@@ -69,9 +69,9 @@ public class UniformTest
     {
         System.out.println("generate");
         final int eventTotal = 1000000;
-        final double offset = 5;
-        final double width = 1;
-        IFunction instance = new Uniform(offset, width);
+        final double minimum = 5;
+        final double maximum = 6;
+        IFunction instance = new Uniform(minimum, maximum);
         final List<Double> result = instance.generate(eventTotal);
         final DescriptiveStatistics statistics = new DescriptiveStatistics();
         result.stream().forEach((value) ->
@@ -80,13 +80,15 @@ public class UniformTest
         });
         final double mean = statistics.getMean();
         final double sd = statistics.getStandardDeviation();
-        final double maximum = statistics.getMax();
+        final double min = statistics.getMin();
+        final double max = statistics.getMax();
         final double error = 0.002;
         System.out.println("  Mean:" + mean);
-        System.out.println("  Standard Deviation:" + sd);
-        System.out.println("  Maximum:" + maximum);
-        assertTrue(Math.abs(mean - (2 * offset + width) / 2) < error);
-        assertTrue(offset + width > maximum);
+        System.out.println("  Maximum:" + min);
+        System.out.println("  Maximum:" + max);
+        assertTrue(Math.abs(mean - (maximum + minimum) / 2) < error);
+        assertTrue(min >= minimum);
+        assertTrue(max <= maximum);
     }
     
 }

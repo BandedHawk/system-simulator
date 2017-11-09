@@ -33,11 +33,19 @@ public class Constant implements IFunction
 
     private final double period;
 
+    /**
+     * Hidden default constructor to avoid implicit creation
+     */
     private Constant()
     {
         this.period = 0;
     }
 
+    /**
+     * Construct constant timing generator
+     * 
+     * @param offset constant time interval
+     */
     public Constant(final double offset)
     {
         this.period = offset;

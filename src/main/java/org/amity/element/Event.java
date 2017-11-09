@@ -20,6 +20,7 @@
 package org.amity.element;
 
 /**
+ * Event that interacts with system components
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
@@ -30,7 +31,11 @@ public class Event
     private double start;
     private double complete;
     private double elapsed;
+    private double executed;
 
+    /**
+     * Hidden default constructor to avoid implicit creation
+     */
     private Event()
     {
         this.label = null;
@@ -38,8 +43,14 @@ public class Event
         this.start = 0;
         this.complete = 0;
         this.elapsed = 0;
+        this.executed = 0;
     }
 
+    /**
+     * Construct labeled event
+     *
+     * @param label distinguishing name of event
+     */
     public Event(String label)
     {
         this.label = label;
@@ -47,8 +58,14 @@ public class Event
         this.start = 0;
         this.complete = 0;
         this.elapsed = 0;
+        this.executed = 0;
     }
 
+    /**
+     * Construct value copy of event
+     *
+     * @param copy event to be replicated
+     */
     public Event(Event copy)
     {
         this.label = copy.label;
@@ -56,8 +73,16 @@ public class Event
         this.start = copy.start;
         this.complete = copy.complete;
         this.elapsed = copy.elapsed;
+        this.executed = copy.executed;
     }
 
+    /**
+     * Convenience method for updating event information
+     *
+     * @param arrival time arrived at component for processing
+     * @param start time began processing by component
+     * @param complete time finished at current component
+     */
     public void setValues(final double arrival, final double start,
             final double complete)
     {
@@ -66,53 +91,111 @@ public class Event
         this.complete = complete;
     }
 
+    /**
+     *
+     * @param label distinguishing name of event
+     */
     public void setLabel(final String label)
     {
         this.label = label;
     }
 
+    /**
+     *
+     * @return distinguishing name of event
+     */
     public String getLabel()
     {
         return this.label;
     }
 
+    /**
+     *
+     * @param arrival time arrived at component for processing
+     */
     public void setArrival(final double arrival)
     {
         this.arrival = arrival;
     }
 
+    /**
+     *
+     * @return time arrived at component for processing
+     */
     public double getArrival()
     {
         return this.arrival;
     }
 
+    /**
+     *
+     * @param start time began processing by component
+     */
     public void setStart(final double start)
     {
         this.start = start;
     }
 
+    /**
+     *
+     * @return time began processing by component
+     */
     public double getStart()
     {
         return this.start;
     }
 
+    /**
+     *
+     * @param complete time finished at current component
+     */
     public void setComplete(final double complete)
     {
         this.complete = complete;
     }
 
+    /**
+     *
+     * @return time finished at current component
+     */
     public double getComplete()
     {
         return this.complete;
     }
 
+    /**
+     *
+     * @param elapsed time alive
+     */
     public void setElapsed(final double elapsed)
     {
         this.elapsed = elapsed;
     }
 
+    /**
+     *
+     * @return time alive
+     */
     public double getElapsed()
     {
         return this.elapsed;
+    }
+
+    /**
+     *
+     * @param executed time actively processed
+     */
+    public void setExecuted(final double executed)
+    {
+        this.executed = executed;
+    }
+
+    /**
+     *
+     * @return time actively processed
+     */
+    public double getExecuted()
+    {
+        return this.executed;
     }
 }

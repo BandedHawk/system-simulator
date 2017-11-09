@@ -178,4 +178,23 @@ public class EventTest
         result = instance.getElapsed();
         assertEquals(expResult, result, 0.0);
     }
+
+    /**
+     * Test of getExecuted method, of class Event.
+     */
+    @Test
+    public void testGetExecuted()
+    {
+        System.out.println("getExecuted");
+        System.out.println("  Test executed initialize");
+        final Event instance = new Event("test");
+        double expResult = 0.0;
+        double result = instance.getExecuted();
+        assertEquals(expResult, result, 0.0);
+        System.out.println("  Test setting executed");
+        expResult = 15.0;
+        instance.setExecuted(expResult);
+        result = instance.getExecuted();
+        assertEquals(expResult, result, 0.0);
+    }
 }

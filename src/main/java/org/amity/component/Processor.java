@@ -36,6 +36,9 @@ public class Processor implements IComponent
     private final IComponent next;
     private final List<Event> local;
 
+    /**
+     * Hidden default constructor to avoid implicit creation
+     */
     private Processor()
     {
         this.label = "dummy";
@@ -44,6 +47,14 @@ public class Processor implements IComponent
         this.next = null;
     }
 
+    /**
+     * Constructs operational component
+     * 
+     * @param label distinguishing name of processing component
+     * @param function model for the component based on processing time
+     * distribution characteristic
+     * @param component next component to process events after current component
+     */
     public Processor(final String label, final IFunction function,
             final IComponent component)
     {
@@ -82,10 +93,11 @@ public class Processor implements IComponent
                     final double complete = available + values.get(count);
                     final double elapsed = event.getElapsed() + complete
                             - arrival;
-                    event.setArrival(arrival);
-                    event.setStart(available);
-                    event.setComplete(complete);
+                    final double executed = event.getExecuted() + complete
+                            - available;
+                    event.setValues(arrival, available, complete);
                     event.setElapsed(elapsed);
+                    event.setExecuted(executed);
                     // Set next component availability
                     available = complete;
                     // Copy current event to local stats

@@ -35,16 +35,27 @@ public class Uniform implements IFunction
     private final double width;
     private final RandomGenerator generator = new JDKRandomGenerator();
 
+    /**
+     * Hidden default constructor to avoid implicit creation
+     */
     private Uniform()
     {
         offset = 0;
         width = 1;
     }
 
-    public Uniform(final double offset, final double width)
+    /**
+     * Construct uniform random distribution generator
+     * 
+     * @param minimum smallest time interval to be produced
+     * @param maximum largest time interval to be produced
+     */
+    public Uniform(final double minimum, final double maximum)
     {
-        this.offset = offset < 0 ? -offset : offset;
-        this.width = width < 0 ? -width : width;
+        final double max = Math.abs(maximum);
+        final double min = Math.abs(minimum);
+        this.offset = Math.min(max, min);
+        this.width = Math.abs(max - min);
     }
 
     @Override
