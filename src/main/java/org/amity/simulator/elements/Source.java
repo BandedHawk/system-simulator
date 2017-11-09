@@ -17,14 +17,14 @@
  *
  * Created on November 7, 2017
  */
-package org.amity.component;
+package org.amity.simulator.elements;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.amity.element.Event;
+import org.amity.simulator.generators.IGenerator;
 
 /**
- * Component represents an event source, generating events spaced out as
+ * Implements an event source, generating events spread out in time as
  * specified by the generation function.
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
@@ -33,7 +33,7 @@ public class Source implements IComponent
 {
 
     private final String label;
-    private final IFunction function;
+    private final IGenerator function;
     private final IComponent next;
     private int eventTotal;
     private final List<Event> local;
@@ -48,7 +48,7 @@ public class Source implements IComponent
     }
 
     public Source(final String label, final int eventTotal,
-            final IFunction function, final IComponent next)
+            final IGenerator function, final IComponent next)
     {
         this.label = label;
         this.eventTotal = eventTotal;

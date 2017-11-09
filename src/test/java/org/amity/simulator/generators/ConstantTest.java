@@ -1,5 +1,5 @@
 /*
- * UniformTest.java
+ * ConstantTest.java
  *
  * (C) Copyright 2017 Jon Barnett.
  *
@@ -17,7 +17,7 @@
  *
  * Created on November 8, 2017
  */
-package org.amity.component;
+package org.amity.simulator.generators;
 
 import java.util.List;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -29,15 +29,14 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * Tests that the resulting values follow a uniform random distribution
- * characteristic.
+ * Tests that the resulting values follow a constant characteristic.
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public class UniformTest
+public class ConstantTest
 {
     
-    public UniformTest()
+    public ConstantTest()
     {
     }
     
@@ -62,16 +61,15 @@ public class UniformTest
     }
 
     /**
-     * Test of generate method, of class Uniform.
+     * Test of generate method, of class Constant.
      */
     @Test
     public void testGenerate()
     {
         System.out.println("generate");
         final int eventTotal = 1000000;
-        final double minimum = 5;
-        final double maximum = 6;
-        IFunction instance = new Uniform(minimum, maximum);
+        final double period = 5;
+        IGenerator instance = new Constant(period);
         final List<Double> result = instance.generate(eventTotal);
         final DescriptiveStatistics statistics = new DescriptiveStatistics();
         result.stream().forEach((value) ->
@@ -80,15 +78,12 @@ public class UniformTest
         });
         final double mean = statistics.getMean();
         final double sd = statistics.getStandardDeviation();
-        final double min = statistics.getMin();
-        final double max = statistics.getMax();
+        final double maximum = statistics.getMax();
         final double error = 0.002;
         System.out.println("  Mean:" + mean);
-        System.out.println("  Maximum:" + min);
-        System.out.println("  Maximum:" + max);
-        assertTrue(Math.abs(mean - (maximum + minimum) / 2) < error);
-        assertTrue(min >= minimum);
-        assertTrue(max <= maximum);
+        System.out.println("  Standard Deviation:" + sd);
+        assertTrue(Math.abs(mean - period) < error);
+        assertTrue(sd < error);
     }
     
 }

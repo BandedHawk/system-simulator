@@ -17,16 +17,19 @@
  *
  * Created on November 8, 2017
  */
-package org.amity.component;
+package org.amity.simulator.elements;
 
+import org.amity.simulator.generators.Constant;
+import org.amity.simulator.elements.Source;
 import java.util.List;
-import org.amity.element.Event;
+import org.amity.simulator.elements.Event;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.amity.simulator.generators.IGenerator;
 
 /**
  * Tests generation of incoming events is properly populated.
@@ -70,7 +73,7 @@ public class SourceTest
         final double period = 5;
         final String label = "test";
         final int eventTotal = 3;
-        final IFunction function = new Constant(period);
+        final IGenerator function = new Constant(period);
         final IComponent instance = new Source(label, eventTotal, function, null);
         instance.simulate(null);
         final List<Event> local = instance.getLocalEvents();

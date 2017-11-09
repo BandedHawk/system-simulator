@@ -17,7 +17,7 @@
  *
  * Created on November 8, 2017
  */
-package org.amity.component;
+package org.amity.simulator.generators;
 
 import java.util.List;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -71,7 +71,7 @@ public class GaussianTest
         final int eventTotal = 1000000;
         final double maximum = 3;
         final double minimum = 1;
-        IFunction instance = new Gaussian(minimum, maximum);
+        IGenerator instance = new Gaussian(minimum, maximum);
         final List<Double> result = instance.generate(eventTotal);
         final DescriptiveStatistics statistics = new DescriptiveStatistics();
         result.stream().forEach((value) ->

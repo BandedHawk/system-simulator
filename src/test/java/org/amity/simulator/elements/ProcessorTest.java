@@ -17,16 +17,20 @@
  *
  * Created on November 8, 2017
  */
-package org.amity.component;
+package org.amity.simulator.elements;
 
+import org.amity.simulator.generators.Constant;
+import org.amity.simulator.elements.Source;
+import org.amity.simulator.elements.Processor;
 import java.util.List;
-import org.amity.element.Event;
+import org.amity.simulator.elements.Event;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.amity.simulator.generators.IGenerator;
 
 /**
  * Tests processing statistics of delay modeling a system component.
@@ -73,8 +77,8 @@ public class ProcessorTest
         final String sourceLabel = "source";
         final String label = "delay";
         final int eventTotal = 4;
-        final IFunction sourceFunction = new Constant(sourcePeriod);
-        final IFunction function = new Constant(period);
+        final IGenerator sourceFunction = new Constant(sourcePeriod);
+        final IGenerator function = new Constant(period);
         final IComponent instance = new Processor(label, function, null);
         final IComponent source =
                 new Source(sourceLabel, eventTotal, sourceFunction, instance);

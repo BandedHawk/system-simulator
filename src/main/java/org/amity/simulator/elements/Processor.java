@@ -17,14 +17,15 @@
  *
  * Created on November 6, 2017
  */
-package org.amity.component;
+package org.amity.simulator.elements;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.amity.element.Event;
+import org.amity.simulator.elements.Event;
+import org.amity.simulator.generators.IGenerator;
 
 /**
- * Implements an active processing component in a system model.
+ * Implements an active processing component in a system model
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
@@ -32,7 +33,7 @@ public class Processor implements IComponent
 {
 
     private final String label;
-    private final IFunction function;
+    private final IGenerator function;
     private final IComponent next;
     private final List<Event> local;
 
@@ -55,7 +56,7 @@ public class Processor implements IComponent
      * distribution characteristic
      * @param component next component to process events after current component
      */
-    public Processor(final String label, final IFunction function,
+    public Processor(final String label, final IGenerator function,
             final IComponent component)
     {
         this.label = label;

@@ -17,13 +17,12 @@
  *
  * Created on November 6, 2017
  */
-package org.amity.component;
+package org.amity.simulator.elements;
 
 import java.util.List;
-import org.amity.element.Event;
 
 /**
- * Definition of a system component for simulation
+ * Interface of a system component in the simulation
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
@@ -32,7 +31,8 @@ public interface IComponent
     /**
      * Access event information for events that passed through component
      * 
-     * @return chronological list of events passing through the component
+     * @return chronological list of events passing through, with global
+     * information
      */
     List<Event> getLocalEvents();
 
@@ -42,8 +42,8 @@ public interface IComponent
      * each event, as well as tracking other details such as total lifespan of
      * the event.
      * 
-     * @param events chronological list of events passing through the system
-     * model
+     * @param events chronological list of events passing through, with local
+     * information
      */
     void simulate(final List<Event> events);
 }

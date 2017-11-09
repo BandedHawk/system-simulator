@@ -1,5 +1,5 @@
 /*
- * Gaussian.java
+ * Uniform.java
  *
  * (C) Copyright 2017 Jon Barnett.
  *
@@ -15,57 +15,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Created on November 6, 2017
+ * Created on November 7, 2017
  */
-package org.amity.component;
+package org.amity.simulator.generators;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.math3.random.GaussianRandomGenerator;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
 
 /**
- * Implements generation of values that have a Gaussian random distribution.
+ * Implements generation of values that have a uniform random distribution.
  * 
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public class Gaussian implements IFunction
+public class Uniform implements IGenerator
 {
-
     private final double offset;
-    private final double deviation;
-    private final double minimum;
-    private final double maximum;
+    private final double width;
     private final RandomGenerator generator = new JDKRandomGenerator();
-    private final GaussianRandomGenerator gaussian
-            = new GaussianRandomGenerator(generator);
 
     /**
      * Hidden default constructor to avoid implicit creation
      */
-    private Gaussian()
+    private Uniform()
     {
-        this.deviation = 0;
-        this.offset = 0;
-        this.minimum = 0;
-        this.maximum = 0;
+        offset = 0;
+        width = 1;
     }
 
     /**
-     * Construct Gaussian distribution generator
+     * Construct uniform random distribution generator
      * 
      * @param minimum smallest time interval to be produced
      * @param maximum largest time interval to be produced
      */
-    public Gaussian(final double minimum, final double maximum)
+    public Uniform(final double minimum, final double maximum)
     {
         final double max = Math.abs(maximum);
         final double min = Math.abs(minimum);
-        this.minimum = Math.min(max, min);
-        this.maximum = Math.max(max, min);
-        this.deviation = Math.abs(max - min) / 10;
-        this.offset = Math.min(max, min) + deviation * 5;
+        this.offset = Math.min(max, min);
+        this.width = Math.abs(max - min);
     }
 
     @Override
@@ -76,20 +66,9 @@ public class Gaussian implements IFunction
         {
             for (int count = 0; count < eventTotal; count++)
             {
-                final double value = gaussian.nextNormalizedDouble() * deviation
+                final double value = generator.nextDouble() * width
                         + offset;
-                if (value > this.maximum)
-                {
-                    values.add(maximum);
-                }
-                else if (value < minimum)
-                {
-                    values.add(minimum);
-                }
-                else
-                {
-                    values.add(value);
-                }
+                values.add(value);
             }
         }
         return values;

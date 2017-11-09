@@ -17,10 +17,10 @@
  *
  * Created on November 6, 2017
  */
-package org.amity.element;
+package org.amity.simulator.elements;
 
 /**
- * Event that interacts with system components
+ * Element that interacts with system components
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */

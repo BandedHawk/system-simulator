@@ -17,8 +17,9 @@
  *
  * Created on November 7, 2017
  */
-package org.amity.element;
+package org.amity.simulator.elements;
 
+import org.amity.simulator.elements.Event;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

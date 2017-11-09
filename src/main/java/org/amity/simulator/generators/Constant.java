@@ -1,5 +1,5 @@
 /*
- * Uniform.java
+ * Constant.java
  *
  * (C) Copyright 2017 Jon Barnett.
  *
@@ -17,45 +17,38 @@
  *
  * Created on November 7, 2017
  */
-package org.amity.component;
+
+package org.amity.simulator.generators;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.math3.random.JDKRandomGenerator;
-import org.apache.commons.math3.random.RandomGenerator;
 
 /**
- * Implements generation of values that have a uniform random distribution.
- * 
+ *  Implements generation of a constant value.
+ *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public class Uniform implements IFunction
+public class Constant implements IGenerator
 {
-    private final double offset;
-    private final double width;
-    private final RandomGenerator generator = new JDKRandomGenerator();
+
+    private final double period;
 
     /**
      * Hidden default constructor to avoid implicit creation
      */
-    private Uniform()
+    private Constant()
     {
-        offset = 0;
-        width = 1;
+        this.period = 0;
     }
 
     /**
-     * Construct uniform random distribution generator
+     * Construct constant timing generator
      * 
-     * @param minimum smallest time interval to be produced
-     * @param maximum largest time interval to be produced
+     * @param offset constant time interval
      */
-    public Uniform(final double minimum, final double maximum)
+    public Constant(final double offset)
     {
-        final double max = Math.abs(maximum);
-        final double min = Math.abs(minimum);
-        this.offset = Math.min(max, min);
-        this.width = Math.abs(max - min);
+        this.period = offset;
     }
 
     @Override
@@ -64,13 +57,12 @@ public class Uniform implements IFunction
         final List<Double> values = new ArrayList<>();
         if (eventTotal > 0)
         {
+            final double value = this.period;
             for (int count = 0; count < eventTotal; count++)
             {
-                final double value = generator.nextDouble() * width
-                        + offset;
                 values.add(value);
             }
         }
         return values;
-    }
+    }    
 }
