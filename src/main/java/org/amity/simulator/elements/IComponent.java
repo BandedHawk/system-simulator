@@ -37,13 +37,17 @@ public interface IComponent
     List<Event> getLocalEvents();
 
     /**
+     * Clear persistent variables in the component model
+     */
+    void reset();
+
+    /**
      * Process a simulation of events passing through the component model,
      * marking the arrival, start of processing and completion of processing for
      * each event, as well as tracking other details such as total lifespan of
      * the event.
      * 
-     * @param events chronological list of events passing through, with local
-     * information
+     * @param event event passing through component in chronological order
      */
-    void simulate(final List<Event> events);
+    void simulate(final Event event);
 }

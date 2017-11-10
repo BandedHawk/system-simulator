@@ -72,12 +72,12 @@ public class GaussianTest
         final double maximum = 3;
         final double minimum = 1;
         IGenerator instance = new Gaussian(minimum, maximum);
-        final List<Double> result = instance.generate(eventTotal);
         final DescriptiveStatistics statistics = new DescriptiveStatistics();
-        result.stream().forEach((value) ->
+        for (int count = 0; count < eventTotal; count++)
         {
+            final double value = instance.generate();
             statistics.addValue(value);
-        });
+        };
         final double mean = statistics.getMean();
         final double sd = statistics.getStandardDeviation();
         final double max = statistics.getMax();

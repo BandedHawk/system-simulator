@@ -21,7 +21,6 @@ package org.amity.simulator.elements;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.amity.simulator.elements.Event;
 import org.amity.simulator.generators.IGenerator;
 
 /**
@@ -36,6 +35,7 @@ public class Processor implements IComponent
     private final IGenerator function;
     private final IComponent next;
     private final List<Event> local;
+    private double available;
 
     /**
      * Hidden default constructor to avoid implicit creation
@@ -43,14 +43,15 @@ public class Processor implements IComponent
     private Processor()
     {
         this.label = "dummy";
-        this.local = new ArrayList<>();
         this.function = null;
         this.next = null;
+        this.local = new ArrayList<>();
+        this.available = 0;
     }
 
     /**
      * Constructs operational component
-     * 
+     *
      * @param label distinguishing name of processing component
      * @param function model for the component based on processing time
      * distribution characteristic
@@ -63,53 +64,43 @@ public class Processor implements IComponent
         this.function = function;
         this.next = component;
         this.local = new ArrayList<>();
+        this.available = 0;
     }
 
     @Override
-    public void simulate(final List<Event> events)
+    public void simulate(final Event event)
     {
-        // Component is immediately available
-        double available = 0;
-        if (events != null)
+        if (event != null)
         {
-            final int eventTotal = events.size();
-            if (eventTotal > 0)
-            {
-                // Generate processing times for each event queued at this
-                // component
-                final List<Double> values = function.generate(events.size());
-                for (int count = 0; count < eventTotal; count++)
-                {
-                    // Assume events in chronological order
-                    final Event event = events.get(count);
-                    // Arrival at this component is time event completed
-                    // processing at last component
-                    final double arrival = event.getComplete();
-                    // Availability of this component depends on when it
-                    // finished processing last event in queue -
-                    // it is either when the event arrived on queue or when
-                    // the component finished processing the last event
-                    available = available > arrival ? available : arrival;
-                    // Update the event for current component interaction
-                    final double complete = available + values.get(count);
-                    final double elapsed = event.getElapsed() + complete
-                            - arrival;
-                    final double executed = event.getExecuted() + complete
-                            - available;
-                    event.setValues(arrival, available, complete);
-                    event.setElapsed(elapsed);
-                    event.setExecuted(executed);
-                    // Set next component availability
-                    available = complete;
-                    // Copy current event to local stats
-                    final Event current = new Event(event);
-                    final boolean result = local.add(current);
-                }
-            }
-            if (next != null)
-            {
-                next.simulate(events);
-            }
+            // Generate processing times for this event at this component
+            final double value = function.generate();
+            // Arrival at this component is time event completed
+            // processing at last component
+            final double arrived = event.getCompleted();
+            // Availability of this component depends on when it
+            // finished processing last event in queue -
+            // it is either when the event arrived on queue or when
+            // the component finished processing the last event
+            this.available = this.available > arrived ? this.available
+                    : arrived;
+            // Update the event for current component interaction
+            final double completed = this.available + value;
+            final double elapsed = event.getElapsed() + completed
+                    - arrived;
+            final double executed = event.getExecuted() + completed
+                    - this.available;
+            event.setValues(arrived, this.available, completed);
+            event.setElapsed(elapsed);
+            event.setExecuted(executed);
+            // Set next component availability
+            this.available = completed;
+            // Copy current event to local stats
+            final Event current = new Event(event);
+            final boolean result = local.add(current);
+        }
+        if (next != null)
+        {
+            next.simulate(event);
         }
     }
 
@@ -117,5 +108,16 @@ public class Processor implements IComponent
     public List<Event> getLocalEvents()
     {
         return this.local;
+    }
+
+    @Override
+    public void reset()
+    {
+        this.local.clear();
+        this.available = 0;
+        if (this.next != null)
+        {
+            this.next.reset();
+        }
     }
 }

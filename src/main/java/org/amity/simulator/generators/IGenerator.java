@@ -35,8 +35,7 @@ public interface IGenerator
      * being used - currently supports uniform random distribution, Gaussian
      * distribution or constant value.
      *
-     * @param eventTotal number of events to be generated
-     * @return list of values based on the generation model
+     * @return value based on the generation model
      */
-    List<Double> generate(final int eventTotal);
+    double generate();
 }

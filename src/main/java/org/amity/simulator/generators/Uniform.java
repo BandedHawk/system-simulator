@@ -26,11 +26,12 @@ import org.apache.commons.math3.random.RandomGenerator;
 
 /**
  * Implements generation of values that have a uniform random distribution.
- * 
+ *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
 public class Uniform implements IGenerator
 {
+
     private final double offset;
     private final double width;
     private final RandomGenerator generator = new JDKRandomGenerator();
@@ -46,7 +47,7 @@ public class Uniform implements IGenerator
 
     /**
      * Construct uniform random distribution generator
-     * 
+     *
      * @param minimum smallest time interval to be produced
      * @param maximum largest time interval to be produced
      */
@@ -59,18 +60,9 @@ public class Uniform implements IGenerator
     }
 
     @Override
-    public List<Double> generate(final int eventTotal)
+    public double generate()
     {
-        final List<Double> values = new ArrayList<>();
-        if (eventTotal > 0)
-        {
-            for (int count = 0; count < eventTotal; count++)
-            {
-                final double value = generator.nextDouble() * width
-                        + offset;
-                values.add(value);
-            }
-        }
-        return values;
+        final double value = generator.nextDouble() * width + offset;
+        return value;
     }
 }

@@ -19,7 +19,6 @@
  */
 package org.amity.simulator.elements;
 
-import org.amity.simulator.elements.Event;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -66,21 +65,43 @@ public class EventTest
     public void testSetValues()
     {
         System.out.println("setValues");
-        final Event instance = new Event("test");
+        final Event instance = new Event("generator", "test");
         final double arrival = 10.0;
         final double start = 15.0;
         final double complete = 20.0;
         System.out.println("  Test setting values");
         instance.setValues(arrival, start, complete);
         System.out.println("    Check arrival");
-        double result = instance.getArrival();
+        double result = instance.getArrived();
         assertEquals(arrival, result, 0.0);
         System.out.println("    Check start");
-        result = instance.getStart();
+        result = instance.getStarted();
         assertEquals(start, result, 0.0);
         System.out.println("    Check complete");
-        result = instance.getComplete();
+        result = instance.getCompleted();
         assertEquals(complete, result, 0.0);
+    }
+
+    /**
+     * Test of getSource method, of class Event.
+     */
+    @Test
+    public void testGetSource()
+    {
+        System.out.println("getSource");
+        System.out.println("  Test source initialize");
+        final String source = "source";
+        final String label = "test";
+        final Event instance = new Event(source, label);
+        assertEquals(source, instance.getSource());
+        System.out.println("  Test source set");
+        final String update = "other";
+        instance.setSource(update);
+        assertEquals(update, instance.getSource());
+        System.out.println("  Test source copy");
+        instance.setSource(source);
+        final Event other = new Event(instance);
+        assertEquals(source, other.getSource());
     }
 
     /**
@@ -91,8 +112,9 @@ public class EventTest
     {
         System.out.println("getLabel");
         System.out.println("  Test label initialize");
+        final String source = "source";
         final String label = "test";
-        final Event instance = new Event(label);
+        final Event instance = new Event(source, label);
         assertEquals(label, instance.getLabel());
         System.out.println("  Test label set");
         final String update = "other";
@@ -112,14 +134,14 @@ public class EventTest
     {
         System.out.println("getArrival");
         System.out.println("  Test arrival initialize");
-        final Event instance = new Event("test");
+        final Event instance = new Event("source", "test");
         double expResult = 0.0;
-        double result = instance.getArrival();
+        double result = instance.getArrived();
         assertEquals(expResult, result, 0.0);
         System.out.println("  Test setting arrival");
         expResult = 15.0;
-        instance.setArrival(expResult);
-        result = instance.getArrival();
+        instance.setArrived(expResult);
+        result = instance.getArrived();
         assertEquals(expResult, result, 0.0);
     }
 
@@ -131,14 +153,14 @@ public class EventTest
     {
         System.out.println("getStart");
         System.out.println("  Test start initialize");
-        final Event instance = new Event("test");
+        final Event instance = new Event("source", "test");
         double expResult = 0.0;
-        double result = instance.getStart();
+        double result = instance.getStarted();
         assertEquals(expResult, result, 0.0);
         System.out.println("  Test setting start");
         expResult = 15.0;
-        instance.setStart(expResult);
-        result = instance.getStart();
+        instance.setStarted(expResult);
+        result = instance.getStarted();
         assertEquals(expResult, result, 0.0);
     }
 
@@ -150,14 +172,14 @@ public class EventTest
     {
         System.out.println("getComplete");
         System.out.println("  Test complete initialize");
-        final Event instance = new Event("test");
+        final Event instance = new Event("source", "test");
         double expResult = 0.0;
-        double result = instance.getComplete();
+        double result = instance.getCompleted();
         assertEquals(expResult, result, 0.0);
         System.out.println("  Test complete start");
         expResult = 15.0;
-        instance.setComplete(expResult);
-        result = instance.getComplete();
+        instance.setCompleted(expResult);
+        result = instance.getCompleted();
         assertEquals(expResult, result, 0.0);
     }
 
@@ -169,7 +191,7 @@ public class EventTest
     {
         System.out.println("getElapsed");
         System.out.println("  Test elapsed initialize");
-        final Event instance = new Event("test");
+        final Event instance = new Event("source", "test");
         double expResult = 0.0;
         double result = instance.getElapsed();
         assertEquals(expResult, result, 0.0);
@@ -188,7 +210,7 @@ public class EventTest
     {
         System.out.println("getExecuted");
         System.out.println("  Test executed initialize");
-        final Event instance = new Event("test");
+        final Event instance = new Event("source", "test");
         double expResult = 0.0;
         double result = instance.getExecuted();
         assertEquals(expResult, result, 0.0);

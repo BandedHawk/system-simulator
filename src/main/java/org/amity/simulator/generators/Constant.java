@@ -52,17 +52,8 @@ public class Constant implements IGenerator
     }
 
     @Override
-    public List<Double> generate(final int eventTotal)
+    public double generate()
     {
-        final List<Double> values = new ArrayList<>();
-        if (eventTotal > 0)
-        {
-            final double value = this.period;
-            for (int count = 0; count < eventTotal; count++)
-            {
-                values.add(value);
-            }
-        }
-        return values;
+        return this.period;
     }    
 }

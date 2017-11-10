@@ -39,26 +39,26 @@ import org.amity.simulator.generators.IGenerator;
  */
 public class ProcessorTest
 {
-    
+
     public ProcessorTest()
     {
     }
-    
+
     @BeforeClass
     public static void setUpClass()
     {
     }
-    
+
     @AfterClass
     public static void tearDownClass()
     {
     }
-    
+
     @Before
     public void setUp()
     {
     }
-    
+
     @After
     public void tearDown()
     {
@@ -80,25 +80,85 @@ public class ProcessorTest
         final IGenerator sourceFunction = new Constant(sourcePeriod);
         final IGenerator function = new Constant(period);
         final IComponent instance = new Processor(label, function, null);
-        final IComponent source =
-                new Source(sourceLabel, eventTotal, sourceFunction, instance);
-        source.simulate(null);
+        final IComponent source
+                = new Source(sourceLabel, eventTotal, sourceFunction, instance);
+        for (int count = 0; count < eventTotal; count++)
+        {
+            source.simulate(null);
+        }
         System.out.println("  check events are preserved");
         final List<Event> local = instance.getLocalEvents();
         assertTrue(local.size() == eventTotal);
         double sourceTick = 0;
         double tick = sourcePeriod;
         System.out.println("  check event statistics are correct");
-        for (final Event event: local)
+        for (final Event event : local)
         {
-            System.out.println("    " + event.getLabel() + " -> arrival: "
-                    + event.getArrival() + ", start: " + event.getStart()
-                    + ", complete: " + event.getComplete());
+            System.out.println("    " + event.getSource() + " "
+                    + event.getLabel() + " -> arrival: " + event.getArrived()
+                    + ", start: " + event.getStarted() + ", complete: "
+                    + event.getCompleted());
             sourceTick += sourcePeriod;
-            assertTrue(event.getArrival() == sourceTick);
-            assertTrue(event.getStart() == tick);
+            assertTrue(event.getArrived() == sourceTick);
+            assertTrue(event.getStarted() == tick);
             final double completeTick = tick + period;
-            assertTrue(event.getComplete() == completeTick);
+            assertTrue(event.getCompleted() == completeTick);
+            final double elapsed = completeTick - sourceTick;
+            assertTrue(event.getElapsed() == elapsed);
+            final double executed = completeTick - tick;
+            assertTrue(event.getExecuted() == executed);
+            tick = completeTick;
+        }
+    }
+
+    /**
+     * Test of reset method, of class Processor.
+     */
+    @Test
+    public void testReset()
+    {
+        System.out.println("reset");
+        System.out.println("  populate components");        
+        final double sourcePeriod = 1;
+        final double period = 2;
+        assertTrue(period > sourcePeriod);
+        final String sourceLabel = "source";
+        final String label = "delay";
+        final int eventTotal = 4;
+        final IGenerator sourceFunction = new Constant(sourcePeriod);
+        final IGenerator function = new Constant(period);
+        final IComponent instance = new Processor(label, function, null);
+        final IComponent source
+                = new Source(sourceLabel, eventTotal, sourceFunction, instance);
+        for (int count = 0; count < eventTotal; count++)
+        {
+            source.simulate(null);
+        }
+        final List<Event> local = instance.getLocalEvents();
+        assertTrue(local.size() == eventTotal);
+        System.out.println("  check reset clears events");        
+        source.reset();
+        assertTrue(local.isEmpty());
+        System.out.println("  repopulate and check events are preserved");
+        for (int count = 0; count < eventTotal; count++)
+        {
+            source.simulate(null);
+        }
+        assertTrue(local.size() == eventTotal);
+        double sourceTick = 0;
+        double tick = sourcePeriod;
+        System.out.println("  check event statistics are correct");
+        for (final Event event : local)
+        {
+            System.out.println("    " + event.getSource() + " "
+                    + event.getLabel() + " -> arrival: " + event.getArrived()
+                    + ", start: " + event.getStarted() + ", complete: "
+                    + event.getCompleted());
+            sourceTick += sourcePeriod;
+            assertTrue(event.getArrived() == sourceTick);
+            assertTrue(event.getStarted() == tick);
+            final double completeTick = tick + period;
+            assertTrue(event.getCompleted() == completeTick);
             final double elapsed = completeTick - sourceTick;
             assertTrue(event.getElapsed() == elapsed);
             final double executed = completeTick - tick;

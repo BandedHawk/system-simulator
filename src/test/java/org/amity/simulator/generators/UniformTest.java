@@ -72,12 +72,12 @@ public class UniformTest
         final double minimum = 5;
         final double maximum = 6;
         IGenerator instance = new Uniform(minimum, maximum);
-        final List<Double> result = instance.generate(eventTotal);
         final DescriptiveStatistics statistics = new DescriptiveStatistics();
-        result.stream().forEach((value) ->
+        for (int count = 0; count < eventTotal; count++)
         {
+            final double value = instance.generate();
             statistics.addValue(value);
-        });
+        };
         final double mean = statistics.getMean();
         final double sd = statistics.getStandardDeviation();
         final double min = statistics.getMin();

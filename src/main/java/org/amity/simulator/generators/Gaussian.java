@@ -27,7 +27,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 
 /**
  * Implements generation of values that have a Gaussian random distribution.
- * 
+ *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
 public class Gaussian implements IGenerator
@@ -54,7 +54,7 @@ public class Gaussian implements IGenerator
 
     /**
      * Construct Gaussian distribution generator
-     * 
+     *
      * @param minimum smallest time interval to be produced
      * @param maximum largest time interval to be produced
      */
@@ -69,29 +69,13 @@ public class Gaussian implements IGenerator
     }
 
     @Override
-    public List<Double> generate(final int eventTotal)
+    public double generate()
     {
         final List<Double> values = new ArrayList<>();
-        if (eventTotal > 0)
-        {
-            for (int count = 0; count < eventTotal; count++)
-            {
-                final double value = gaussian.nextNormalizedDouble() * deviation
-                        + offset;
-                if (value > this.maximum)
-                {
-                    values.add(maximum);
-                }
-                else if (value < minimum)
-                {
-                    values.add(minimum);
-                }
-                else
-                {
-                    values.add(value);
-                }
-            }
-        }
-        return values;
+        final double value = gaussian.nextNormalizedDouble() * deviation
+                + offset;
+        final double modifiedValue = value > this.maximum ? this.maximum
+                : value < this.minimum ? this.minimum : value;
+        return modifiedValue;
     }
 }

@@ -70,12 +70,12 @@ public class ConstantTest
         final int eventTotal = 1000000;
         final double period = 5;
         IGenerator instance = new Constant(period);
-        final List<Double> result = instance.generate(eventTotal);
         final DescriptiveStatistics statistics = new DescriptiveStatistics();
-        result.stream().forEach((value) ->
+        for (int count = 0; count < eventTotal; count++)
         {
+            final double value = instance.generate();
             statistics.addValue(value);
-        });
+        };
         final double mean = statistics.getMean();
         final double sd = statistics.getStandardDeviation();
         final double maximum = statistics.getMax();

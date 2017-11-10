@@ -26,10 +26,11 @@ package org.amity.simulator.elements;
  */
 public class Event
 {
+    private String source;
     private String label;
-    private double arrival;
-    private double start;
-    private double complete;
+    private double arrived;
+    private double started;
+    private double completed;
     private double elapsed;
     private double executed;
 
@@ -38,10 +39,11 @@ public class Event
      */
     private Event()
     {
+        this.source = null;
         this.label = null;
-        this.arrival = 0;
-        this.start = 0;
-        this.complete = 0;
+        this.arrived = 0;
+        this.started = 0;
+        this.completed = 0;
         this.elapsed = 0;
         this.executed = 0;
     }
@@ -49,14 +51,16 @@ public class Event
     /**
      * Construct labeled event
      *
+     * @param source name of source
      * @param label distinguishing name of event
      */
-    public Event(String label)
+    public Event(final String source, final String label)
     {
+        this.source = source;
         this.label = label;
-        this.arrival = 0;
-        this.start = 0;
-        this.complete = 0;
+        this.arrived = 0;
+        this.started = 0;
+        this.completed = 0;
         this.elapsed = 0;
         this.executed = 0;
     }
@@ -68,10 +72,11 @@ public class Event
      */
     public Event(Event copy)
     {
+        this.source = copy.source;
         this.label = copy.label;
-        this.arrival = copy.arrival;
-        this.start = copy.start;
-        this.complete = copy.complete;
+        this.arrived = copy.arrived;
+        this.started = copy.started;
+        this.completed = copy.completed;
         this.elapsed = copy.elapsed;
         this.executed = copy.executed;
     }
@@ -86,9 +91,27 @@ public class Event
     public void setValues(final double arrival, final double start,
             final double complete)
     {
-        this.arrival = arrival;
-        this.start = start;
-        this.complete = complete;
+        this.arrived = arrival;
+        this.started = start;
+        this.completed = complete;
+    }
+
+    /**
+     *
+     * @param source distinguishing name of source
+     */
+    public void setSource(final String source)
+    {
+        this.source = source;
+    }
+
+    /**
+     *
+     * @return distinguishing name of source
+     */
+    public String getSource()
+    {
+        return this.source;
     }
 
     /**
@@ -111,56 +134,56 @@ public class Event
 
     /**
      *
-     * @param arrival time arrived at component for processing
+     * @param arrived time arrived at component for processing
      */
-    public void setArrival(final double arrival)
+    public void setArrived(final double arrived)
     {
-        this.arrival = arrival;
+        this.arrived = arrived;
     }
 
     /**
      *
      * @return time arrived at component for processing
      */
-    public double getArrival()
+    public double getArrived()
     {
-        return this.arrival;
+        return this.arrived;
     }
 
     /**
      *
-     * @param start time began processing by component
+     * @param started time began processing by component
      */
-    public void setStart(final double start)
+    public void setStarted(final double started)
     {
-        this.start = start;
+        this.started = started;
     }
 
     /**
      *
      * @return time began processing by component
      */
-    public double getStart()
+    public double getStarted()
     {
-        return this.start;
+        return this.started;
     }
 
     /**
      *
-     * @param complete time finished at current component
+     * @param completed time finished at current component
      */
-    public void setComplete(final double complete)
+    public void setCompleted(final double completed)
     {
-        this.complete = complete;
+        this.completed = completed;
     }
 
     /**
      *
      * @return time finished at current component
      */
-    public double getComplete()
+    public double getCompleted()
     {
-        return this.complete;
+        return this.completed;
     }
 
     /**

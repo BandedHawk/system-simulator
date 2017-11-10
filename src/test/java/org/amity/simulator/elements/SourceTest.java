@@ -20,9 +20,7 @@
 package org.amity.simulator.elements;
 
 import org.amity.simulator.generators.Constant;
-import org.amity.simulator.elements.Source;
 import java.util.List;
-import org.amity.simulator.elements.Event;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -38,26 +36,26 @@ import org.amity.simulator.generators.IGenerator;
  */
 public class SourceTest
 {
-    
+
     public SourceTest()
     {
     }
-    
+
     @BeforeClass
     public static void setUpClass()
     {
     }
-    
+
     @AfterClass
     public static void tearDownClass()
     {
     }
-    
+
     @Before
     public void setUp()
     {
     }
-    
+
     @After
     public void tearDown()
     {
@@ -75,16 +73,67 @@ public class SourceTest
         final int eventTotal = 3;
         final IGenerator function = new Constant(period);
         final IComponent instance = new Source(label, eventTotal, function, null);
-        instance.simulate(null);
+        for (int count = 0; count < eventTotal; count++)
+        {
+            instance.simulate(null);
+        }
+        System.out.println("  check events are preserved");
         final List<Event> local = instance.getLocalEvents();
         assertTrue(local.size() == eventTotal);
         double tick = 0;
-        for (Event event: local)
+        System.out.println("  check event statistics are correct");
+        for (Event event : local)
         {
             tick += period;
-            assertTrue(event.getArrival() == tick);
-            assertTrue(event.getStart() == tick);
-            assertTrue(event.getComplete() == tick);
+            System.out.println("    " + event.getSource() + " "
+                    + event.getLabel() + " -> arrival: " + event.getArrived()
+                    + ", start: " + event.getStarted() + ", complete: "
+                    + event.getCompleted());
+            assertTrue(event.getArrived() == tick);
+            assertTrue(event.getStarted() == tick);
+            assertTrue(event.getCompleted() == tick);
+        }
+    }
+
+    /**
+     * Test of reset method, of class Processor.
+     */
+    @Test
+    public void testReset()
+    {
+        System.out.println("reset");
+        final double period = 5;
+        final String label = "test";
+        final int eventTotal = 3;
+        final IGenerator function = new Constant(period);
+        final IComponent instance = new Source(label, eventTotal, function, null);
+        for (int count = 0; count < eventTotal; count++)
+        {
+            instance.simulate(null);
+        }
+        final List<Event> local = instance.getLocalEvents();
+        assertTrue(local.size() == eventTotal);
+        System.out.println("  check reset clears events");        
+        instance.reset();
+        assertTrue(local.isEmpty());
+        System.out.println("  repopulate and check events are preserved");
+        for (int count = 0; count < eventTotal; count++)
+        {
+            instance.simulate(null);
+        }
+        assertTrue(local.size() == eventTotal);
+        double tick = 0;
+        System.out.println("  check event statistics are correct");
+        for (Event event : local)
+        {
+            tick += period;
+            System.out.println("    " + event.getSource() + " "
+                    + event.getLabel() + " -> arrival: " + event.getArrived()
+                    + ", start: " + event.getStarted() + ", complete: "
+                    + event.getCompleted());
+            assertTrue(event.getArrived() == tick);
+            assertTrue(event.getStarted() == tick);
+            assertTrue(event.getCompleted() == tick);
         }
     }
 }

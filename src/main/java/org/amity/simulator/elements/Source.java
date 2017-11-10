@@ -24,8 +24,8 @@ import java.util.List;
 import org.amity.simulator.generators.IGenerator;
 
 /**
- * Implements an event source, generating events spread out in time as
- * specified by the generation function.
+ * Implements an event source, generating events spread out in time as specified
+ * by the generation function.
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
@@ -35,60 +35,53 @@ public class Source implements IComponent
     private final String label;
     private final IGenerator function;
     private final IComponent next;
-    private int eventTotal;
     private final List<Event> local;
+    private int counter;
+    private double time;
 
     private Source()
     {
         this.label = "dummy";
         this.local = new ArrayList<>();
-        this.eventTotal = 0;
         this.next = null;
         this.function = null;
+        this.counter = 0;
+        this.time = 0;
     }
 
     public Source(final String label, final int eventTotal,
             final IGenerator function, final IComponent next)
     {
         this.label = label;
-        this.eventTotal = eventTotal;
-        this.function = function;
         this.next = next;
+        this.function = function;
         this.local = new ArrayList<>();
+        this.counter = 0;
+        this.time = 0;
     }
 
     @Override
-    public void simulate(final List<Event> events)
+    public void simulate(final Event injectedEvent)
     {
-        if (events == null && this.eventTotal > 0)
+        if (injectedEvent == null)
         {
-            // Cumulative event timeline
-            double counter = 0;
-            this.local.clear();
-            final List<Double> values = function.generate(eventTotal);
-            for (int count = 0; count < this.eventTotal; count++)
-            {
-                final Event event = new Event(Integer.toString(count));
-                final double value = values.get(count);
-                counter = counter + value;
-                event.setValues(counter, counter, counter);
-                this.local.add(event);
-            }
+            // Cumulative injectedEvent timeline
+            final double value = function.generate();
+            final Event event = new Event(this.label,
+                    Integer.toString(this.counter++));
+            this.time += value;
+            event.setValues(this.time, this.time, this.time);
+            this.local.add(event);
         }
-        else if (events != null)
+        else
         {
-            this.local.clear();
-            this.local.addAll(events);
-            this.eventTotal = events.size();
+            this.local.add(injectedEvent);
         }
-        if (next != null && this.eventTotal > 0)
+        if (next != null)
         {
             // Make a global copy to pass on
-            final List<Event> global = new ArrayList<>();
-            this.local.stream().map((event) -> new Event(event)).forEach((copy) ->
-            {
-                global.add(copy);
-            });
+            final Event global =
+                    new Event(this.local.get(this.local.size() - 1));
             next.simulate(global);
         }
     }
@@ -97,5 +90,17 @@ public class Source implements IComponent
     public List<Event> getLocalEvents()
     {
         return this.local;
+    }
+
+    @Override
+    public void reset()
+    {
+        this.local.clear();
+        this.counter = 0;
+        this.time = 0;
+        if (this.next != null)
+        {
+            this.next.reset();
+        }
     }
 }
