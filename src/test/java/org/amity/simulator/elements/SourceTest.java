@@ -65,9 +65,9 @@ public class SourceTest
      * Test of simulate method, of class Source.
      */
     @Test
-    public void testExecute()
+    public void testSimulate()
     {
-        System.out.println("execute");
+        System.out.println("simulate");
         final double period = 5;
         final String label = "test";
         final int eventTotal = 3;
@@ -75,7 +75,7 @@ public class SourceTest
         final IComponent instance = new Source(label, eventTotal, function, null);
         for (int count = 0; count < eventTotal; count++)
         {
-            instance.simulate(null);
+            final Event event = instance.simulate(null);
         }
         System.out.println("  check events are preserved");
         final List<Event> local = instance.getLocalEvents();
@@ -119,7 +119,11 @@ public class SourceTest
         System.out.println("  repopulate and check events are preserved");
         for (int count = 0; count < eventTotal; count++)
         {
-            instance.simulate(null);
+            final Event event = instance.simulate(null);
+            if (event == null)
+            {
+                break;
+            }
         }
         assertTrue(local.size() == eventTotal);
         double tick = 0;

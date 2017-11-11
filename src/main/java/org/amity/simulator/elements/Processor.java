@@ -68,7 +68,7 @@ public class Processor implements IComponent
     }
 
     @Override
-    public void simulate(final Event event)
+    public Event simulate(final Event event)
     {
         if (event != null)
         {
@@ -96,12 +96,12 @@ public class Processor implements IComponent
             this.available = completed;
             // Copy current event to local stats
             final Event current = new Event(event);
-            final boolean result = local.add(current);
+            current.setComponent(null);
+            final boolean result = this.local.add(current);
+            // Modify global event to next component to pass through
+            event.setComponent(this.next);
         }
-        if (next != null)
-        {
-            next.simulate(event);
-        }
+        return event;
     }
 
     @Override

@@ -47,7 +47,8 @@ public interface IComponent
      * each event, as well as tracking other details such as total lifespan of
      * the event.
      * 
-     * @param event event passing through component in chronological order
+     * @param event entity passing into component in chronological order
+     * @return entity with modified timing data due to component interaction
      */
-    void simulate(final Event event);
+    Event simulate(final Event event);
 }

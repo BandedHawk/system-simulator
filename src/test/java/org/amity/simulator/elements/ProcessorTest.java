@@ -19,6 +19,8 @@
  */
 package org.amity.simulator.elements;
 
+import java.util.Comparator;
+import java.util.LinkedList;
 import org.amity.simulator.generators.Constant;
 import org.amity.simulator.elements.Source;
 import org.amity.simulator.elements.Processor;
@@ -68,9 +70,9 @@ public class ProcessorTest
      * Test of simulate method, of class Processor.
      */
     @Test
-    public void testExecute()
+    public void testSimulate()
     {
-        System.out.println("execute");
+        System.out.println("simulate");
         final double sourcePeriod = 1;
         final double period = 2;
         assertTrue(period > sourcePeriod);
@@ -80,15 +82,31 @@ public class ProcessorTest
         final IGenerator sourceFunction = new Constant(sourcePeriod);
         final IGenerator function = new Constant(period);
         final IComponent instance = new Processor(label, function, null);
+        final LinkedList<Event> events = new LinkedList<>();
         final IComponent source
                 = new Source(sourceLabel, eventTotal, sourceFunction, instance);
         for (int count = 0; count < eventTotal; count++)
         {
-            source.simulate(null);
+            final Event event = source.simulate(null);
+            events.add(event);
+        }
+        // sort events by arrival time
+        events.sort(Comparator.comparingDouble(Event::getArrived));
+        assertTrue(events.size() == eventTotal);
+        while (events.size() > 0)
+        {
+            final Event event = events.removeFirst();
+            event.simulate();
+            if (event.getComponent() != null)
+            {
+                events.add(event);
+                events.sort(Comparator.comparingDouble(Event::getArrived));
+            }
         }
         System.out.println("  check events are preserved");
         final List<Event> local = instance.getLocalEvents();
         assertTrue(local.size() == eventTotal);
+        assertTrue(events.isEmpty());
         double sourceTick = 0;
         double tick = sourcePeriod;
         System.out.println("  check event statistics are correct");
@@ -128,11 +146,26 @@ public class ProcessorTest
         final IGenerator sourceFunction = new Constant(sourcePeriod);
         final IGenerator function = new Constant(period);
         final IComponent instance = new Processor(label, function, null);
+        final LinkedList<Event> events = new LinkedList<>();
         final IComponent source
                 = new Source(sourceLabel, eventTotal, sourceFunction, instance);
         for (int count = 0; count < eventTotal; count++)
         {
-            source.simulate(null);
+            final Event event = source.simulate(null);
+            events.add(event);
+        }
+        // sort events by arrival time
+        events.sort(Comparator.comparingDouble(Event::getArrived));
+        assertTrue(events.size() == eventTotal);
+        while (events.size() > 0)
+        {
+            final Event event = events.removeFirst();
+            event.simulate();
+            if (event.getComponent() != null)
+            {
+                events.add(event);
+                events.sort(Comparator.comparingDouble(Event::getArrived));
+            }
         }
         final List<Event> local = instance.getLocalEvents();
         assertTrue(local.size() == eventTotal);
@@ -142,9 +175,24 @@ public class ProcessorTest
         System.out.println("  repopulate and check events are preserved");
         for (int count = 0; count < eventTotal; count++)
         {
-            source.simulate(null);
+            final Event event = source.simulate(null);
+            events.add(event);
+        }
+        // sort events by arrival time
+        events.sort(Comparator.comparingDouble(Event::getArrived));
+        assertTrue(events.size() == eventTotal);
+        while (events.size() > 0)
+        {
+            final Event event = events.removeFirst();
+            event.simulate();
+            if (event.getComponent() != null)
+            {
+                events.add(event);
+                events.sort(Comparator.comparingDouble(Event::getArrived));
+            }
         }
         assertTrue(local.size() == eventTotal);
+        assertTrue(events.isEmpty());
         double sourceTick = 0;
         double tick = sourcePeriod;
         System.out.println("  check event statistics are correct");

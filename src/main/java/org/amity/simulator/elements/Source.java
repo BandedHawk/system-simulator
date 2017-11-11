@@ -61,7 +61,7 @@ public class Source implements IComponent
     }
 
     @Override
-    public void simulate(final Event injectedEvent)
+    public Event simulate(final Event injectedEvent)
     {
         if (injectedEvent == null)
         {
@@ -77,13 +77,11 @@ public class Source implements IComponent
         {
             this.local.add(injectedEvent);
         }
-        if (next != null)
-        {
-            // Make a global copy to pass on
-            final Event global =
-                    new Event(this.local.get(this.local.size() - 1));
-            next.simulate(global);
-        }
+        // Make a global copy to pass on
+        final Event global =
+                new Event(this.local.get(this.local.size() - 1));
+        global.setComponent(this.next);
+        return global;
     }
 
     @Override

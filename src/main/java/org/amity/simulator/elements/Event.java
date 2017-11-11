@@ -33,6 +33,7 @@ public class Event
     private double completed;
     private double elapsed;
     private double executed;
+    private IComponent component;
 
     /**
      * Hidden default constructor to avoid implicit creation
@@ -46,6 +47,7 @@ public class Event
         this.completed = 0;
         this.elapsed = 0;
         this.executed = 0;
+        this.component = null;
     }
 
     /**
@@ -63,6 +65,7 @@ public class Event
         this.completed = 0;
         this.elapsed = 0;
         this.executed = 0;
+        this.component = null;
     }
 
     /**
@@ -79,6 +82,7 @@ public class Event
         this.completed = copy.completed;
         this.elapsed = copy.elapsed;
         this.executed = copy.executed;
+        this.component = copy.component;
     }
 
     /**
@@ -220,5 +224,34 @@ public class Event
     public double getExecuted()
     {
         return this.executed;
+    }
+
+    /**
+     * 
+     * @param component current system element event is at
+     */
+    public void setComponent(final IComponent component)
+    {
+        this.component = component;
+    }
+
+    /**
+     * 
+     * @return current system element event is at
+     */
+    public IComponent getComponent()
+    {
+        return this.component;
+    }
+
+    /**
+     * Simulate event passing through component
+     */
+    public void simulate()
+    {
+        if (component != null)
+        {
+            this.component.simulate(this);
+        }
     }
 }
