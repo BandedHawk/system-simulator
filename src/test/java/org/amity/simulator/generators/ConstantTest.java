@@ -19,7 +19,6 @@
  */
 package org.amity.simulator.generators;
 
-import java.util.List;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.junit.After;
 import org.junit.AfterClass;

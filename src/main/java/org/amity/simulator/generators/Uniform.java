@@ -19,8 +19,6 @@
  */
 package org.amity.simulator.generators;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
 

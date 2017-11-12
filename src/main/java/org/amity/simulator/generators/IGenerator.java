@@ -19,8 +19,6 @@
  */
 package org.amity.simulator.generators;
 
-import java.util.List;
-
 /**
  * Interface for the random distribution model that generates values in the
  * system simulation
