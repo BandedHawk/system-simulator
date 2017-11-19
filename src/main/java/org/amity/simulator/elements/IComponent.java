@@ -51,4 +51,22 @@ public interface IComponent
      * @return entity with modified timing data due to component interaction
      */
     Event simulate(final Event event);
+
+    /**
+     * 
+     * @return downstream processing component
+     */
+    IComponent getNext();
+
+    /**
+     * 
+     * @param next downstream processing component
+     */
+    void setNext(IComponent next);
+
+    /**
+     * 
+     * @return name of downstream processing component
+     */
+    String getNextReference();
 }

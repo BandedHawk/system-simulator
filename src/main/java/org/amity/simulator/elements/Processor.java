@@ -33,7 +33,8 @@ public class Processor implements IComponent
 
     private final String label;
     private final IGenerator function;
-    private final IComponent next;
+    private IComponent next;
+    private final String nextReference;
     private final List<Event> local;
     private double available;
 
@@ -44,9 +45,10 @@ public class Processor implements IComponent
     {
         this.label = "dummy";
         this.function = null;
-        this.next = null;
+        this.nextReference = null;
         this.local = new ArrayList<>();
         this.available = 0;
+        this.next  = null;
     }
 
     /**
@@ -55,16 +57,18 @@ public class Processor implements IComponent
      * @param label distinguishing name of processing component
      * @param function model for the component based on processing time
      * distribution characteristic
-     * @param component next component to process events after current component
+     * @param component name of next component to process events after current
+     * component
      */
     public Processor(final String label, final IGenerator function,
-            final IComponent component)
+            String component)
     {
         this.label = label;
         this.function = function;
-        this.next = component;
+        this.nextReference = component;
         this.local = new ArrayList<>();
         this.available = 0;
+        this.next = null;
     }
 
     @Override
@@ -119,5 +123,23 @@ public class Processor implements IComponent
         {
             this.next.reset();
         }
+    }
+
+    @Override
+    public IComponent getNext()
+    {
+        return this.next;
+    }
+
+    @Override
+    public void setNext(final IComponent next)
+    {
+        this.next = next;
+    }
+
+    @Override
+    public String getNextReference()
+    {
+        return this.nextReference;
     }
 }

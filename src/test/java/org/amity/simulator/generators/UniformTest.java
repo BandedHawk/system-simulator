@@ -76,7 +76,7 @@ public class UniformTest
         {
             final double value = instance.generate();
             statistics.addValue(value);
-        };
+        }
         final double mean = statistics.getMean();
         final double sd = statistics.getStandardDeviation();
         final double min = statistics.getMin();

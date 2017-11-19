@@ -34,7 +34,8 @@ public class Source implements IComponent
 
     private final String label;
     private final IGenerator function;
-    private final IComponent next;
+    private IComponent next;
+    private final String nextReference;
     private final List<Event> local;
     private int counter;
     private double time;
@@ -43,21 +44,23 @@ public class Source implements IComponent
     {
         this.label = "dummy";
         this.local = new ArrayList<>();
-        this.next = null;
+        this.nextReference = null;
         this.function = null;
         this.counter = 0;
         this.time = 0;
+        this.next = null;
     }
 
-    public Source(final String label, final int eventTotal,
-            final IGenerator function, final IComponent next)
+    public Source(final String label, final IGenerator function,
+            final String component)
     {
         this.label = label;
-        this.next = next;
+        this.nextReference = component;
         this.function = function;
         this.local = new ArrayList<>();
         this.counter = 0;
         this.time = 0;
+        this.next = null;
     }
 
     @Override
@@ -100,5 +103,23 @@ public class Source implements IComponent
         {
             this.next.reset();
         }
+    }
+
+    @Override
+    public IComponent getNext()
+    {
+        return this.next;
+    }
+
+    @Override
+    public void setNext(final IComponent next)
+    {
+        this.next = next;
+    }
+
+    @Override
+    public String getNextReference()
+    {
+        return this.nextReference;
     }
 }

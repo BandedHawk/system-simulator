@@ -1,0 +1,24 @@
+component 
+{// declare source
+    type: source
+    name: source
+    function
+    {
+        type: gaussian
+        minimum: 5
+        maximum: 6
+    }
+    next: processor 1
+} // end declaration
+component
+{
+    type: processor
+    name: processor 1
+    function // 
+    {
+        type: uniform
+        maximum: 5
+        maximum: 6
+    }
+}
+// end

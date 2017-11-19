@@ -81,7 +81,8 @@ public class ProcessorTest
         final IComponent instance = new Processor(label, function, null);
         final LinkedList<Event> events = new LinkedList<>();
         final IComponent source
-                = new Source(sourceLabel, eventTotal, sourceFunction, instance);
+                = new Source(sourceLabel, sourceFunction, label);
+        source.setNext(instance);
         for (int count = 0; count < eventTotal; count++)
         {
             final Event event = source.simulate(null);
@@ -145,7 +146,8 @@ public class ProcessorTest
         final IComponent instance = new Processor(label, function, null);
         final LinkedList<Event> events = new LinkedList<>();
         final IComponent source
-                = new Source(sourceLabel, eventTotal, sourceFunction, instance);
+                = new Source(sourceLabel, sourceFunction, label);
+        source.setNext(instance);
         for (int count = 0; count < eventTotal; count++)
         {
             final Event event = source.simulate(null);
