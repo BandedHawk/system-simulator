@@ -102,12 +102,13 @@ public class Builder
                                 = section.substring(matcher.start(),
                                         matcher.end()).trim();
                         position += matcher.end();
+                        final int start = position - match.length() + 1;
                         // ignore comments
                         if (!syntax.equals(Syntax.COMMENT))
                         {
                             final Token token
                                     = new Token(match, syntax,
-                                            tracker.lineNumber, position);
+                                            tracker.lineNumber, start);
                             tracker.tokens.add(token);
                         }
                         if (syntax.equals(Syntax.CLOSE))

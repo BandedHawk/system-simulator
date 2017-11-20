@@ -32,8 +32,8 @@ import java.util.regex.Pattern;
  */
 public class Vocabulary
 {
-    public final static Map<String, Map<String, Definition>>[] DEFINITIONS;
-    public final static List<String>[] DECLARATIONS;
+    private final static Map<String, Map<String, Definition>>[] DEFINITIONS;
+    private final static List<String>[] DECLARATIONS;
     public final static String TYPE_NAME = "type";
     public final static Pattern TYPE_PATTERN;
     public final static String MAXIMUM = "maximum";
@@ -82,5 +82,41 @@ public class Vocabulary
         DECLARATIONS = (List<String>[]) new List[2];
         DECLARATIONS[0] = components;
         DECLARATIONS[1] = subcomponents;
+    }
+
+    /**
+     * 
+     * @param key
+     * @param depth
+     * @return 
+     */
+    public static boolean containsDefinition(final String key,
+            final int depth)
+    {
+        return Vocabulary.DEFINITIONS[depth].containsKey(key);
+    }
+
+    /**
+     * 
+     * @param key
+     * @param depth
+     * @return 
+     */
+    public static Map<String, Definition> get(final String key,
+            final int depth)
+    {
+        return Vocabulary.DEFINITIONS[depth].get(key);
+    }
+
+    /**
+     * 
+     * @param key
+     * @param depth
+     * @return 
+     */
+    public static boolean containsDeclaration(final String key,
+            final int depth)
+    {
+        return Vocabulary.DECLARATIONS[depth].contains(key);
     }
 }

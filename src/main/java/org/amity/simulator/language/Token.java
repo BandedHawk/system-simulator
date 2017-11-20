@@ -41,7 +41,7 @@ public class Token
     private final int line;
     private final int position;
     private Token next;
-    private Scratchpad[] scratchpad;
+    private ScratchPad[] scratch;
 
     /**
      * Hidden default constructor to avoid implicit creation
@@ -53,7 +53,7 @@ public class Token
         this.position = 0;
         this.line = 0;
         this.next = null;
-        this.scratchpad = null;
+        this.scratch = null;
     }
 
     /**
@@ -71,7 +71,7 @@ public class Token
         this.position = position;
         this.line = line;
         this.next = null;
-        this.scratchpad = null;
+        this.scratch = null;
     }
 
     /**
@@ -148,20 +148,20 @@ public class Token
      */
     public void compile()
     {
-        if (this.scratchpad == null)
+        if (this.scratch == null)
         {
-            this.scratchpad = (Scratchpad[]) new Scratchpad[3];
-            this.scratchpad[0] = new Scratchpad(0);
-            this.scratchpad[1] = new Scratchpad(1);
-            this.scratchpad[2] = new Scratchpad(2);
+            this.scratch = (ScratchPad[]) new ScratchPad[3];
+            this.scratch[0] = new ScratchPad(0);
+            this.scratch[1] = new ScratchPad(1);
+            this.scratch[2] = new ScratchPad(2);
         }
-        this.compile(this.scratchpad[0]);
+        this.compile(this.scratch[0]);
         // Resolve downstream references
-        final Scratchpad local = this.scratchpad[0];
-        if (local.success)
+        final ScratchPad local = this.scratch[0];
+        if (local.ok())
         {
             final Map<String, IComponent> components =
-                    scratchpad[1].components;
+                    scratch[1].components;
             final Map<String, List<IComponent>> references = new HashMap<>();
             // Determine references to resolve
             for (final IComponent component: components.values())
@@ -187,11 +187,10 @@ public class Token
                     // Make sure we don't connect to a source component
                     if (component instanceof Source)
                     {
-                        local.success = false;
                         final StringBuilder error =
                                 new StringBuilder(reference);
                         error.append(" is a source and cannot be downstream");
-                        local.errors.add(error.toString());
+                        local.addError(error.toString());
                     }
                     // Resolve references
                     else
@@ -205,17 +204,16 @@ public class Token
                 }
                 else
                 {
-                    local.success = false;
                     final StringBuilder error =
                             new StringBuilder(reference);
                     error.append(" is not defined");
-                    local.errors.add(error.toString());
+                    local.addError(error.toString());
                 }
             }
         }
-        if (!local.success)
+        if (!local.ok())
         {
-            for (final String error : local.errors)
+            for (final String error : local.errors())
             {
                 System.out.println(error);
             }
@@ -226,7 +224,7 @@ public class Token
      *
      * @param local
      */
-    private void compile(final Scratchpad local)
+    private void compile(final ScratchPad local)
     {
         final Token token = this;
         final Token nextToken = this.next;
@@ -242,55 +240,48 @@ public class Token
                     {
                         case OPEN:
                             // Word unknown in vocabulary for declaration
-                            if (!Vocabulary.DECLARATIONS[local.depth]
-                                    .contains(local.label))
+                            if (!Vocabulary.containsDeclaration(local.label,
+                                    local.depth))
                             {
-                                local.success = false;
                                 final StringBuilder error =
                                         new StringBuilder(token.value);
                                 error.append(" is not recognised at ");
                                 error.append(token.line).append(", ")
                                         .append(token.position);
-                                local.errors.add(error.toString());
+                                local.addError(error.toString());
                             }
                             break;
                         case ASSIGN:
                             break;
                         default:
-                            local.success = false;
                             final StringBuilder error =
                                     new StringBuilder(nextToken.value);
                             error.append(" is unexpected at ");
                             error.append(nextToken.line).append(", ")
                                     .append(nextToken.position);
-                            local.errors.add(error.toString());
+                            local.addError(error.toString());
                             break;
                     }
                 }
                 else
                 {
-                    local.success = false;
                     final StringBuilder error =
                             new StringBuilder("Expected token following ");
                     error.append(token.line).append(", ")
                             .append(token.position);
-                    local.errors.add(error.toString());
+                    local.addError(error.toString());
                 }
                 break;
             case VALUE:
-                local.names.put(local.label, local.labelToken);
-                local.values.put(local.label, token);
+                local.put(local.labelToken, token);
                 break;
             case CLOSE:
-                this.compileObject(this.scratchpad[local.depth]);
+                this.compileObject(this.scratch[local.depth]);
                 current -= 1;
-                // Copy error and error status to upper scratchpad
-                this.scratchpad[current].success =
-                        this.scratchpad[current].success && local.success;
-                this.scratchpad[current].errors.addAll(local.errors);
+                // Copy errors to upper scratch
+                this.scratch[current].addErrors(local.errors());
                 // clear local errors
-                local.errors.clear();
-                local.success = true;
+                local.clearErrors();
                 break;
             case OPEN:
                 current += 1;
@@ -299,11 +290,11 @@ public class Token
             default:
                 break;
         }
-        // move to next token and the appropriate scratchpad by nesting level
+        // move to next token and the appropriate scratch by nesting level
         if (nextToken != null)
         {
-            nextToken.scratchpad = this.scratchpad;
-            nextToken.compile(this.scratchpad[current]);
+            nextToken.scratch = this.scratch;
+            nextToken.compile(this.scratch[current]);
         }
     }
 
@@ -311,53 +302,46 @@ public class Token
      * 
      * @param local 
      */
-    private void compileObject(final Scratchpad local)
+    private void compileObject(final ScratchPad local)
     {
         final Token token = this;
-        if (local.names.containsKey(Vocabulary.TYPE_NAME))
+        if (local.containsName(Vocabulary.TYPE_NAME))
         {
-            final String type = local.values
-                    .get(Vocabulary.TYPE_NAME).getValue();
-            if (Vocabulary.DEFINITIONS[local.depth - 1].containsKey(type))
+            final String type = local.value(Vocabulary.TYPE_NAME);
+            if (Vocabulary.containsDefinition(type, local.depth - 1))
             {
                 final Map<String, Definition> parameters
-                        = Vocabulary.DEFINITIONS[local.depth - 1]
-                        .get(type);
+                        = Vocabulary.get(type, local.depth - 1);
                 final Map<String, String> pairs = new HashMap<>();
-                for (final String name : local.values.keySet())
+                for (final String name : local.values())
                 {
                     if (parameters.containsKey(name))
                     {
-                        final String pairValue = local.values.get(name)
-                                .getValue();
+                        final String pairValue = local.value(name);
                         final Matcher matcher = parameters.get(name)
                                 .getPattern().matcher(pairValue);
                         if (matcher.find())
                         {
                             pairs.put(name, pairValue);
                         }
-                        else
                         // Parameter value does not match requirements
+                        else
                         {
-                            local.success = false;
                             final StringBuilder error =
                                     new StringBuilder(name);
                             error.append(" does not have a valid value at ");
-                            error.append(local.values.get(name).line)
-                                    .append(", ")
-                                    .append(local.values.get(name).position);
-                            local.errors.add(error.toString());
+                            error.append(local.location(name));
+                            local.addError(error.toString());
                         }
                     }
                     else if (!name.equals(Vocabulary.TYPE_NAME))
                     {
-                        local.success = false;
                         final StringBuilder error =
                                 new StringBuilder(name);
                         error.append(" is not a valid parameter at ");
                         error.append(token.line).append(", ")
                                 .append(token.position);
-                        local.errors.add(error.toString());
+                        local.addError(error.toString());
                     }
                 }
                 for (final String parameter : parameters.keySet())
@@ -365,26 +349,25 @@ public class Token
                     if (parameters.get(parameter).getMandatory())
                     {
                         final boolean specified
-                                = local.values.containsKey(parameter);
+                                = local.containsName(parameter);
                         if (!specified)
                         {
-                            local.success = false;
                             final StringBuilder error =
                                     new StringBuilder("Mandatory parameter ");
                             error.append(parameter)
                                     .append(" was not defined at ");
                             error.append(token.line).append(", ")
                                     .append(token.position);
-                            local.errors.add(error.toString());
+                            local.addError(error.toString());
                         }
                     }
                 }
                 // Only compile if there have been no errors
-                if (local.success)
+                if (local.ok())
                 {
                     // Get generators for the component being compiled
                     List<IGenerator> functions = local.depth == 1
-                            ? this.scratchpad[local.depth + 1].functions : null;
+                            ? this.scratch[local.depth + 1].functions : null;
                     switch (type)
                     {
                         case Vocabulary.SOURCE:
@@ -421,76 +404,29 @@ public class Token
                     }
                 }
             }
+            else
+            {
+                final StringBuilder error =
+                        new StringBuilder("Unrecognized type ");
+                error.append(type).append(" at ")
+                        .append(local.location(Vocabulary.TYPE_NAME));
+                local.addError(error.toString());
+            }
         }
         else
         {
-            local.success = false;
             final StringBuilder error =
                     new StringBuilder("Did not specify a type at ");
             error.append(token.line).append(", ")
                     .append(token.position);
-            local.errors.add(error.toString());
+            local.addError(error.toString());
         }
-        local.names.clear();
-        local.values.clear();
-        // Clear generator scratchpad after injection into components
+        // clear stored pairs
+        local.clear();
+        // Clear generator scratch after injection into components
         if (local.depth == 1)
         {
-            this.scratchpad[local.depth + 1].functions.clear();
-        }
-    }
-
-    /**
-     * Internal storage for tracking compilation state
-     */
-    private class Scratchpad
-    {
-
-        private final int depth;
-        private String label;
-        private Token labelToken;
-        private boolean success;
-        private final Map<String, Token> names;
-        private final Map<String, Token> values;
-        private final Map<String, IComponent> sources;
-        private final Map<String, IComponent> components;
-        private final List<IGenerator> functions;
-        private final List<String> errors;
-
-        /**
-         * Default constructor - not used
-         */
-        private Scratchpad()
-        {
-            this.depth = 0;
-            this.label = null;
-            this.labelToken = null;
-            this.success = true;
-            this.names = new HashMap<>();
-            this.values = new HashMap<>();
-            this.sources = new HashMap<>();
-            this.components = new HashMap<>();
-            this.functions = new ArrayList<>();
-            this.errors = new ArrayList<>();
-        }
-
-        /**
-         * Constructor that notes the nesting for the processing
-         *
-         * @param depth level of nesting
-         */
-        private Scratchpad(final int depth)
-        {
-            this.depth = depth;
-            this.label = null;
-            this.labelToken = null;
-            this.success = true;
-            this.names = new HashMap<>();
-            this.values = new HashMap<>();
-            this.sources = new HashMap<>();
-            this.components = new HashMap<>();
-            this.functions = new ArrayList<>();
-            this.errors = new ArrayList<>();
+            this.scratch[local.depth + 1].functions.clear();
         }
     }
 }
