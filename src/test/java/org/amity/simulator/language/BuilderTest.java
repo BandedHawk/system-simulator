@@ -108,7 +108,7 @@ public class BuilderTest
         {
             assertTrue(false);
         }
-        token.assemble();
+        token.compile();
         assertTrue(true);
     }
     

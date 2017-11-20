@@ -122,4 +122,10 @@ public class Source implements IComponent
     {
         return this.nextReference;
     }
+
+    @Override
+    public String getLabel()
+    {
+        return label;
+    }
 }

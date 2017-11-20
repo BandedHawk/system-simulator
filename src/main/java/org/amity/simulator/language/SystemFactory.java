@@ -19,11 +19,15 @@
  */
 package org.amity.simulator.language;
 
+import java.util.List;
 import java.util.Map;
 import org.amity.simulator.elements.IComponent;
 import org.amity.simulator.elements.Processor;
 import org.amity.simulator.elements.Source;
+import org.amity.simulator.generators.Constant;
+import org.amity.simulator.generators.Gaussian;
 import org.amity.simulator.generators.IGenerator;
+import org.amity.simulator.generators.Uniform;
 
 /**
  * Declares methods for producing system simulation component instances
@@ -36,11 +40,11 @@ public class SystemFactory
     /**
      * 
      * @param pairs
-     * @param function
+     * @param functions
      * @return 
      */
     public final static IComponent getSource(final Map<String, String> pairs,
-            IGenerator function)
+            List<IGenerator> functions)
     {
         String label = null;
         String nextReference = null;
@@ -49,26 +53,27 @@ public class SystemFactory
             switch (parameter)
             {
                 case Vocabulary.NAME:
-                    label = pairs.get(label);
+                    label = pairs.get(parameter);
                     break;
                 case Vocabulary.NEXT:
-                    nextReference = pairs.get(label);
+                    nextReference = pairs.get(parameter);
                 default:
                     break;
             }
         }
-        final IComponent source = new Source(label, function, nextReference);
+        final IComponent source = new Source(label, functions.get(0),
+                nextReference);
         return source;
     }
 
     /**
      * 
      * @param pairs
-     * @param function
+     * @param functions
      * @return 
      */
     public final static IComponent getProcessor(final Map<String, String> pairs,
-            IGenerator function)
+            final List<IGenerator> functions)
     {
         String label = null;
         String nextReference = null;
@@ -77,16 +82,96 @@ public class SystemFactory
             switch (parameter)
             {
                 case Vocabulary.NAME:
-                    label = pairs.get(label);
+                    label = pairs.get(parameter);
                     break;
                 case Vocabulary.NEXT:
-                    nextReference = pairs.get(label);
+                    nextReference = pairs.get(parameter);
                 default:
                     break;
             }
         }
         final IComponent processor
-                = new Processor(label, function, nextReference);
+                = new Processor(label, functions.get(0), nextReference);
         return processor;
+    }
+
+    /**
+     * 
+     * @param pairs
+     * @return 
+     */
+    public final static IGenerator getGaussian(final Map<String, String> pairs)
+    {
+        double maximum = 0;
+        double minimum = 0;
+        for (final String parameter : pairs.keySet())
+        {
+            final String value = pairs.get(parameter);
+            switch (parameter)
+            {
+                case Vocabulary.MAXIMUM:
+                    maximum = Double.parseDouble(value);
+                    break;
+                case Vocabulary.MINIMUM:
+                    minimum = Double.parseDouble(value);
+                    break;
+                default:
+                    break;
+            }
+        }
+        final IGenerator generator = new Gaussian(minimum, maximum);
+        return generator;
+    }
+
+    /**
+     * 
+     * @param pairs
+     * @return 
+     */
+    public final static IGenerator getUniform(final Map<String, String> pairs)
+    {
+        double maximum = 0;
+        double minimum = 0;
+        for (final String parameter : pairs.keySet())
+        {
+            final String value = pairs.get(parameter);
+            switch (parameter)
+            {
+                case Vocabulary.MAXIMUM:
+                    maximum = Double.parseDouble(value);
+                    break;
+                case Vocabulary.MINIMUM:
+                    minimum = Double.parseDouble(value);
+                    break;
+                default:
+                    break;
+            }
+        }
+        final IGenerator generator = new Uniform(minimum, maximum);
+        return generator;
+    }
+
+    /**
+     * 
+     * @param pairs
+     * @return 
+     */
+    public final static IGenerator getConstant(final Map<String, String> pairs)
+    {
+        double offset = 0;
+        for (final String parameter : pairs.keySet())
+        {
+            final String value = pairs.get(parameter);
+            switch (parameter)
+            {
+                case Vocabulary.OFFSET:
+                    offset = Double.parseDouble(value);
+                    break;
+                default:
+                    break;
+            }
+        }
+        final IGenerator generator = new Constant(offset);
+        return generator;
     }
 }

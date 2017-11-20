@@ -142,4 +142,10 @@ public class Processor implements IComponent
     {
         return this.nextReference;
     }
+
+    @Override
+    public String getLabel()
+    {
+        return this.label;
+    }
 }

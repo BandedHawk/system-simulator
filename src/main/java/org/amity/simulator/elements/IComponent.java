@@ -69,4 +69,10 @@ public interface IComponent
      * @return name of downstream processing component
      */
     String getNextReference();
+
+    /**
+     * 
+     * @return name of component
+     */
+    String getLabel();
 }
