@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
  */
 public class Vocabulary
 {
-    public final static Map<String, Map<String, Pattern>>[] DEFINITIONS;
+    public final static Map<String, Map<String, Definition>>[] DEFINITIONS;
     public final static List<String>[] DECLARATIONS;
     public final static String TYPE_NAME = "type";
     public final static Pattern TYPE_PATTERN;
@@ -52,20 +52,23 @@ public class Vocabulary
     static
     {
         TYPE_PATTERN = Pattern.compile("^\\s*[a-zA-Z][\\s|\\w]*$");
-        final Map<String, Map<String, Pattern>> blocks = new HashMap<>();
-        final Map<String, Pattern> component = new HashMap<>();
-        component.put(Vocabulary.NAME,
-                Pattern.compile("^\\s*[a-zA-Z][\\s|\\w]*$"));
-        component.put(Vocabulary.NEXT,
-                Pattern.compile("^\\s*[a-zA-Z][\\s|\\w]*$"));
+        final Map<String, Map<String, Definition>> blocks = new HashMap<>();
+        final Map<String, Definition> component = new HashMap<>();
+        final Pattern words = Pattern.compile("^\\s*[a-zA-Z][\\s|\\w]*$");
+        final Pattern number = Pattern.compile("^\\d+$");
+        final Definition name = new Definition(words, true);
+        final Definition next = new Definition(words, false);
+        final Definition mandatoryNumber = new Definition(number, true);
+        component.put(Vocabulary.NAME, name);
+        component.put(Vocabulary.NEXT, next);
         blocks.put(Vocabulary.SOURCE, component);
         blocks.put(Vocabulary.PROCESSOR, component);
-        final Map<String, Map<String, Pattern>> functions = new HashMap<>();
-        final Map<String, Pattern> bounds = new HashMap<>();
-        bounds.put(Vocabulary.MAXIMUM, Pattern.compile("^\\d+$"));
-        bounds.put(Vocabulary.MINIMUM, Pattern.compile("^\\d+$"));
-        final Map<String, Pattern> offset = new HashMap<>();
-        offset.put(Vocabulary.OFFSET, Pattern.compile("^\\d+$"));
+        final Map<String, Map<String, Definition>> functions = new HashMap<>();
+        final Map<String, Definition> bounds = new HashMap<>();
+        bounds.put(Vocabulary.MAXIMUM, mandatoryNumber);
+        bounds.put(Vocabulary.MINIMUM, mandatoryNumber);
+        final Map<String, Definition> offset = new HashMap<>();
+        offset.put(Vocabulary.OFFSET, mandatoryNumber);
         functions.put(Vocabulary.UNIFORM, bounds);
         functions.put(Vocabulary.CONSTANT, offset);
         functions.put(Vocabulary.GAUSSIAN, bounds);
@@ -73,7 +76,7 @@ public class Vocabulary
         components.add(Vocabulary.COMPONENT);
         final List<String> subcomponents = new ArrayList<>();
         subcomponents.add(Vocabulary.FUNCTION);
-        DEFINITIONS = (Map<String, Map<String, Pattern>>[]) new Map[2];
+        DEFINITIONS = (Map<String, Map<String, Definition>>[]) new Map[2];
         DEFINITIONS[0] = blocks;
         DEFINITIONS[1] = functions;
         DECLARATIONS = (List<String>[]) new List[2];

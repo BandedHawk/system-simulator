@@ -135,8 +135,8 @@ public class Token
     }
 
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public int size()
     {
@@ -144,7 +144,7 @@ public class Token
     }
 
     /**
-     * 
+     *
      */
     public void compile()
     {
@@ -159,8 +159,8 @@ public class Token
     }
 
     /**
-     * 
-     * @param local 
+     *
+     * @param local
      */
     private void compile(final Scratchpad local)
     {
@@ -234,9 +234,9 @@ public class Token
             System.out.println("Type: " + type);
             if (Vocabulary.DEFINITIONS[local.depth - 1].containsKey(type))
             {
-                final Map<String, Pattern> parameters
+                final Map<String, Definition> parameters
                         = Vocabulary.DEFINITIONS[local.depth - 1]
-                                .get(type);
+                        .get(type);
                 System.out.println(parameters.keySet());
                 System.out.println(local.depth - 1);
                 final Map<String, String> pairs = new HashMap<>();
@@ -244,10 +244,10 @@ public class Token
                 {
                     if (parameters.containsKey(name))
                     {
-                        final String pairValue
-                                = local.values.get(name).getValue();
-                        final Matcher matcher
-                                = parameters.get(name).matcher(pairValue);
+                        final String pairValue = local.values.get(name)
+                                .getValue();
+                        final Matcher matcher = parameters.get(name)
+                                .getPattern().matcher(pairValue);
                         if (matcher.find())
                         {
                             pairs.put(name, pairValue);
@@ -267,38 +267,61 @@ public class Token
                                 + token.line + ", " + token.position);
                     }
                 }
-                List<IGenerator> functions = local.depth == 1 ?
-                        this.scratchpad[local.depth + 1].functions : null; 
-                switch(type)
+                boolean missing = false;
+                for (final String parameter : parameters.keySet())
                 {
-                    case Vocabulary.SOURCE:
-                        final IComponent source =
-                                SystemFactory.getSource(pairs, functions);
-                        local.components.put(source.getLabel(), source);
-                        local.sources.put(source.getLabel(), source);
-                        break;
-                    case Vocabulary.PROCESSOR:
-                        final IComponent processor =
-                                SystemFactory.getProcessor(pairs, functions);
-                        local.components.put(processor.getLabel(), processor);
-                        break;
-                    case Vocabulary.UNIFORM:
-                        final IGenerator uniform =
-                                SystemFactory.getUniform(pairs);
-                        local.functions.add(uniform);
-                        break;
-                    case Vocabulary.GAUSSIAN:
-                        final IGenerator gaussian =
-                                SystemFactory.getGaussian(pairs);
-                        local.functions.add(gaussian);
-                        break;
-                    case Vocabulary.CONSTANT:
-                        final IGenerator constant =
-                                SystemFactory.getConstant(pairs);
-                        local.functions.add(constant);
-                        break;
-                    default:
-                        break;
+                    if (parameters.get(parameter).getMandatory())
+                    {
+                        final boolean specified
+                                = local.values.containsKey(parameter);
+                        if (!specified)
+                        {
+                            System.out.println("Mandatory parameter "
+                                    + parameter + " was not defined at "
+                                    + token.line + ", " + token.position);
+                            missing = missing || !specified;
+                        }
+                    }
+                }
+                if (!missing)
+                {
+                    // Get generators for the component being compiled
+                    List<IGenerator> functions = local.depth == 1
+                            ? this.scratchpad[local.depth + 1].functions : null;
+                    switch (type)
+                    {
+                        case Vocabulary.SOURCE:
+                            final IComponent source
+                                    = SystemFactory.getSource(pairs,
+                                            functions);
+                            local.components.put(source.getLabel(), source);
+                            local.sources.put(source.getLabel(), source);
+                            break;
+                        case Vocabulary.PROCESSOR:
+                            final IComponent processor
+                                    = SystemFactory.getProcessor(pairs,
+                                            functions);
+                            local.components.put(processor.getLabel(),
+                                    processor);
+                            break;
+                        case Vocabulary.UNIFORM:
+                            final IGenerator uniform
+                                    = SystemFactory.getUniform(pairs);
+                            local.functions.add(uniform);
+                            break;
+                        case Vocabulary.GAUSSIAN:
+                            final IGenerator gaussian
+                                    = SystemFactory.getGaussian(pairs);
+                            local.functions.add(gaussian);
+                            break;
+                        case Vocabulary.CONSTANT:
+                            final IGenerator constant
+                                    = SystemFactory.getConstant(pairs);
+                            local.functions.add(constant);
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
         }
@@ -348,7 +371,7 @@ public class Token
 
         /**
          * Constructor that notes the nesting for the processing
-         * 
+         *
          * @param depth level of nesting
          */
         private Scratchpad(final int depth)
