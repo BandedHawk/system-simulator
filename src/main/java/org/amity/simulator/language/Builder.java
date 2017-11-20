@@ -78,10 +78,6 @@ public class Builder
             tracker.errors.add(error);
             tracker.passed = false;
         }
-        for (final String error : tracker.errors)
-        {
-            System.out.println(error);
-        }
     }
 
     private void parseLine(final ParseTracker tracker)
@@ -139,9 +135,11 @@ public class Builder
                 }
                 if (!found)
                 {
-                    final String error = "Unexpected entry found at line "
-                            + tracker.lineNumber + " and position " + position;
-                    tracker.errors.add(error);
+                    final StringBuilder error =
+                            new StringBuilder("Unexpected entry found at ");
+                    error.append(tracker.lineNumber).append(", ")
+                            .append(position);
+                    tracker.errors.add(error.toString());
                     tracker.passed = false;
                 }
             }

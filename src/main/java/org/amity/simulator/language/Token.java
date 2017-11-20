@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.amity.simulator.elements.IComponent;
+import org.amity.simulator.elements.Source;
 import org.amity.simulator.generators.IGenerator;
 
 /**
@@ -156,6 +156,70 @@ public class Token
             this.scratchpad[2] = new Scratchpad(2);
         }
         this.compile(this.scratchpad[0]);
+        // Resolve downstream references
+        final Scratchpad local = this.scratchpad[0];
+        if (local.success)
+        {
+            final Map<String, IComponent> components =
+                    scratchpad[1].components;
+            final Map<String, List<IComponent>> references = new HashMap<>();
+            // Determine references to resolve
+            for (final IComponent component: components.values())
+            {
+                final String reference = component.getNextReference();
+                if (reference != null)
+                {
+                    final List<IComponent> list =
+                            references.containsKey(reference)
+                            ? references.get(reference) :
+                            new ArrayList<>();
+                    list.add(component);
+                    references.putIfAbsent(reference, list);
+                }
+            }
+            // Look for reference component
+            for (final String reference : references.keySet())
+            {
+                if (components.containsKey(reference))
+                {
+                    final IComponent component =
+                            components.get(reference);
+                    // Make sure we don't connect to a source component
+                    if (component instanceof Source)
+                    {
+                        local.success = false;
+                        final StringBuilder error =
+                                new StringBuilder(reference);
+                        error.append(" is a source and cannot be downstream");
+                        local.errors.add(error.toString());
+                    }
+                    // Resolve references
+                    else
+                    {
+                        for (final IComponent referee
+                                : references.get(reference))
+                        {
+                            referee.setNext(referee);
+                        }
+                    }
+                }
+                else
+                {
+                    local.success = false;
+                    final StringBuilder error =
+                            new StringBuilder(reference);
+                    error.append(" is not defined");
+                    local.errors.add(error.toString());
+                }
+            }
+        }
+        if (!local.success)
+        {
+            for (final String error : local.errors)
+            {
+                System.out.println(error);
+            }
+        }
     }
 
     /**
@@ -177,29 +241,40 @@ public class Token
                     switch (nextToken.syntax)
                     {
                         case OPEN:
+                            // Word unknown in vocabulary for declaration
                             if (!Vocabulary.DECLARATIONS[local.depth]
                                     .contains(local.label))
                             {
-                                System.out.println(token.value
-                                        + " is not recognised at "
-                                        + token.line + ", "
-                                        + token.position);
+                                local.success = false;
+                                final StringBuilder error =
+                                        new StringBuilder(token.value);
+                                error.append(" is not recognised at ");
+                                error.append(token.line).append(", ")
+                                        .append(token.position);
+                                local.errors.add(error.toString());
                             }
                             break;
                         case ASSIGN:
                             break;
                         default:
-                            System.out.println(nextToken.value
-                                    + " is unexpected at "
-                                    + nextToken.line + ", "
-                                    + nextToken.position);
+                            local.success = false;
+                            final StringBuilder error =
+                                    new StringBuilder(nextToken.value);
+                            error.append(" is unexpected at ");
+                            error.append(nextToken.line).append(", ")
+                                    .append(nextToken.position);
+                            local.errors.add(error.toString());
                             break;
                     }
                 }
                 else
                 {
-                    System.out.println("Expected token following " + token.line
-                            + ", " + token.position);
+                    local.success = false;
+                    final StringBuilder error =
+                            new StringBuilder("Expected token following ");
+                    error.append(token.line).append(", ")
+                            .append(token.position);
+                    local.errors.add(error.toString());
                 }
                 break;
             case VALUE:
@@ -207,8 +282,15 @@ public class Token
                 local.values.put(local.label, token);
                 break;
             case CLOSE:
-                this.compileObjects(this.scratchpad[local.depth]);
+                this.compileObject(this.scratchpad[local.depth]);
                 current -= 1;
+                // Copy error and error status to upper scratchpad
+                this.scratchpad[current].success =
+                        this.scratchpad[current].success && local.success;
+                this.scratchpad[current].errors.addAll(local.errors);
+                // clear local errors
+                local.errors.clear();
+                local.success = true;
                 break;
             case OPEN:
                 current += 1;
@@ -217,6 +299,7 @@ public class Token
             default:
                 break;
         }
+        // move to next token and the appropriate scratchpad by nesting level
         if (nextToken != null)
         {
             nextToken.scratchpad = this.scratchpad;
@@ -224,21 +307,22 @@ public class Token
         }
     }
 
-    private void compileObjects(final Scratchpad local)
+    /**
+     * 
+     * @param local 
+     */
+    private void compileObject(final Scratchpad local)
     {
         final Token token = this;
         if (local.names.containsKey(Vocabulary.TYPE_NAME))
         {
             final String type = local.values
                     .get(Vocabulary.TYPE_NAME).getValue();
-            System.out.println("Type: " + type);
             if (Vocabulary.DEFINITIONS[local.depth - 1].containsKey(type))
             {
                 final Map<String, Definition> parameters
                         = Vocabulary.DEFINITIONS[local.depth - 1]
                         .get(type);
-                System.out.println(parameters.keySet());
-                System.out.println(local.depth - 1);
                 final Map<String, String> pairs = new HashMap<>();
                 for (final String name : local.values.keySet())
                 {
@@ -253,21 +337,29 @@ public class Token
                             pairs.put(name, pairValue);
                         }
                         else
+                        // Parameter value does not match requirements
                         {
-                            System.out.println(name
-                                    + " does not have a valid value at "
-                                    + local.values.get(name).line + ", "
-                                    + local.values.get(name).position);
+                            local.success = false;
+                            final StringBuilder error =
+                                    new StringBuilder(name);
+                            error.append(" does not have a valid value at ");
+                            error.append(local.values.get(name).line)
+                                    .append(", ")
+                                    .append(local.values.get(name).position);
+                            local.errors.add(error.toString());
                         }
                     }
                     else if (!name.equals(Vocabulary.TYPE_NAME))
                     {
-                        System.out.println(name
-                                + " is not a valid parameter at "
-                                + token.line + ", " + token.position);
+                        local.success = false;
+                        final StringBuilder error =
+                                new StringBuilder(name);
+                        error.append(" is not a valid parameter at ");
+                        error.append(token.line).append(", ")
+                                .append(token.position);
+                        local.errors.add(error.toString());
                     }
                 }
-                boolean missing = false;
                 for (final String parameter : parameters.keySet())
                 {
                     if (parameters.get(parameter).getMandatory())
@@ -276,14 +368,19 @@ public class Token
                                 = local.values.containsKey(parameter);
                         if (!specified)
                         {
-                            System.out.println("Mandatory parameter "
-                                    + parameter + " was not defined at "
-                                    + token.line + ", " + token.position);
-                            missing = missing || !specified;
+                            local.success = false;
+                            final StringBuilder error =
+                                    new StringBuilder("Mandatory parameter ");
+                            error.append(parameter)
+                                    .append(" was not defined at ");
+                            error.append(token.line).append(", ")
+                                    .append(token.position);
+                            local.errors.add(error.toString());
                         }
                     }
                 }
-                if (!missing)
+                // Only compile if there have been no errors
+                if (local.success)
                 {
                     // Get generators for the component being compiled
                     List<IGenerator> functions = local.depth == 1
@@ -327,8 +424,12 @@ public class Token
         }
         else
         {
-            System.out.println("Did not specify a type at " + token.line
-                    + ", " + token.position);
+            local.success = false;
+            final StringBuilder error =
+                    new StringBuilder("Did not specify a type at ");
+            error.append(token.line).append(", ")
+                    .append(token.position);
+            local.errors.add(error.toString());
         }
         local.names.clear();
         local.values.clear();
@@ -348,11 +449,13 @@ public class Token
         private final int depth;
         private String label;
         private Token labelToken;
+        private boolean success;
         private final Map<String, Token> names;
         private final Map<String, Token> values;
         private final Map<String, IComponent> sources;
         private final Map<String, IComponent> components;
         private final List<IGenerator> functions;
+        private final List<String> errors;
 
         /**
          * Default constructor - not used
@@ -361,12 +464,14 @@ public class Token
         {
             this.depth = 0;
             this.label = null;
+            this.labelToken = null;
+            this.success = true;
             this.names = new HashMap<>();
             this.values = new HashMap<>();
             this.sources = new HashMap<>();
             this.components = new HashMap<>();
             this.functions = new ArrayList<>();
-            this.labelToken = null;
+            this.errors = new ArrayList<>();
         }
 
         /**
@@ -378,12 +483,14 @@ public class Token
         {
             this.depth = depth;
             this.label = null;
+            this.labelToken = null;
+            this.success = true;
             this.names = new HashMap<>();
             this.values = new HashMap<>();
             this.sources = new HashMap<>();
             this.components = new HashMap<>();
             this.functions = new ArrayList<>();
-            this.labelToken = null;
+            this.errors = new ArrayList<>();
         }
     }
 }
