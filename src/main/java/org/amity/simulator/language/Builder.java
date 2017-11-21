@@ -39,6 +39,7 @@ public class Builder
         {
             final ParseTracker tracker = new ParseTracker();
             parse(scanner, tracker);
+            // Convert from list to linked list
             if (tracker.passed && !tracker.tokens.isEmpty())
             {
                 token = tracker.tokens.get(0);
@@ -137,9 +138,9 @@ public class Builder
                 if (!found)
                 {
                     final StringBuilder error =
-                            new StringBuilder("Unexpected entry found at ");
+                            new StringBuilder("Unexpected entry found near ");
                     error.append(tracker.lineNumber).append(", ")
-                            .append(position);
+                            .append(position + 1);
                     tracker.errors.add(error.toString());
                     tracker.passed = false;
                 }

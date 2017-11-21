@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import org.amity.simulator.elements.IComponent;
+import org.amity.simulator.elements.Model;
 import org.amity.simulator.elements.Source;
 import org.amity.simulator.generators.IGenerator;
 
@@ -146,7 +147,7 @@ public class Token
     /**
      *
      */
-    public void compile()
+    public Model compile()
     {
         if (this.scratch == null)
         {
@@ -161,7 +162,7 @@ public class Token
         if (local.ok())
         {
             final Map<String, IComponent> components =
-                    scratch[1].components;
+                    this.scratch[1].components;
             final Map<String, List<IComponent>> references = new HashMap<>();
             // Determine references to resolve
             for (final IComponent component: components.values())
@@ -198,7 +199,7 @@ public class Token
                         for (final IComponent referee
                                 : references.get(reference))
                         {
-                            referee.setNext(referee);
+                            referee.setNext(component);
                         }
                     }
                 }
@@ -218,6 +219,15 @@ public class Token
                 System.out.println(error);
             }
         }
+        final Model model = new Model();
+        model.errors.addAll(local.errors());
+        if (local.ok())
+        {
+            model.compiled = true;
+            model.sources.addAll(this.scratch[1].sources.values());
+            model.components.putAll(this.scratch[1].components);
+        }
+        return model;
     }
 
     /**

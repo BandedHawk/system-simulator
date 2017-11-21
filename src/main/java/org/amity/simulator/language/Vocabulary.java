@@ -37,6 +37,7 @@ public class Vocabulary
     public final static String TYPE_NAME = "type";
     public final static Pattern TYPE_PATTERN;
     public final static String MAXIMUM = "maximum";
+    public final static String MONITOR = "monitor";
     public final static String MINIMUM = "minimum";
     public final static String OFFSET = "offset";
     public final static String UNIFORM = "uniform";
@@ -58,9 +59,11 @@ public class Vocabulary
         final Pattern number = Pattern.compile("^\\d+$");
         final Definition name = new Definition(words, true);
         final Definition next = new Definition(words, false);
+        final Definition monitor = new Definition(words, false);
         final Definition mandatoryNumber = new Definition(number, true);
         component.put(Vocabulary.NAME, name);
         component.put(Vocabulary.NEXT, next);
+        component.put(Vocabulary.MONITOR, monitor);
         blocks.put(Vocabulary.SOURCE, component);
         blocks.put(Vocabulary.PROCESSOR, component);
         final Map<String, Map<String, Definition>> functions = new HashMap<>();
