@@ -1,0 +1,21 @@
+component
+{
+    type: source
+    name: generator
+    function
+    {
+        type: constant
+        offset: 1
+    }
+    next: delay
+}
+component
+{
+    type: processor
+    name: delay
+    function
+    {
+        type: constant
+        offset: 2
+    }
+}

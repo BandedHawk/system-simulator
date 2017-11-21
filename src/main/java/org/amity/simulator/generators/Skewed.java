@@ -15,26 +15,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Created on November 6, 2017
+ * Created on November 21, 2017
  */
 package org.amity.simulator.generators;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.math3.random.GaussianRandomGenerator;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
+import org.apache.commons.math3.util.FastMath;
 
 /**
- * Implements generation of values that have a Gaussian random distribution.
+ * Implements generation of values that have a skewed Gaussian random
+ * distribution.
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public class Gaussian implements IGenerator
+public class Skewed implements IGenerator
 {
-
-    private final double offset;
-    private final double deviation;
+    private final double factor;
+    private final double middle;
     private final double minimum;
     private final double maximum;
+    private final double range;
+    private final double skew;
     private final RandomGenerator generator = new JDKRandomGenerator();
     private final GaussianRandomGenerator gaussian
             = new GaussianRandomGenerator(generator);
@@ -42,37 +47,46 @@ public class Gaussian implements IGenerator
     /**
      * Hidden default constructor to avoid implicit creation
      */
-    private Gaussian()
+    private Skewed()
     {
-        this.deviation = 0;
-        this.offset = 0;
+        this.factor = 0;
+        this.middle = 0;
         this.minimum = 0;
         this.maximum = 0;
+        this.range = 0;
+        this.skew = 0;
     }
 
     /**
-     * Construct Gaussian distribution generator
+     * Construct skewed Gaussian distribution generator
      *
      * @param minimum smallest time interval to be produced
      * @param maximum largest time interval to be produced
+     * @param skew the degree to which the values cluster around the mode
+     * @param bias the tendency of the mode to approach the min, max
+     * or midpoint value; positive values bias toward max, negative values
+     * toward min
      */
-    public Gaussian(final double minimum, final double maximum)
+    public Skewed(final double minimum, final double maximum,
+            final double skew, final double bias)
     {
         final double max = Math.abs(maximum);
         final double min = Math.abs(minimum);
         this.minimum = Math.min(max, min);
         this.maximum = Math.max(max, min);
-        this.deviation = Math.abs(max - min) / 10;
-        this.offset = Math.min(max, min) + deviation * 5;
+        this.middle = (max + min) / 2;
+        this.range = Math.abs(max - min);
+        this.skew = Math.abs(skew);
+        this.factor = FastMath.exp(bias);
     }
 
     @Override
     public double generate()
     {
-        final double value = gaussian.nextNormalizedDouble() * deviation
-                + offset;
-        final double modifiedValue = value > this.maximum ? this.maximum
-                : value < this.minimum ? this.minimum : value;
+        final List<Double> values = new ArrayList<>();
+        final double value = factor
+                + FastMath.exp(-gaussian.nextNormalizedDouble() / skew);
+        final double modifiedValue = middle + range * (factor / value - 0.5);
         return modifiedValue;
     }
 }

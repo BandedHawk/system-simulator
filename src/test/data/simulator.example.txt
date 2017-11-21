@@ -20,5 +20,33 @@ component
         minimum: 5
         maximum: 6
     }
+    monitor: No
+    next: processor 2
+}
+component
+{
+    type: processor
+    name: processor 2
+    function // 
+    {
+        type: skewed
+        minimum: 5.0
+        maximum: 6.0
+        skew: 0.8
+        bias: -3
+    }
+    monitor: Y
+    next: processor 3
+}
+component
+{
+    type: processor
+    name: processor 3
+    function // 
+    {
+        type: constant
+        offset: 1
+    }
+    monitor: yes
 }
 // end

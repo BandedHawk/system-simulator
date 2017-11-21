@@ -27,6 +27,7 @@ import org.amity.simulator.elements.Source;
 import org.amity.simulator.generators.Constant;
 import org.amity.simulator.generators.Gaussian;
 import org.amity.simulator.generators.IGenerator;
+import org.amity.simulator.generators.Skewed;
 import org.amity.simulator.generators.Uniform;
 
 /**
@@ -172,6 +173,42 @@ public class SystemFactory
             }
         }
         final IGenerator generator = new Constant(offset);
+        return generator;
+    }
+
+    /**
+     * 
+     * @param pairs
+     * @return 
+     */
+    public final static IGenerator getSkewed(final Map<String, String> pairs)
+    {
+        double maximum = 0;
+        double minimum = 0;
+        double skew = 0;
+        double bias = 0;
+        for (final String parameter : pairs.keySet())
+        {
+            final String value = pairs.get(parameter);
+            switch (parameter)
+            {
+                case Vocabulary.MAXIMUM:
+                    maximum = Double.parseDouble(value);
+                    break;
+                case Vocabulary.MINIMUM:
+                    minimum = Double.parseDouble(value);
+                    break;
+                case Vocabulary.SKEW:
+                    skew = Double.parseDouble(value);
+                    break;
+                case Vocabulary.BIAS:
+                    bias = Double.parseDouble(value);
+                    break;
+                default:
+                    break;
+            }
+        }
+        final IGenerator generator = new Skewed(minimum, maximum, skew, bias);
         return generator;
     }
 }

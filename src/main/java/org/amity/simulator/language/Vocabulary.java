@@ -36,10 +36,13 @@ public class Vocabulary
     private final static List<String>[] DECLARATIONS;
     public final static String TYPE_NAME = "type";
     public final static Pattern TYPE_PATTERN;
-    public final static String MAXIMUM = "maximum";
     public final static String MONITOR = "monitor";
+    public final static String MAXIMUM = "maximum";
     public final static String MINIMUM = "minimum";
     public final static String OFFSET = "offset";
+    public final static String SKEW = "skew";
+    public final static String BIAS = "bias";
+    public final static String SKEWED = "skewed";
     public final static String UNIFORM = "uniform";
     public final static String CONSTANT = "constant";
     public final static String GAUSSIAN = "gaussian";
@@ -56,11 +59,16 @@ public class Vocabulary
         final Map<String, Map<String, Definition>> blocks = new HashMap<>();
         final Map<String, Definition> component = new HashMap<>();
         final Pattern words = Pattern.compile("^\\s*[a-zA-Z][\\s|\\w]*$");
-        final Pattern number = Pattern.compile("^\\d+$");
+        final Pattern positiveDecimal = Pattern.compile("^\\+?\\d*\\.?\\d+$");
+        final Pattern decimal = Pattern.compile("^[\\+\\-]?\\d*\\.?\\d+$");
+        final Pattern binaryResponse = Pattern.compile("^[Yy]([Ee][Ss])*|[Nn][Oo]*$");
         final Definition name = new Definition(words, true);
         final Definition next = new Definition(words, false);
-        final Definition monitor = new Definition(words, false);
-        final Definition mandatoryNumber = new Definition(number, true);
+        final Definition monitor = new Definition(binaryResponse, false);
+        final Definition mandatoryDecimal =
+                new Definition(positiveDecimal, true);
+        final Definition biasDecimal =
+                new Definition(decimal, true);
         component.put(Vocabulary.NAME, name);
         component.put(Vocabulary.NEXT, next);
         component.put(Vocabulary.MONITOR, monitor);
@@ -68,13 +76,19 @@ public class Vocabulary
         blocks.put(Vocabulary.PROCESSOR, component);
         final Map<String, Map<String, Definition>> functions = new HashMap<>();
         final Map<String, Definition> bounds = new HashMap<>();
-        bounds.put(Vocabulary.MAXIMUM, mandatoryNumber);
-        bounds.put(Vocabulary.MINIMUM, mandatoryNumber);
+        bounds.put(Vocabulary.MAXIMUM, mandatoryDecimal);
+        bounds.put(Vocabulary.MINIMUM, mandatoryDecimal);
+        final Map<String, Definition> complex = new HashMap<>();
+        complex.put(Vocabulary.MAXIMUM, mandatoryDecimal);
+        complex.put(Vocabulary.MINIMUM, mandatoryDecimal);
+        complex.put(Vocabulary.BIAS, biasDecimal);
+        complex.put(Vocabulary.SKEW, mandatoryDecimal);
         final Map<String, Definition> offset = new HashMap<>();
-        offset.put(Vocabulary.OFFSET, mandatoryNumber);
+        offset.put(Vocabulary.OFFSET, mandatoryDecimal);
         functions.put(Vocabulary.UNIFORM, bounds);
         functions.put(Vocabulary.CONSTANT, offset);
         functions.put(Vocabulary.GAUSSIAN, bounds);
+        functions.put(Vocabulary.SKEWED, complex);
         final List<String> components = new ArrayList<>();
         components.add(Vocabulary.COMPONENT);
         final List<String> subcomponents = new ArrayList<>();

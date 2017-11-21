@@ -30,7 +30,7 @@ import org.amity.simulator.elements.Source;
 import org.amity.simulator.generators.IGenerator;
 
 /**
- * Storage for data collected during parsing against syntax
+ * Storage and processing for data collected during parsing against syntax
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
@@ -95,7 +95,7 @@ public class Token
 
     /**
      *
-     * @return
+     * @return file line location for the token
      */
     public int getLine()
     {
@@ -104,7 +104,7 @@ public class Token
 
     /**
      *
-     * @return
+     * @return location on the line for the token
      */
     public int getPosition()
     {
@@ -112,7 +112,7 @@ public class Token
     }
 
     /**
-     * Put token at the end of the double linked list
+     * Put token at the end of the linked list
      *
      * @param token item to be added to the list
      */
@@ -128,7 +128,7 @@ public class Token
 
     /**
      *
-     * @return nextToken token in double linked list
+     * @return nextToken token in linked list
      */
     public Token getNext()
     {
@@ -145,7 +145,9 @@ public class Token
     }
 
     /**
-     *
+     * Compiles the simulation model from the token chain
+     * 
+     * @return simulation model information
      */
     public Model compile()
     {
@@ -231,8 +233,10 @@ public class Token
     }
 
     /**
+     * Compilation at the nested level in the language syntax
      *
-     * @param local
+     * @param local nest level scratchpad for collecting compilation
+     * information
      */
     private void compile(final ScratchPad local)
     {
@@ -309,8 +313,10 @@ public class Token
     }
 
     /**
+     * Manufactures the actual system simulation components for the model
      * 
-     * @param local 
+     * @param local nest level scratchpad for collecting compilation
+     * information
      */
     private void compileObject(final ScratchPad local)
     {
@@ -408,6 +414,11 @@ public class Token
                             final IGenerator constant
                                     = SystemFactory.getConstant(pairs);
                             local.functions.add(constant);
+                            break;
+                        case Vocabulary.SKEWED:
+                            final IGenerator skewed
+                                    = SystemFactory.getSkewed(pairs);
+                            local.functions.add(skewed);
                             break;
                         default:
                             break;

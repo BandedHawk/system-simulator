@@ -52,6 +52,10 @@ public class Builder
                     }
                 }
             }
+            for (final String error : tracker.errors)
+            {
+                System.out.println(error);
+            }
         }
         catch (Exception exception)
         {
