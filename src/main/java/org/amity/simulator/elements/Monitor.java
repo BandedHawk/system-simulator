@@ -76,13 +76,17 @@ public class Monitor
      */
     public void displayStatistics(final IComponent component)
     {
-        waiting.clear();
-        processing.clear();
-        visiting.clear();
-        arrivals.clear();
         double last = 0;
         double idle = 0;
         double arrival = 0;
+        final boolean source = component instanceof Source;
+        if (!source)
+        {
+            waiting.clear();
+            processing.clear();
+            visiting.clear();
+        }
+        arrivals.clear();
         // Collect data into statistical services
         for (final Event event : component.getLocalEvents())
         {
@@ -100,12 +104,15 @@ public class Monitor
                 {
                     arrivals.addValue(arrived - arrival);
                 }
-                waiting.addValue(started - arrived);
-                processing.addValue(completed - started);
-                visiting.addValue(completed - arrived);
-                // time from completion of last event or start of time to
-                // time execution begins for this event
-                idle += started - FastMath.max(this .start, last);
+                if (!source)
+                {
+                    waiting.addValue(started - arrived);
+                    processing.addValue(completed - started);
+                    visiting.addValue(completed - arrived);
+                    // time from completion of last event or start of time to
+                    // time execution begins for this event
+                    idle += started - FastMath.max(this .start, last);
+                }
             }
             // last event complete time
             last = completed;
@@ -114,29 +121,37 @@ public class Monitor
         }
         // total time
         final double timespan = last - this.start;
-        final double utilization = (timespan - idle)/ timespan;
         System.out.println("Component: " + component.getLabel());
-        System.out.println("  Events processed: " + this.waiting.getN());
-        System.out.println("  Utilization: " + utilization);
-        System.out.println("  Wait time");
-        System.out.println("    Mean:" + this.waiting.getMean());
-        System.out.println("    Standard Deviation:"
-                + this.waiting.getStandardDeviation());
-        System.out.println("    Maximum: " + this.waiting.getMax());
-        System.out.println("    Minimum: " + this.waiting.getMin());
-        System.out.println("  Process time");
-        System.out.println("    Mean:" + this.processing.getMean());
-        System.out.println("    Standard Deviation:"
-                + this.processing.getStandardDeviation());
-        System.out.println("    Maximum: " + this.processing.getMax());
-        System.out.println("    Minimum: " + this.processing.getMin());
-        System.out.println("  Visit time");
-        System.out.println("    Mean:" + this.visiting.getMean());
-        System.out.println("    Standard Deviation:"
-                + this.visiting.getStandardDeviation());
-        System.out.println("    Maximum: " + this.visiting.getMax());
-        System.out.println("    Minimum: " + this.visiting.getMin());
-        System.out.println("  Arrival rate");
+        if (source)
+        {
+            System.out.println("  Events generated: " + this.waiting.getN());
+            System.out.println("  Generation rate");
+        }
+        else
+        {
+            System.out.println("  Events processed: " + this.waiting.getN());
+            final double utilization = (timespan - idle)/ timespan;
+            System.out.println("  Utilization: " + utilization);
+            System.out.println("  Wait time");
+            System.out.println("    Mean:" + this.waiting.getMean());
+            System.out.println("    Standard Deviation:"
+                    + this.waiting.getStandardDeviation());
+            System.out.println("    Maximum: " + this.waiting.getMax());
+            System.out.println("    Minimum: " + this.waiting.getMin());
+            System.out.println("  Process time");
+            System.out.println("    Mean:" + this.processing.getMean());
+            System.out.println("    Standard Deviation:"
+                    + this.processing.getStandardDeviation());
+            System.out.println("    Maximum: " + this.processing.getMax());
+            System.out.println("    Minimum: " + this.processing.getMin());
+            System.out.println("  Visit time");
+            System.out.println("    Mean:" + this.visiting.getMean());
+            System.out.println("    Standard Deviation:"
+                    + this.visiting.getStandardDeviation());
+            System.out.println("    Maximum: " + this.visiting.getMax());
+            System.out.println("    Minimum: " + this.visiting.getMin());
+            System.out.println("  Arrival rate");
+        }
         System.out.println("    Mean:" + this.arrivals.getMean());
         System.out.println("    Standard Deviation:"
                 + this.arrivals.getStandardDeviation());
