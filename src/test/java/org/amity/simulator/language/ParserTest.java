@@ -1,5 +1,5 @@
 /*
- * BuilderTest.java
+ * ParserTest.java
  *
  * (C) Copyright 2017 Jon Barnett.
  *
@@ -39,10 +39,10 @@ import static org.junit.Assert.*;
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public class BuilderTest
+public class ParserTest
 {
     
-    public BuilderTest()
+    public ParserTest()
     {
     }
     
@@ -67,14 +67,14 @@ public class BuilderTest
     }
 
     /**
-     * Test of parse method, of class Builder.
+     * Test of parse method, of class Parser.
      */
     @Test
     public void testParse()
     {
         System.out.println("parse");
         final File file = new File("src/test/data/simulator.example.txt");
-        final Builder instance = new Builder();
+        final Parser instance = new Parser();
         final Token token = instance.parse(file);
         System.out.println("  syntax rule check");
         if (token.size() > 3)

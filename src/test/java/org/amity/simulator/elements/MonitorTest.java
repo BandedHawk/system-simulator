@@ -22,7 +22,7 @@ package org.amity.simulator.elements;
 import java.io.File;
 import java.util.Comparator;
 import java.util.LinkedList;
-import org.amity.simulator.language.Builder;
+import org.amity.simulator.language.Parser;
 import org.amity.simulator.language.Token;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -71,7 +71,7 @@ public class MonitorTest
     {
         System.out.println("displayStatistics");
         final File file = new File("src/test/data/monitoring.example.txt");
-        final Builder builder = new Builder();
+        final Parser builder = new Parser();
         final Token token = builder.parse(file);
         final Model model = token.compile();
         final double sampleStart = 40;

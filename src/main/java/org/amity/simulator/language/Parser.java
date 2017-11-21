@@ -1,5 +1,5 @@
 /*
- * Builder.java
+ * Parser.java
  *
  * (C) Copyright 2017 Jon Barnett.
  *
@@ -26,12 +26,22 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 
 /**
+ * Parses file against the syntax rules for the specification
+ * language and generates tokens for further processing.
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public class Builder
+public class Parser
 {
 
+    /**
+     * Converts the text in a file to syntactically correct tokens for
+     * further processing
+     * 
+     * @param file text to be converted into tokens
+     * @return start of the linked list of tokens if the text was
+     * syntactically correct otherwise <code>null</code>
+     */
     public Token parse(final File file)
     {
         Token token = null;
@@ -68,6 +78,11 @@ public class Builder
         return token;
     }
 
+    /**
+     * 
+     * @param scanner
+     * @param tracker 
+     */
     private void parse(final Scanner scanner, final ParseTracker tracker)
     {
         while (scanner.hasNextLine())
@@ -85,6 +100,12 @@ public class Builder
         }
     }
 
+    /**
+     * Processes a line of text from the file and generates valid tokens
+     * if the text meets the syntax rules.
+     * 
+     * @param tracker 
+     */
     private void parseLine(final ParseTracker tracker)
     {
         int position = 0;
