@@ -128,4 +128,13 @@ public class Source implements IComponent
     {
         return label;
     }
+
+    @Override
+    public void generateStatistics(final Monitor monitor)
+    {
+        if (monitor != null)
+        {
+            monitor.displayStatistics(this);
+        }
+    }
 }

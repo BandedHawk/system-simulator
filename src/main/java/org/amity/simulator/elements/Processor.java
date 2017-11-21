@@ -148,4 +148,13 @@ public class Processor implements IComponent
     {
         return this.label;
     }
+
+    @Override
+    public void generateStatistics(final Monitor monitor)
+    {
+        if (monitor != null)
+        {
+            monitor.displayStatistics(this);
+        }
+    }
 }

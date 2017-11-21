@@ -58,6 +58,7 @@ public class Token
     }
 
     /**
+     * Creates a fully initialized and immutable token
      *
      * @param value
      * @param syntax
@@ -86,7 +87,7 @@ public class Token
 
     /**
      *
-     * @return
+     * @return part of language tag of the token
      */
     public Syntax getSyntax()
     {
@@ -137,7 +138,7 @@ public class Token
 
     /**
      *
-     * @return
+     * @returnl inked list length
      */
     public int size()
     {

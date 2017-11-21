@@ -1,0 +1,54 @@
+component 
+{
+    type: source
+    name: source
+    function
+    {
+        type: uniform
+        minimum: 2.0
+        maximum: 3.0
+    }
+    next: network
+}
+component
+{
+    type: processor
+    name: network
+    function // 
+    {
+        type: skewed
+        minimum: 0.25
+        maximum: 0.75
+        skew: 0.8
+        bias: -2.0
+    }
+    monitor: No
+    next: web server
+}
+component
+{
+    type: processor
+    name: web server
+    function 
+    {
+        type: skewed
+        minimum: 1.5
+        maximum: 2.5
+        skew: 0.8
+        bias: -1.0
+    }
+    next: database
+}
+component
+{
+    type: processor
+    name: database
+    function
+    {
+        type: skewed
+        minimum: 0.5
+        maximum: 1.5
+        skew: 0.8
+        bias: -3.0
+    }
+}

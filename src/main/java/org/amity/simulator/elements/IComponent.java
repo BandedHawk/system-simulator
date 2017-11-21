@@ -75,4 +75,6 @@ public interface IComponent
      * @return name of component
      */
     String getLabel();
+
+    void generateStatistics(Monitor monitor);
 }
