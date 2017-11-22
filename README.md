@@ -15,8 +15,8 @@ java -jar system-simulator-1.0-SNAPSHOT.jar -cp commons-math3-3.6.1.jar:commons-
 Help on parameters will be generated if no parameters are supplied.
 
 ## Upcoming changes to modeler
-*Addition of a load balancer component to spread events between downstream components
-*Better handling of numerical values in system specification file
+* Addition of a load balancer component to spread events between downstream components
+* Better handling of numerical values in system specification file
 
 ## Specification language
 Examples of the specification language for system components can be found in src/test/data.
