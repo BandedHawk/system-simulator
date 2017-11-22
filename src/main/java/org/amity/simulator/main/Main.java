@@ -210,75 +210,86 @@ public class Main
                 double generate = Double.parseDouble(generateText);
                 double start = Double.parseDouble(startText);
                 double end = Double.parseDouble(endText);
-                if (start > end)
-                {
-                    System.err.println("Sample start time must be lower than the sample end time");
-                    error = true;
-                }
-                if (end > generate)
-                {
-                    System.err.println("Sample end time must be less than the generate time");
-                }
-                if (!error)
-                {
-                    final Parser parser = new Parser();
-                    final Token token = parser.parse(file);
-                    if (token != null)
-                    {
-                        final Model model = token.compile();
-                        if (model.compiled)
-                        {
-                            final Monitor monitor = new Monitor(start, end);
-                            final LinkedList<Event> events = new LinkedList<>();
-                            final List<Event> completed = new ArrayList<>();
-                            for (final IComponent source : model.sources)
-                            {
-                                do
-                                {
-                                    final Event event = source.simulate(null);
-                                    if (event.getStarted() > generate)
-                                    {
-                                        break;
-                                    }
-                                    events.add(event);
-                                }
-                                while (true);
-                            }
-                            while (events.size() > 0)
-                            {
-                                final Event event = events.removeFirst();
-                                event.simulate();
-                                if (event.getComponent() == null)
-                                {
-                                    completed.add(event);
-                                }
-                                else
-                                {
-                                    events.add(event);
-                                    events.sort(Comparator.comparingDouble(Event::getArrived));
-                                }
-                            }
-                            monitor.displayStatistics(completed);
-                            for (final IComponent component : model.components.values())
-                            {
-                                component.generateStatistics(monitor);
-                            }
-                        }
-                        else
-                        {
-                            error = true;
-                        }
-                    }
-                    else
-                    {
-                        error = true;
-                    }
-                }
+                Main.run(file, generate, start, end);
             }
         }
         if (error)
         {
             System.exit(-1);
         }
+    }
+
+    private static boolean run(final File file, final double generate,
+            final double start, final double end)
+    {
+        boolean error = false;
+        if (start > end)
+        {
+            System.err.println("Sample start time must be lower than the sample end time");
+            error = true;
+        }
+        if (end > generate)
+        {
+            System.err.println("Sample end time must be less than the generate time");
+        }
+        if (!error)
+        {
+            final Parser parser = new Parser();
+            final Token token = parser.parse(file);
+            if (token != null)
+            {
+                System.out.println("Completed syntax parsing");
+                final Model model = token.compile();
+                if (model.compiled)
+                {
+                    System.out.println("Completed compilation");
+                    final Monitor monitor = new Monitor(start, end);
+                    final LinkedList<Event> events = new LinkedList<>();
+                    final List<Event> completed = new ArrayList<>();
+                    System.out.println("Start simulation");
+                    for (final IComponent source : model.sources)
+                    {
+                        do
+                        {
+                            final Event event = source.simulate(null);
+                            if (event.getStarted() > generate)
+                            {
+                                break;
+                            }
+                            events.add(event);
+                        }
+                        while (true);
+                    }
+                    while (events.size() > 0)
+                    {
+                        final Event event = events.removeFirst();
+                        event.simulate();
+                        if (event.getComponent() == null)
+                        {
+                            completed.add(event);
+                        }
+                        else
+                        {
+                            events.add(event);
+                            events.sort(Comparator.comparingDouble(Event::getArrived));
+                        }
+                    }
+                    monitor.displayStatistics(completed);
+                    for (final IComponent component : model.components.values())
+                    {
+                        component.generateStatistics(monitor);
+                    }
+                }
+                else
+                {
+                    error = true;
+                }
+            }
+            else
+            {
+                error = true;
+            }
+        }
+        return error;
     }
 }
