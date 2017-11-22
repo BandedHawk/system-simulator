@@ -148,8 +148,6 @@ public class ScratchPad
 
     public String location(final String name)
     {
-        System.out.println(this.names.keySet());
-        System.out.println(this.values.keySet());
         final String line = Integer.toString(this.values.get(name).getLine());
         StringBuilder error = new StringBuilder(line);
         error.append(", ").append(this.values.get(name).getPosition());

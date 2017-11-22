@@ -219,7 +219,7 @@ public class Token
         {
             for (final String error : local.errors())
             {
-                System.out.println(error);
+                System.err.println(error);
             }
         }
         final Model model = new Model();

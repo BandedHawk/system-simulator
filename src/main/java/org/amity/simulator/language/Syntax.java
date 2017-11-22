@@ -22,7 +22,7 @@ package org.amity.simulator.language;
 import java.util.regex.Pattern;
 
 /**
- * Defines parts of the grammar for defining system elements
+ * Defines structure of the language for defining system elements
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */

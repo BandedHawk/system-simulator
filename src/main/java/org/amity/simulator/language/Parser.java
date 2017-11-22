@@ -64,24 +64,27 @@ public class Parser
             }
             for (final String error : tracker.errors)
             {
-                System.out.println(error);
+                System.err.println(error);
             }
         }
         catch (Exception exception)
         {
-            System.out.println(exception.toString());
+            System.err.println(exception.toString());
             for (StackTraceElement element : exception.getStackTrace())
             {
-                System.out.println(element.toString());
+                System.err.println(element.toString());
             }
         }
         return token;
     }
 
     /**
+     * Splits file stream into lines and delegates to a line parser to
+     * do more granular parsing
      * 
-     * @param scanner
-     * @param tracker 
+     * @param scanner stream representation of the file
+     * @param tracker local state container for the parser for line to line
+     * continuity
      */
     private void parse(final Scanner scanner, final ParseTracker tracker)
     {
@@ -104,7 +107,8 @@ public class Parser
      * Processes a line of text from the file and generates valid tokens
      * if the text meets the syntax rules.
      * 
-     * @param tracker 
+     * @param tracker local state container for the parser for line to line
+     * continuity
      */
     private void parseLine(final ParseTracker tracker)
     {
@@ -167,12 +171,17 @@ public class Parser
                     error.append(tracker.lineNumber).append(", ")
                             .append(position + 1);
                     tracker.errors.add(error.toString());
+                    // Reset state and hope we get a re-sync eventually
+                    tracker.state = Syntax.OPEN;
                     tracker.passed = false;
                 }
             }
         }
     }
 
+    /**
+     * State container to supporting parsing of the file
+     */
     private class ParseTracker
     {
 
@@ -184,6 +193,9 @@ public class Parser
         private boolean passed;
         private int depth;
 
+        /**
+         * Constructor to configure initial parsing state
+         */
         private ParseTracker()
         {
             this.state = Syntax.START;

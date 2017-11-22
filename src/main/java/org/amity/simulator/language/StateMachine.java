@@ -81,7 +81,13 @@ public class StateMachine
         }
     }
 
-    public static List<Syntax> getOptions(Syntax state)
+    /**
+     * Retrieve possible next states, given current state
+     * 
+     * @param state current condition of the parsing system
+     * @return valid states to traverse
+     */
+    public static List<Syntax> getOptions(final Syntax state)
     {
         return MACHINE.get(state);
     }
