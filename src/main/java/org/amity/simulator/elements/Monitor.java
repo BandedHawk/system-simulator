@@ -87,6 +87,8 @@ public class Monitor
         double last = 0;
         double idle = 0;
         double arrival = 0;
+        double startPeriod = 0;
+        boolean counted = false;
         final boolean source = component instanceof Source;
         if (!source)
         {
@@ -113,6 +115,11 @@ public class Monitor
                 }
                 if (!source)
                 {
+                    if (!counted)
+                    {
+                        startPeriod = arrived;
+                        counted = true;
+                    }
                     this.waiting.addValue(started - arrived);
                     this.processing.addValue(completed - started);
                     this.visiting.addValue(completed - arrived);
@@ -128,17 +135,22 @@ public class Monitor
         }
         // total time
         final double timespan = last - this.start;
+        // throughput based on arrival of first event to completion of
+        // last event
+        final double throughput = this.arrivals.getN() / (last - startPeriod);
         System.out.println("Component: " + component.getLabel());
         if (source)
         {
             System.out.println("  Events generated: " + this.waiting.getN());
-            System.out.println("  Generation rate");
+            System.out.println("  Generation rate: " + throughput);
+            System.out.println("  Generation characteristics");
         }
         else
         {
             System.out.println("  Events processed: " + this.waiting.getN());
             final double utilization = (timespan - idle) / timespan;
             System.out.println("  Utilization: " + utilization);
+            System.out.println("  Throughput: " + throughput);
             System.out.println("  Wait time");
             System.out.println("    Mean:" + this.waiting.getMean());
             System.out.println("    Standard Deviation:"
@@ -166,6 +178,11 @@ public class Monitor
         System.out.println("    Minimum: " + this.arrivals.getMin());
     }
 
+    /**
+     * Calculate statistics for events that completed processing in the system
+     * 
+     * @param events list of completed events
+     */
     public void displayStatistics(final List<Event> events)
     {
         waiting.clear();
@@ -176,6 +193,7 @@ public class Monitor
         executed.clear();
         double started = 0;
         double completed = 0;
+        boolean counted = false;
         // Collect data into statistical services
         for (final Event event : events)
         {
@@ -185,9 +203,10 @@ public class Monitor
             }
             if (event.getCreated() >= this.start)
             {
-                if (start == 0)
+                if (!counted)
                 {
                     started = event.getCreated();
+                    counted = true;
                 }
                 final double lifetime =
                         event.getCompleted() - event.getCreated();
