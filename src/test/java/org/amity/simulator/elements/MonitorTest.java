@@ -71,8 +71,8 @@ public class MonitorTest
     {
         System.out.println("displayStatistics");
         final File file = new File("src/test/data/monitoring.example.txt");
-        final Parser builder = new Parser();
-        final Token token = builder.parse(file);
+        final Parser parser = new Parser();
+        final Token token = parser.parse(file);
         final Model model = token.compile();
         final double sampleStart = 40;
         final double sampleEnd = 10000;

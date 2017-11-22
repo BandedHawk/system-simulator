@@ -70,9 +70,9 @@ public class Source implements IComponent
         {
             // Cumulative injectedEvent timeline
             final double value = function.generate();
-            final Event event = new Event(this.label,
-                    Integer.toString(this.counter++));
             this.time += value;
+            final Event event = new Event(this.label,
+                    Integer.toString(this.counter++), this.time);
             event.setValues(this.time, this.time, this.time);
             this.local.add(event);
         }

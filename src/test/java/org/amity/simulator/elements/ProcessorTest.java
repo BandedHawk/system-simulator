@@ -120,7 +120,7 @@ public class ProcessorTest
             final double completeTick = tick + period;
             assertTrue(event.getCompleted() == completeTick);
             final double elapsed = completeTick - sourceTick;
-            assertTrue(event.getElapsed() == elapsed);
+            assertTrue(event.getCompleted() - event.getCreated() == elapsed);
             final double executed = completeTick - tick;
             assertTrue(event.getExecuted() == executed);
             tick = completeTick;
@@ -207,7 +207,7 @@ public class ProcessorTest
             final double completeTick = tick + period;
             assertTrue(event.getCompleted() == completeTick);
             final double elapsed = completeTick - sourceTick;
-            assertTrue(event.getElapsed() == elapsed);
+            assertTrue(event.getCompleted() - event.getCreated() == elapsed);
             final double executed = completeTick - tick;
             assertTrue(event.getExecuted() == executed);
             tick = completeTick;

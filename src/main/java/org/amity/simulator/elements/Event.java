@@ -28,10 +28,10 @@ public class Event
 {
     private String source;
     private String label;
+    private final double created;
     private double arrived;
     private double started;
     private double completed;
-    private double elapsed;
     private double executed;
     private IComponent component;
 
@@ -42,10 +42,10 @@ public class Event
     {
         this.source = null;
         this.label = null;
+        this.created = 0;
         this.arrived = 0;
         this.started = 0;
         this.completed = 0;
-        this.elapsed = 0;
         this.executed = 0;
         this.component = null;
     }
@@ -55,15 +55,16 @@ public class Event
      *
      * @param source name of source
      * @param label distinguishing name of event
+     * @param created time event was created
      */
-    public Event(final String source, final String label)
+    public Event(final String source, final String label, final double created)
     {
         this.source = source;
         this.label = label;
+        this.created = created;
         this.arrived = 0;
         this.started = 0;
         this.completed = 0;
-        this.elapsed = 0;
         this.executed = 0;
         this.component = null;
     }
@@ -77,10 +78,10 @@ public class Event
     {
         this.source = copy.source;
         this.label = copy.label;
+        this.created = copy.created;
         this.arrived = copy.arrived;
         this.started = copy.started;
         this.completed = copy.completed;
-        this.elapsed = copy.elapsed;
         this.executed = copy.executed;
         this.component = copy.component;
     }
@@ -138,6 +139,15 @@ public class Event
 
     /**
      *
+     * @return time event was created
+     */
+    public double getCreated()
+    {
+        return this.created;
+    }
+
+    /**
+     *
      * @param arrived time arrived at component for processing
      */
     public void setArrived(final double arrived)
@@ -188,24 +198,6 @@ public class Event
     public double getCompleted()
     {
         return this.completed;
-    }
-
-    /**
-     *
-     * @param elapsed time alive
-     */
-    public void setElapsed(final double elapsed)
-    {
-        this.elapsed = elapsed;
-    }
-
-    /**
-     *
-     * @return time alive
-     */
-    public double getElapsed()
-    {
-        return this.elapsed;
     }
 
     /**

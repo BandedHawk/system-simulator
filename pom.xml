@@ -5,8 +5,8 @@
     <artifactId>system-simulator</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <description>Software that performs modeling of a physical system for throughput
-        simulation.</description>
+    <description>Software that performs modeling of a physical system for
+        throughput simulation.</description>
     <name>GridLock</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

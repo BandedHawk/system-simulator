@@ -19,6 +19,7 @@
  */
 package org.amity.simulator.elements;
 
+import java.util.List;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.util.FastMath;
 
@@ -29,10 +30,13 @@ import org.apache.commons.math3.util.FastMath;
  */
 public class Monitor
 {
+
     private final DescriptiveStatistics arrivals;
     private final DescriptiveStatistics waiting;
     private final DescriptiveStatistics processing;
     private final DescriptiveStatistics visiting;
+    private final DescriptiveStatistics elapsed;
+    private final DescriptiveStatistics executed;
     private final double start;
     private final double end;
 
@@ -47,11 +51,13 @@ public class Monitor
         this.waiting = new DescriptiveStatistics();
         this.processing = new DescriptiveStatistics();
         this.visiting = new DescriptiveStatistics();
+        this.elapsed = new DescriptiveStatistics();
+        this.executed = new DescriptiveStatistics();
     }
 
     /**
      * Constructor to initialize monitor
-     * 
+     *
      * @param start lower bound of monitoring period
      * @param end upper bound of monitoring period
      */
@@ -67,11 +73,13 @@ public class Monitor
         this.waiting = new DescriptiveStatistics();
         this.processing = new DescriptiveStatistics();
         this.visiting = new DescriptiveStatistics();
+        this.elapsed = new DescriptiveStatistics();
+        this.executed = new DescriptiveStatistics();
     }
 
     /**
      * Calculate statistics for a component and send to standard output
-     * 
+     *
      * @param component item to be interrogated
      */
     public void displayStatistics(final IComponent component)
@@ -82,11 +90,11 @@ public class Monitor
         final boolean source = component instanceof Source;
         if (!source)
         {
-            waiting.clear();
-            processing.clear();
-            visiting.clear();
+            this.waiting.clear();
+            this.processing.clear();
+            this.visiting.clear();
         }
-        arrivals.clear();
+        this.arrivals.clear();
         // Collect data into statistical services
         for (final Event event : component.getLocalEvents())
         {
@@ -97,21 +105,20 @@ public class Monitor
             {
                 break;
             }
-            if (arrived >= this.start
-                    && completed <= this.end)
+            if (arrived >= this.start)
             {
                 if (arrival > 0)
                 {
-                    arrivals.addValue(arrived - arrival);
+                    this.arrivals.addValue(arrived - arrival);
                 }
                 if (!source)
                 {
-                    waiting.addValue(started - arrived);
-                    processing.addValue(completed - started);
-                    visiting.addValue(completed - arrived);
+                    this.waiting.addValue(started - arrived);
+                    this.processing.addValue(completed - started);
+                    this.visiting.addValue(completed - arrived);
                     // time from completion of last event or start of time to
                     // time execution begins for this event
-                    idle += started - FastMath.max(this .start, last);
+                    idle += started - FastMath.max(this.start, last);
                 }
             }
             // last event complete time
@@ -130,7 +137,7 @@ public class Monitor
         else
         {
             System.out.println("  Events processed: " + this.waiting.getN());
-            final double utilization = (timespan - idle)/ timespan;
+            final double utilization = (timespan - idle) / timespan;
             System.out.println("  Utilization: " + utilization);
             System.out.println("  Wait time");
             System.out.println("    Mean:" + this.waiting.getMean());
@@ -157,5 +164,60 @@ public class Monitor
                 + this.arrivals.getStandardDeviation());
         System.out.println("    Maximum: " + this.arrivals.getMax());
         System.out.println("    Minimum: " + this.arrivals.getMin());
+    }
+
+    public void displayStatistics(final List<Event> events)
+    {
+        waiting.clear();
+        processing.clear();
+        visiting.clear();
+        arrivals.clear();
+        elapsed.clear();
+        executed.clear();
+        double started = 0;
+        double completed = 0;
+        // Collect data into statistical services
+        for (final Event event : events)
+        {
+            if (event.getCompleted() > this.end)
+            {
+                break;
+            }
+            if (event.getCreated() >= this.start)
+            {
+                if (start == 0)
+                {
+                    started = event.getCreated();
+                }
+                final double lifetime =
+                        event.getCompleted() - event.getCreated();
+                elapsed.addValue(lifetime);
+                executed.addValue(event.getExecuted());
+                completed = event.getCompleted();
+            }
+        }
+        final double throughput = this.elapsed.getN() / (completed - started);
+        final double active = this.executed.getMean() / this.elapsed.getMean();
+        System.out.println("Event information");
+        System.out.println("  Events completed processing: "
+                + this.elapsed.getN());
+        System.out.println("  Throughput: " + throughput);
+        System.out.println("  Ratio of processing in lifetime: " + active);
+        System.out.println("  Event lifetime");
+        System.out.println("    Mean:" + this.elapsed.getMean());
+        System.out.println("    Standard Deviation:"
+                + this.elapsed.getStandardDeviation());
+        System.out.println("    Maximum time in system: "
+                + this.elapsed.getMax());
+        System.out.println("    Minimum time in system: "
+                + this.elapsed.getMin());
+        System.out.println("  Event in execution");
+        System.out.println("    Mean:" + this.executed.getMean());
+        System.out.println("    Standard Deviation:"
+                + this.executed.getStandardDeviation());
+        System.out.println("    Maximum time processing: "
+                + this.executed.getMax());
+        System.out.println("    Minimum time processing: "
+                + this.executed.getMin());
     }
 }

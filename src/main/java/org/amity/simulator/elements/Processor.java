@@ -89,12 +89,8 @@ public class Processor implements IComponent
                     : arrived;
             // Update the event for current component interaction
             final double completed = this.available + value;
-            final double elapsed = event.getElapsed() + completed
-                    - arrived;
-            final double executed = event.getExecuted() + completed
-                    - this.available;
+            final double executed = event.getExecuted() + value;
             event.setValues(arrived, this.available, completed);
-            event.setElapsed(elapsed);
             event.setExecuted(executed);
             // Set next component availability
             this.available = completed;
