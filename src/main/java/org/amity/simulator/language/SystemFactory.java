@@ -49,6 +49,7 @@ public class SystemFactory
     {
         String label = null;
         String nextReference = null;
+        boolean monitor = false;
         for (final String parameter : pairs.keySet())
         {
             switch (parameter)
@@ -58,12 +59,15 @@ public class SystemFactory
                     break;
                 case Vocabulary.NEXT:
                     nextReference = pairs.get(parameter);
+                case Vocabulary.MONITOR:
+                    monitor = pairs.get(parameter).toLowerCase().contains("y");
+                    break;
                 default:
                     break;
             }
         }
         final IComponent source = new Source(label, functions.get(0),
-                nextReference);
+                nextReference, monitor);
         return source;
     }
 
@@ -78,6 +82,7 @@ public class SystemFactory
     {
         String label = null;
         String nextReference = null;
+        boolean monitor = false;
         for (final String parameter : pairs.keySet())
         {
             switch (parameter)
@@ -87,12 +92,15 @@ public class SystemFactory
                     break;
                 case Vocabulary.NEXT:
                     nextReference = pairs.get(parameter);
+                case Vocabulary.MONITOR:
+                    monitor = pairs.get(parameter).toLowerCase().contains("y");
+                    break;
                 default:
                     break;
             }
         }
         final IComponent processor
-                = new Processor(label, functions.get(0), nextReference);
+                = new Processor(label, functions.get(0), nextReference, monitor);
         return processor;
     }
 

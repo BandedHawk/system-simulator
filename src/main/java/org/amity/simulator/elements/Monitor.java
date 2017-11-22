@@ -141,7 +141,7 @@ public class Monitor
         System.out.println("Component: " + component.getLabel());
         if (source)
         {
-            System.out.println("  Events generated: " + this.waiting.getN());
+            System.out.println("  Events generated: " + this.arrivals.getN());
             System.out.println("  Generation rate: " + throughput);
             System.out.println("  Generation characteristics");
         }

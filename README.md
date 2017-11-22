@@ -17,6 +17,7 @@ Help on parameters will be generated if no parameters are supplied.
 ## Upcoming changes to modeler
 * Addition of a load balancer component to spread events between downstream components
 * Better handling of numerical values in system specification file
+* Change response characteristics based on source
 
 ## Specification language
 Examples of the specification language for system components can be found in src/test/data.

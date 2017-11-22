@@ -78,10 +78,10 @@ public class ProcessorTest
         final int eventTotal = 4;
         final IGenerator sourceFunction = new Constant(sourcePeriod);
         final IGenerator function = new Constant(period);
-        final IComponent instance = new Processor(label, function, null);
+        final IComponent instance = new Processor(label, function, null, false);
         final LinkedList<Event> events = new LinkedList<>();
         final IComponent source
-                = new Source(sourceLabel, sourceFunction, label);
+                = new Source(sourceLabel, sourceFunction, label, false);
         source.setNext(instance);
         for (int count = 0; count < eventTotal; count++)
         {
@@ -143,10 +143,10 @@ public class ProcessorTest
         final int eventTotal = 4;
         final IGenerator sourceFunction = new Constant(sourcePeriod);
         final IGenerator function = new Constant(period);
-        final IComponent instance = new Processor(label, function, null);
+        final IComponent instance = new Processor(label, function, null, false);
         final LinkedList<Event> events = new LinkedList<>();
         final IComponent source
-                = new Source(sourceLabel, sourceFunction, label);
+                = new Source(sourceLabel, sourceFunction, label, false);
         source.setNext(instance);
         for (int count = 0; count < eventTotal; count++)
         {

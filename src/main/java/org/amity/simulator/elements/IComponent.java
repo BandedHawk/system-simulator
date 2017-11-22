@@ -76,5 +76,10 @@ public interface IComponent
      */
     String getLabel();
 
+    /**
+     * Produce display statistics on component
+     * 
+     * @param monitor plug-in to generate monitoring information
+     */
     void generateStatistics(Monitor monitor);
 }

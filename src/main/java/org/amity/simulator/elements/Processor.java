@@ -36,6 +36,7 @@ public class Processor implements IComponent
     private IComponent next;
     private final String nextReference;
     private final List<Event> local;
+    private final boolean monitor;
     private double available;
 
     /**
@@ -47,6 +48,7 @@ public class Processor implements IComponent
         this.function = null;
         this.nextReference = null;
         this.local = new ArrayList<>();
+        this.monitor = false;
         this.available = 0;
         this.next  = null;
     }
@@ -59,14 +61,16 @@ public class Processor implements IComponent
      * distribution characteristic
      * @param component name of next component to process events after current
      * component
+     * @param monitor flag for generating component output information
      */
     public Processor(final String label, final IGenerator function,
-            String component)
+            String component, final boolean monitor)
     {
         this.label = label;
         this.function = function;
         this.nextReference = component;
         this.local = new ArrayList<>();
+        this.monitor = monitor;
         this.available = 0;
         this.next = null;
     }
@@ -148,7 +152,7 @@ public class Processor implements IComponent
     @Override
     public void generateStatistics(final Monitor monitor)
     {
-        if (monitor != null)
+        if (this.monitor && monitor != null)
         {
             monitor.displayStatistics(this);
         }

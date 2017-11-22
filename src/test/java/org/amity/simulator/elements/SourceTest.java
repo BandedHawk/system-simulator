@@ -72,7 +72,7 @@ public class SourceTest
         final String label = "test";
         final int eventTotal = 3;
         final IGenerator function = new Constant(period);
-        final IComponent instance = new Source(label, function, null);
+        final IComponent instance = new Source(label, function, null, false);
         for (int count = 0; count < eventTotal; count++)
         {
             final Event event = instance.simulate(null);
@@ -106,7 +106,7 @@ public class SourceTest
         final String label = "test";
         final int eventTotal = 3;
         final IGenerator function = new Constant(period);
-        final IComponent instance = new Source(label, function, null);
+        final IComponent instance = new Source(label, function, null, false);
         for (int count = 0; count < eventTotal; count++)
         {
             instance.simulate(null);

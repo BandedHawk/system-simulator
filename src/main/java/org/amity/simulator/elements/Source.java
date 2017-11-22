@@ -37,6 +37,7 @@ public class Source implements IComponent
     private IComponent next;
     private final String nextReference;
     private final List<Event> local;
+    private final boolean monitor;
     private int counter;
     private double time;
 
@@ -46,18 +47,20 @@ public class Source implements IComponent
         this.local = new ArrayList<>();
         this.nextReference = null;
         this.function = null;
+        this.monitor = false;
         this.counter = 0;
         this.time = 0;
         this.next = null;
     }
 
     public Source(final String label, final IGenerator function,
-            final String component)
+            final String component, final boolean monitor)
     {
         this.label = label;
         this.nextReference = component;
         this.function = function;
         this.local = new ArrayList<>();
+        this.monitor = monitor;
         this.counter = 0;
         this.time = 0;
         this.next = null;
@@ -132,7 +135,7 @@ public class Source implements IComponent
     @Override
     public void generateStatistics(final Monitor monitor)
     {
-        if (monitor != null)
+        if (this.monitor && monitor != null)
         {
             monitor.displayStatistics(this);
         }
