@@ -47,7 +47,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>org.amity.main.Main</mainClass>
+                            <mainClass>org.amity.simulator.main.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
