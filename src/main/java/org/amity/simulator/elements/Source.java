@@ -133,6 +133,12 @@ public class Source implements IComponent
     }
 
     @Override
+    public List<Integer> getDepths()
+    {
+        return new ArrayList<>();
+    }
+
+    @Override
     public void generateStatistics(final Monitor monitor)
     {
         if (this.monitor && monitor != null)

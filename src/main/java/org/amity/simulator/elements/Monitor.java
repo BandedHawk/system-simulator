@@ -37,6 +37,7 @@ public class Monitor
     private final DescriptiveStatistics visiting;
     private final DescriptiveStatistics elapsed;
     private final DescriptiveStatistics executed;
+    private final DescriptiveStatistics queue;
     private final double start;
     private final double end;
 
@@ -53,6 +54,7 @@ public class Monitor
         this.visiting = new DescriptiveStatistics();
         this.elapsed = new DescriptiveStatistics();
         this.executed = new DescriptiveStatistics();
+        this.queue = new DescriptiveStatistics();
     }
 
     /**
@@ -75,6 +77,7 @@ public class Monitor
         this.visiting = new DescriptiveStatistics();
         this.elapsed = new DescriptiveStatistics();
         this.executed = new DescriptiveStatistics();
+        this.queue = new DescriptiveStatistics();
     }
 
     /**
@@ -147,13 +150,25 @@ public class Monitor
         }
         else
         {
+            queue.clear();
+            final List<Integer> depths = component.getDepths();
+            for (final int depth : depths)
+            {
+                queue.addValue(depth);
+            }
             System.out.println("  Events processed: " + this.waiting.getN());
             final double utilization = (timespan - idle) / timespan;
             System.out.println("  Utilization: " + utilization);
             System.out.println("  Throughput: " + throughput);
+            System.out.println("  Queued events");
+            System.out.println("    Mean:" + this.queue.getMean());
+            System.out.println("    Standard deviation:"
+                    + this.queue.getStandardDeviation());
+            System.out.println("    Maximum: " + this.queue.getMax());
+            System.out.println("    Minimum: " + this.queue.getMin());
             System.out.println("  Wait time");
             System.out.println("    Mean:" + this.waiting.getMean());
-            System.out.println("    Standard Deviation:"
+            System.out.println("    Standard deviation:"
                     + this.waiting.getStandardDeviation());
             System.out.println("    Maximum: " + this.waiting.getMax());
             System.out.println("    Minimum: " + this.waiting.getMin());
@@ -169,7 +184,7 @@ public class Monitor
                     + this.visiting.getStandardDeviation());
             System.out.println("    Maximum: " + this.visiting.getMax());
             System.out.println("    Minimum: " + this.visiting.getMin());
-            System.out.println("  Arrival rate");
+            System.out.println("  Arrival characteristics");
         }
         System.out.println("    Mean:" + this.arrivals.getMean());
         System.out.println("    Standard Deviation:"

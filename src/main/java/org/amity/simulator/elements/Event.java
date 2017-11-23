@@ -246,4 +246,15 @@ public class Event
             this.component.simulate(this);
         }
     }
+
+    @Override
+    public String toString()
+    {
+        final StringBuilder string = new StringBuilder(this.source);
+        string.append(", ").append(this.label).append(", ");
+        string.append(this.created).append(", ").append(this.arrived);
+        string.append(", ").append(this.started).append(", ");
+        string.append(this.completed);
+        return string.toString();
+    }
 }

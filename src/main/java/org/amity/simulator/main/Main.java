@@ -262,6 +262,8 @@ public class Main
                     }
                     while (events.size() > 0)
                     {
+                        events.sort(Comparator
+                                .comparingDouble(Event::getCompleted));
                         final Event event = events.removeFirst();
                         event.simulate();
                         if (event.getComponent() == null)
@@ -271,7 +273,6 @@ public class Main
                         else
                         {
                             events.add(event);
-                            events.sort(Comparator.comparingDouble(Event::getArrived));
                         }
                     }
                     monitor.displayStatistics(completed);

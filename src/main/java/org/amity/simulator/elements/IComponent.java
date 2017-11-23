@@ -77,6 +77,12 @@ public interface IComponent
     String getLabel();
 
     /**
+     * 
+     * @return queue lengths
+     */
+    List<Integer> getDepths();
+
+    /**
      * Produce display statistics on component
      * 
      * @param monitor plug-in to generate monitoring information

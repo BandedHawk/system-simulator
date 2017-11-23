@@ -38,6 +38,8 @@ public class Processor implements IComponent
     private final List<Event> local;
     private final boolean monitor;
     private double available;
+    private List<Integer> depths;
+    private int depth;
 
     /**
      * Hidden default constructor to avoid implicit creation
@@ -51,6 +53,8 @@ public class Processor implements IComponent
         this.monitor = false;
         this.available = 0;
         this.next  = null;
+        this.depths = new ArrayList<>();
+        this.depth = 0;
     }
 
     /**
@@ -73,6 +77,8 @@ public class Processor implements IComponent
         this.monitor = monitor;
         this.available = 0;
         this.next = null;
+        this.depths = new ArrayList<>();
+        this.depth = 0;
     }
 
     @Override
@@ -104,6 +110,19 @@ public class Processor implements IComponent
             final boolean result = this.local.add(current);
             // Modify global event to next component to pass through
             event.setComponent(this.next);
+            // Check how many events are waiting to execute
+            final int last = this.local.size() - 1;
+            final double joined = current.getArrived();
+            if (last > 0)
+            {
+                this.depth = 0;
+                for (int i = last - 1; i > -1; i--)
+                {
+                    this.depth +=
+                            this.local.get(i).getCompleted() > joined ? 1 : 0;
+                }
+            }
+            depths.add(this.depth);
         }
         return event;
     }
@@ -147,6 +166,12 @@ public class Processor implements IComponent
     public String getLabel()
     {
         return this.label;
+    }
+
+    @Override
+    public List<Integer> getDepths()
+    {
+        return this.depths;
     }
 
     @Override
