@@ -1,5 +1,7 @@
-## Example output from a simulation
+## Reference model
+![System Model for Reference](https://raw.githubusercontent.com/BandedHawk/system-simulator/master/complex-system.png System Model for Simulation)
 
+## Example output from a simulation
 ```
 Statistics for events that occurred between 500.0 and 95500.0
 Event information

@@ -70,7 +70,7 @@ public class Uniform implements IGenerator
         final StringBuilder string =
                 new StringBuilder(this.getClass().getSimpleName());
         string.append(" - ").append(this.offset).append(":");
-        string.append(this.width);
+        string.append(this.offset + this.width);
         return string.toString();
     }
 }
