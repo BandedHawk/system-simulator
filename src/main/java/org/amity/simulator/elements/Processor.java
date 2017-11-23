@@ -182,4 +182,10 @@ public class Processor implements IComponent
             monitor.displayStatistics(this);
         }
     }
+
+    @Override
+    public String description()
+    {
+        return this.function.characteristics();
+    }
 }

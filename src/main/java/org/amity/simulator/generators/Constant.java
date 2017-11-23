@@ -53,4 +53,13 @@ public class Constant implements IGenerator
     {
         return this.period;
     }    
+
+    @Override
+    public String characteristics()
+    {
+        final StringBuilder string =
+                new StringBuilder(this.getClass().getSimpleName());
+        string.append(" - ").append(this.period);
+        return string.toString();
+    }
 }

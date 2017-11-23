@@ -142,6 +142,7 @@ public class Monitor
         // last event
         final double throughput = this.arrivals.getN() / (last - startPeriod);
         System.out.println("Component: " + component.getLabel());
+        System.out.println("  function: " + component.description());
         if (source)
         {
             System.out.println("  Events generated: " + this.arrivals.getN());

@@ -75,4 +75,14 @@ public class Gaussian implements IGenerator
                 : value < this.minimum ? this.minimum : value;
         return modifiedValue;
     }
+
+    @Override
+    public String characteristics()
+    {
+        final StringBuilder string =
+                new StringBuilder(this.getClass().getSimpleName());
+        string.append(" - ").append(this.minimum).append(":");
+        string.append(this.maximum);
+        return string.toString();
+    }
 }

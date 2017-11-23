@@ -88,4 +88,11 @@ public interface IComponent
      * @param monitor plug-in to generate monitoring information
      */
     void generateStatistics(Monitor monitor);
+
+    /**
+     * Produces characteristics of function
+     * 
+     * @return description of function
+     */
+    String description();
 }

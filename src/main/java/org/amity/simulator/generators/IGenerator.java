@@ -36,4 +36,11 @@ public interface IGenerator
      * @return value based on the generation model
      */
     double generate();
+
+    /**
+     * Returns information on the configuration and type of generator
+     * 
+     * @return information on generator
+     */
+    String characteristics();
 }

@@ -63,4 +63,14 @@ public class Uniform implements IGenerator
         final double value = generator.nextDouble() * width + offset;
         return value;
     }
+
+    @Override
+    public String characteristics()
+    {
+        final StringBuilder string =
+                new StringBuilder(this.getClass().getSimpleName());
+        string.append(" - ").append(this.offset).append(":");
+        string.append(this.width);
+        return string.toString();
+    }
 }

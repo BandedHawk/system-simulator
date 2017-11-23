@@ -40,6 +40,7 @@ public class Skewed implements IGenerator
     private final double maximum;
     private final double range;
     private final double skew;
+    private final double bias;
     private final RandomGenerator generator = new JDKRandomGenerator();
     private final GaussianRandomGenerator gaussian
             = new GaussianRandomGenerator(generator);
@@ -55,6 +56,7 @@ public class Skewed implements IGenerator
         this.maximum = 0;
         this.range = 0;
         this.skew = 0;
+        this.bias = 0;
     }
 
     /**
@@ -77,6 +79,7 @@ public class Skewed implements IGenerator
         this.middle = (max + min) / 2;
         this.range = Math.abs(max - min);
         this.skew = Math.abs(skew);
+        this.bias = bias;
         this.factor = FastMath.exp(bias);
     }
 
@@ -88,5 +91,16 @@ public class Skewed implements IGenerator
                 + FastMath.exp(-gaussian.nextNormalizedDouble() / skew);
         final double modifiedValue = middle + range * (factor / value - 0.5);
         return modifiedValue;
+    }
+
+    @Override
+    public String characteristics()
+    {
+        final StringBuilder string =
+                new StringBuilder(this.getClass().getSimpleName());
+        string.append(" - ").append(this.minimum).append(":");
+        string.append(this.maximum).append(":").append(this.skew).append(":");
+        string.append(this.bias);
+        return string.toString();
     }
 }

@@ -146,4 +146,10 @@ public class Source implements IComponent
             monitor.displayStatistics(this);
         }
     }
+
+    @Override
+    public String description()
+    {
+        return this.function.characteristics();
+    }
 }

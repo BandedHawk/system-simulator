@@ -275,6 +275,8 @@ public class Main
                             events.add(event);
                         }
                     }
+                    System.out.println("Statistics for events that occurred between "
+                            + start + " and " + end);
                     monitor.displayStatistics(completed);
                     for (final IComponent component : model.components.values())
                     {
