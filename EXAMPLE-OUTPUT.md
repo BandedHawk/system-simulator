@@ -1,5 +1,5 @@
 ## Reference model
-![System Model for Reference](https://raw.githubusercontent.com/BandedHawk/system-simulator/master/complex-system.png System Model for Simulation)
+![alt text](https://raw.githubusercontent.com/BandedHawk/system-simulator/master/complex-system.png "System Model for Simulation")
 
 ## Example output from a simulation
 ```
