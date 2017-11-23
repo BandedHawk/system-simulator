@@ -60,10 +60,10 @@ public class Token
     /**
      * Creates a fully initialized and immutable token
      *
-     * @param value
-     * @param syntax
-     * @param line
-     * @param position
+     * @param value source text
+     * @param syntax type of token
+     * @param line location in the source file
+     * @param position location of token in the source line
      */
     public Token(final String value, final Syntax syntax,
             final int line, final int position)
@@ -138,7 +138,7 @@ public class Token
 
     /**
      *
-     * @returnl inked list length
+     * @return linked list length
      */
     public int size()
     {
@@ -215,6 +215,8 @@ public class Token
                 }
             }
         }
+        final Model model = new Model();
+        model.errors.addAll(local.errors());
         if (!local.ok())
         {
             for (final String error : local.errors())
@@ -222,9 +224,7 @@ public class Token
                 System.err.println(error);
             }
         }
-        final Model model = new Model();
-        model.errors.addAll(local.errors());
-        if (local.ok())
+        else
         {
             model.compiled = true;
             model.sources.addAll(this.scratch[1].sources.values());

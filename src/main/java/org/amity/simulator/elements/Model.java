@@ -31,10 +31,10 @@ import java.util.Map;
  */
 public class Model
 {
-    public List<String> errors;
+    public final List<String> errors;
     public boolean compiled;
-    public List<IComponent> sources;
-    public Map<String, IComponent> components;
+    public final List<IComponent> sources;
+    public final Map<String, IComponent> components;
 
     public Model()
     {

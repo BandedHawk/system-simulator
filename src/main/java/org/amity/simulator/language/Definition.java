@@ -22,7 +22,7 @@ package org.amity.simulator.language;
 import java.util.regex.Pattern;
 
 /**
- * 
+ * Specification for name-value pair requirements
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
@@ -32,7 +32,7 @@ public class Definition
     private final boolean mandatory;
 
     /**
-     * 
+     * Default constructor - intentionally hidden
      */
     private Definition()
     {
@@ -41,9 +41,10 @@ public class Definition
     }
 
     /**
+     * Create immutable specification for name-value pair
      * 
-     * @param pattern
-     * @param mandatory 
+     * @param pattern regular expression to test value token
+     * @param mandatory required name-value pair if <code>true</code> 
      */
     public Definition(final Pattern pattern, final boolean mandatory)
     {
@@ -53,13 +54,17 @@ public class Definition
 
     /**
      * 
-     * @return 
+     * @return regular expression to test value token
      */
     public Pattern getPattern()
     {
         return pattern;
     }
 
+    /**
+     * 
+     * @return required name-value pair if <code>true</code> 
+     */
     public boolean getMandatory()
     {
         return mandatory;
