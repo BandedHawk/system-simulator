@@ -19,6 +19,9 @@
  */
 package org.amity.simulator.generators;
 
+import java.util.Map;
+import org.amity.simulator.elements.IComponent;
+import org.amity.simulator.language.Vocabulary;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
 
@@ -32,6 +35,9 @@ public class Uniform implements IGenerator
 
     private final double offset;
     private final double width;
+    private final String source;
+    private final String reference;
+    private IComponent next;
     private final RandomGenerator generator = new JDKRandomGenerator();
 
     /**
@@ -41,6 +47,9 @@ public class Uniform implements IGenerator
     {
         offset = 0;
         width = 1;
+        this.source = Vocabulary.DEFAULT;
+        this.reference = null;
+        this.next = null;
     }
 
     /**
@@ -48,13 +57,19 @@ public class Uniform implements IGenerator
      *
      * @param minimum smallest time interval to be produced
      * @param maximum largest time interval to be produced
+     * @param source name of associated event source
+     * @param reference name of downstream component
      */
-    public Uniform(final double minimum, final double maximum)
+    public Uniform(final double minimum, final double maximum,
+            final String source, final String reference)
     {
         final double max = Math.abs(maximum);
         final double min = Math.abs(minimum);
         this.offset = Math.min(max, min);
         this.width = Math.abs(max - min);
+        this.source = source;
+        this.reference = reference;
+        this.next = null;
     }
 
     @Override
@@ -72,5 +87,65 @@ public class Uniform implements IGenerator
         string.append(" - ").append(this.offset).append(":");
         string.append(this.offset + this.width);
         return string.toString();
+    }
+
+    @Override
+    public String getSource()
+    {
+        return source;
+    }
+
+    @Override
+    public String getReference()
+    {
+        return reference;
+    }
+
+    @Override
+    public IComponent getNext()
+    {
+        return next;
+    }
+
+    @Override
+    public void setNext(IComponent next)
+    {
+        this.next = next;
+    }
+
+    /**
+     * 
+     * @param pairs
+     * @return 
+     */
+    public final static IGenerator instance(final Map<String, String> pairs)
+    {
+        double maximum = 0;
+        double minimum = 0;
+        String reference = null;
+        String source = Vocabulary.DEFAULT;
+        for (final String parameter : pairs.keySet())
+        {
+            final String value = pairs.get(parameter);
+            switch (parameter)
+            {
+                case Vocabulary.MAXIMUM:
+                    maximum = Double.parseDouble(value);
+                    break;
+                case Vocabulary.MINIMUM:
+                    minimum = Double.parseDouble(value);
+                    break;
+                case Vocabulary.SOURCE:
+                    source = pairs.get(parameter);
+                    break;
+                case Vocabulary.NEXT:
+                    reference = pairs.get(parameter);
+                default:
+                    break;
+            }
+        }
+        final IGenerator generator = new Uniform(minimum, maximum, source,
+                reference);
+        return generator;
     }
 }

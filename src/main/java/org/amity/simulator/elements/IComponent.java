@@ -20,6 +20,8 @@
 package org.amity.simulator.elements;
 
 import java.util.List;
+import java.util.Map;
+import org.amity.simulator.generators.IGenerator;
 
 /**
  * Interface of a system component in the simulation
@@ -54,27 +56,15 @@ public interface IComponent
 
     /**
      * 
-     * @return downstream processing component
-     */
-    IComponent getNext();
-
-    /**
-     * 
-     * @param next downstream processing component
-     */
-    void setNext(IComponent next);
-
-    /**
-     * 
-     * @return name of downstream processing component
-     */
-    String getNextReference();
-
-    /**
-     * 
      * @return name of component
      */
     String getLabel();
+
+    /**
+     * 
+     * @return list of named references and associated generators
+     */
+    Map<String, List<IGenerator>> getReferences();
 
     /**
      * 

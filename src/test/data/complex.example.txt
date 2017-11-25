@@ -7,9 +7,9 @@ component
         type: uniform
         minimum: 1.5
         maximum: 2.5
+        next: network 1
     }
     monitor: Yes
-    next: network 1
 }
 component
 {
@@ -20,9 +20,9 @@ component
         type: uniform
         minimum: 1.5
         maximum: 2.5
+        next: network 2
     }
     monitor: Y
-    next: network 2
 }
 component
 {
@@ -35,9 +35,9 @@ component
         maximum: 0.75
         skew: 0.8
         bias: -2.0
+        next: web server 1
     }
     monitor: Y
-    next: web server 1
 }
 component
 {
@@ -50,9 +50,9 @@ component
         maximum: 0.75
         skew: 0.8
         bias: -2.0
+        next: web server 2
     }
     monitor: Y
-    next: web server 2
 }
 component
 {
@@ -65,9 +65,9 @@ component
         maximum: 2.5
         skew: 0.8
         bias: -1.0
+        next: database
     }
     monitor: Y
-    next: database
 }
 component
 {
@@ -80,9 +80,9 @@ component
         maximum: 2.5
         skew: 0.8
         bias: -1.0
+        next: database
     }
     monitor: Y
-    next: database
 }
 component
 {

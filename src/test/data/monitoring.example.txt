@@ -5,10 +5,11 @@ component
     function
     {
         type: uniform
-        minimum: 2.0
-        maximum: 3.0
+        minimum: 1.4
+        maximum: 2.4
+        next: network
     }
-    next: network
+    monitor: Yes
 }
 component
 {
@@ -21,9 +22,9 @@ component
         maximum: 0.75
         skew: 0.8
         bias: -2.0
+        next: web server
     }
-    monitor: No
-    next: web server
+    monitor: Y
 }
 component
 {
@@ -36,8 +37,9 @@ component
         maximum: 2.5
         skew: 0.8
         bias: -1.0
+        next: database
     }
-    next: database
+    monitor: Y
 }
 component
 {
@@ -51,4 +53,5 @@ component
         skew: 0.8
         bias: -3.0
     }
+    monitor: Y
 }

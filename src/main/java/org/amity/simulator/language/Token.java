@@ -26,8 +26,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import org.amity.simulator.elements.IComponent;
 import org.amity.simulator.elements.Model;
+import org.amity.simulator.elements.Processor;
 import org.amity.simulator.elements.Source;
+import org.amity.simulator.generators.Constant;
+import org.amity.simulator.generators.Gaussian;
 import org.amity.simulator.generators.IGenerator;
+import org.amity.simulator.generators.Skewed;
+import org.amity.simulator.generators.Uniform;
 
 /**
  * Storage and processing for data collected during parsing against syntax
@@ -159,26 +164,35 @@ public class Token
             this.scratch[1] = new ScratchPad(1);
             this.scratch[2] = new ScratchPad(2);
         }
-        this.compile(this.scratch[0]);
-        // Resolve downstream references
         final ScratchPad local = this.scratch[0];
+        this.compile(local);
+        // Resolve downstream references
         if (local.ok())
         {
             final Map<String, IComponent> components =
                     this.scratch[1].components;
-            final Map<String, List<IComponent>> references = new HashMap<>();
-            // Determine references to resolve
+            // Create list of references and associated generators that need
+            // target components
+            final Map<String, List<IGenerator>> references = new HashMap<>();
+            // Determine references to resolve by component
             for (final IComponent component: components.values())
             {
-                final String reference = component.getNextReference();
-                if (reference != null)
+                // Get list of generators and the references in the component
+                final Map<String, List<IGenerator>> generators
+                        = component.getReferences();
+                // Get references in the component
+                for (final String reference : generators.keySet())
                 {
-                    final List<IComponent> list =
-                            references.containsKey(reference)
-                            ? references.get(reference) :
-                            new ArrayList<>();
-                    list.add(component);
-                    references.putIfAbsent(reference, list);
+                    // Add list of generators per reference into global list
+                    if (reference != null)
+                    {
+                        final List<IGenerator> list =
+                                references.containsKey(reference)
+                                ? references.get(reference) :
+                                new ArrayList<>();
+                        list.addAll(generators.get(reference));
+                        references.putIfAbsent(reference, list);
+                    }
                 }
             }
             // Look for reference component
@@ -199,7 +213,7 @@ public class Token
                     // Resolve references
                     else
                     {
-                        for (final IComponent referee
+                        for (final IGenerator referee
                                 : references.get(reference))
                         {
                             referee.setNext(component);
@@ -389,36 +403,34 @@ public class Token
                     {
                         case Vocabulary.SOURCE:
                             final IComponent source
-                                    = SystemFactory.getSource(pairs,
-                                            functions);
+                                    = Source.instance(pairs, functions);
                             local.components.put(source.getLabel(), source);
                             local.sources.put(source.getLabel(), source);
                             break;
                         case Vocabulary.PROCESSOR:
                             final IComponent processor
-                                    = SystemFactory.getProcessor(pairs,
-                                            functions);
+                                    = Processor.instance(pairs, functions);
                             local.components.put(processor.getLabel(),
                                     processor);
                             break;
                         case Vocabulary.UNIFORM:
                             final IGenerator uniform
-                                    = SystemFactory.getUniform(pairs);
+                                    = Uniform.instance(pairs);
                             local.functions.add(uniform);
                             break;
                         case Vocabulary.GAUSSIAN:
                             final IGenerator gaussian
-                                    = SystemFactory.getGaussian(pairs);
+                                    = Gaussian.instance(pairs);
                             local.functions.add(gaussian);
                             break;
                         case Vocabulary.CONSTANT:
                             final IGenerator constant
-                                    = SystemFactory.getConstant(pairs);
+                                    = Constant.instance(pairs);
                             local.functions.add(constant);
                             break;
                         case Vocabulary.SKEWED:
                             final IGenerator skewed
-                                    = SystemFactory.getSkewed(pairs);
+                                    = Skewed.instance(pairs);
                             local.functions.add(skewed);
                             break;
                         default:

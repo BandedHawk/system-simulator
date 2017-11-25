@@ -6,8 +6,8 @@ component
     {
         type: constant
         offset: 1
+        next: delay
     }
-    next: delay
 }
 component
 {

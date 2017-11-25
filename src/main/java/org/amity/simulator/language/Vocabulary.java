@@ -48,6 +48,7 @@ public class Vocabulary
     public final static String GAUSSIAN = "gaussian";
     public final static String FUNCTION = "function";
     public final static String SOURCE = "source";
+    public final static String DEFAULT = "default";
     public final static String PROCESSOR = "processor";
     public final static String NEXT = "next";
     public final static String NAME = "name";
@@ -62,15 +63,14 @@ public class Vocabulary
         final Pattern positiveDecimal = Pattern.compile("^\\+?\\d*\\.?\\d+$");
         final Pattern decimal = Pattern.compile("^[\\+\\-]?\\d*\\.?\\d+$");
         final Pattern binaryResponse = Pattern.compile("^[Yy]([Ee][Ss])*|[Nn][Oo]*$");
-        final Definition name = new Definition(words, true);
-        final Definition next = new Definition(words, false);
+        final Definition mandatoryWords = new Definition(words, true);
+        final Definition optionalWords = new Definition(words, false);
         final Definition monitor = new Definition(binaryResponse, false);
         final Definition mandatoryDecimal =
                 new Definition(positiveDecimal, true);
         final Definition biasDecimal =
                 new Definition(decimal, true);
-        component.put(Vocabulary.NAME, name);
-        component.put(Vocabulary.NEXT, next);
+        component.put(Vocabulary.NAME, mandatoryWords);
         component.put(Vocabulary.MONITOR, monitor);
         blocks.put(Vocabulary.SOURCE, component);
         blocks.put(Vocabulary.PROCESSOR, component);
@@ -89,6 +89,11 @@ public class Vocabulary
         functions.put(Vocabulary.CONSTANT, offset);
         functions.put(Vocabulary.GAUSSIAN, bounds);
         functions.put(Vocabulary.SKEWED, complex);
+        for (final Map<String, Definition> function : functions.values())
+        {
+            function.put(Vocabulary.NEXT, optionalWords);
+            function.put(Vocabulary.SOURCE, optionalWords);
+        }
         final List<String> components = new ArrayList<>();
         components.add(Vocabulary.COMPONENT);
         final List<String> subcomponents = new ArrayList<>();

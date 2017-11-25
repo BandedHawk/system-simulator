@@ -19,6 +19,13 @@
  */
 package org.amity.simulator.generators;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.amity.simulator.elements.IComponent;
+import org.amity.simulator.elements.Processor;
+import org.amity.simulator.language.Vocabulary;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -35,26 +42,26 @@ import static org.junit.Assert.*;
  */
 public class UniformTest
 {
-    
+
     public UniformTest()
     {
     }
-    
+
     @BeforeClass
     public static void setUpClass()
     {
     }
-    
+
     @AfterClass
     public static void tearDownClass()
     {
     }
-    
+
     @Before
     public void setUp()
     {
     }
-    
+
     @After
     public void tearDown()
     {
@@ -70,7 +77,10 @@ public class UniformTest
         final int eventTotal = 1000000;
         final double minimum = 5;
         final double maximum = 6;
-        IGenerator instance = new Uniform(minimum, maximum);
+        final String source = Vocabulary.DEFAULT;
+        final String reference = "database";
+        final IGenerator instance = new Uniform(minimum, maximum, source,
+                reference);
         final DescriptiveStatistics statistics = new DescriptiveStatistics();
         for (int count = 0; count < eventTotal; count++)
         {
@@ -89,5 +99,94 @@ public class UniformTest
         assertTrue(min >= minimum);
         assertTrue(max <= maximum);
     }
-    
+
+    /**
+     * Test of characteristics method, of class Uniform.
+     */
+    @Test
+    public void testCharacteristics()
+    {
+        System.out.println("characteristics");
+        final double minimum = 5;
+        final double maximum = 6;
+        final String source = Vocabulary.DEFAULT;
+        final String reference = "database";
+        final IGenerator instance = new Uniform(minimum, maximum, source,
+                reference);
+        assertTrue(instance.characteristics() != null);
+    }
+
+    /**
+     * Test of getSource method, of class Uniform.
+     */
+    @Test
+    public void testGetSource()
+    {
+        System.out.println("getSource");
+        final double minimum = 5;
+        final double maximum = 6;
+        final String source = Vocabulary.DEFAULT;
+        final String reference = "database";
+        final IGenerator instance = new Uniform(minimum, maximum, source,
+                reference);
+        assertEquals(instance.getSource(), source);
+    }
+
+    /**
+     * Test of getReference method, of class Uniform.
+     */
+    @Test
+    public void testGetReference()
+    {
+        final double minimum = 5;
+        final double maximum = 6;
+        final String source = Vocabulary.DEFAULT;
+        final String reference = "database";
+        final IGenerator instance = new Uniform(minimum, maximum, source,
+                reference);
+        assertEquals(instance.getReference(), reference);
+    }
+
+    /**
+     * Test of getNext method, of class Uniform.
+     */
+    @Test
+    public void testGetNext()
+    {
+        System.out.println("getNext");
+        final double minimum = 5;
+        final double maximum = 6;
+        final String source = Vocabulary.DEFAULT;
+        final String reference = "database";
+        final IGenerator instance = new Uniform(minimum, maximum, source,
+                reference);
+        final List<IGenerator> generators = new ArrayList<>();
+        generators.add(instance);
+        final IComponent component = new Processor("test", generators,
+                false);
+        instance.setNext(component);
+        assertEquals(instance.getNext(), component);
+    }
+
+    /**
+     * Test of instance method, of class Uniform.
+     */
+    @Test
+    public void testInstance()
+    {
+        System.out.println("instance");
+        Map<String, String> pairs = new HashMap<>();
+        pairs.put(Vocabulary.MAXIMUM, "121.2");
+        pairs.put(Vocabulary.MINIMUM, "37.5");
+        IGenerator result = Uniform.instance(pairs);
+        assertTrue(result != null);
+        assertEquals(result.getReference(), null);
+        assertEquals(result.getSource(), Vocabulary.DEFAULT);
+        assertEquals(result.characteristics(), "Uniform - 37.5:121.2");
+        pairs.put(Vocabulary.SOURCE, Vocabulary.COMPONENT);
+        pairs.put(Vocabulary.NEXT, Vocabulary.PROCESSOR);
+        result = Uniform.instance(pairs);
+        assertEquals(result.getSource(), Vocabulary.COMPONENT);
+        assertEquals(result.getReference(), Vocabulary.PROCESSOR);
+    }
 }

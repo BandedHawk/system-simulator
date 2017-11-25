@@ -20,8 +20,11 @@
 package org.amity.simulator.elements;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.amity.simulator.generators.IGenerator;
+import org.amity.simulator.language.Vocabulary;
 
 /**
  * Implements an active processing component in a system model
@@ -32,13 +35,12 @@ public class Processor implements IComponent
 {
 
     private final String label;
-    private final IGenerator function;
-    private IComponent next;
-    private final String nextReference;
+    private final Map<String, IGenerator> generators;
+    private final Map<String, List<IGenerator>> references;
     private final List<Event> local;
     private final boolean monitor;
     private double available;
-    private List<Integer> depths;
+    private final List<Integer> depths;
     private int depth;
 
     /**
@@ -47,12 +49,11 @@ public class Processor implements IComponent
     private Processor()
     {
         this.label = "dummy";
-        this.function = null;
-        this.nextReference = null;
+        this.generators = new HashMap<>();
+        this.references = new HashMap<>();
         this.local = new ArrayList<>();
         this.monitor = false;
         this.available = 0;
-        this.next  = null;
         this.depths = new ArrayList<>();
         this.depth = 0;
     }
@@ -61,24 +62,43 @@ public class Processor implements IComponent
      * Constructs operational component
      *
      * @param label distinguishing name of processing component
-     * @param function model for the component based on processing time
+     * @param generators models for the component based on processing time
      * distribution characteristic
-     * @param component name of next component to process events after current
-     * component
      * @param monitor flag for generating component output information
      */
-    public Processor(final String label, final IGenerator function,
-            String component, final boolean monitor)
+    public Processor(final String label, final List<IGenerator> generators,
+            final boolean monitor)
     {
         this.label = label;
-        this.function = function;
-        this.nextReference = component;
+        this.generators = new HashMap<>();
         this.local = new ArrayList<>();
+        this.references = new HashMap<>();
         this.monitor = monitor;
         this.available = 0;
-        this.next = null;
         this.depths = new ArrayList<>();
         this.depth = 0;
+        // Put the generators into the source lookup
+        if (generators != null && !generators.isEmpty())
+        {
+            for (final IGenerator generator : generators)
+            {
+                this.generators.put(generator.getSource(), generator);
+            }
+        }
+        // Determine downstream references to resolve
+        for (final IGenerator generator : this.generators.values())
+        {
+            final String reference = generator.getReference();
+            if (reference != null)
+            {
+                final List<IGenerator> list
+                        = this.references.containsKey(reference)
+                        ? this.references.get(reference)
+                        : new ArrayList<>();
+                list.add(generator);
+                references.putIfAbsent(reference, list);
+            }
+        }
     }
 
     @Override
@@ -87,7 +107,13 @@ public class Processor implements IComponent
         if (event != null)
         {
             // Generate processing times for this event at this component
-            final double value = function.generate();
+            final IGenerator generator
+                    = generators.containsKey(event.getSource())
+                    ? generators.get(event.getSource())
+                    : generators.containsKey(Vocabulary.DEFAULT)
+                    ? generators.get(Vocabulary.DEFAULT)
+                    : null;
+            final double value = generator.generate();
             // Arrival at this component is time event completed
             // processing at last component
             final double arrived = event.getCompleted();
@@ -109,8 +135,8 @@ public class Processor implements IComponent
             current.setComponent(null);
             final boolean result = this.local.add(current);
             // Modify global event to next component to pass through
-            event.setComponent(this.next);
-            // Check how many events are waiting to execute
+            event.setComponent(generator.getNext());
+            // Check how many events are waiting to execute to find queue depth
             final int last = this.local.size() - 1;
             final double joined = current.getArrived();
             if (last > 0)
@@ -118,8 +144,9 @@ public class Processor implements IComponent
                 this.depth = 0;
                 for (int i = last - 1; i > -1; i--)
                 {
-                    this.depth +=
-                            this.local.get(i).getCompleted() > joined ? 1 : 0;
+                    this.depth
+                            += this.local.get(i).getCompleted() > joined
+                            ? 1 : 0;
                 }
             }
             depths.add(this.depth);
@@ -138,28 +165,14 @@ public class Processor implements IComponent
     {
         this.local.clear();
         this.available = 0;
-        if (this.next != null)
+        // Reset downstream components
+        for (final IGenerator generator : this.generators.values())
         {
-            this.next.reset();
+            if (generator.getNext() != null)
+            {
+                generator.getNext().reset();
+            }
         }
-    }
-
-    @Override
-    public IComponent getNext()
-    {
-        return this.next;
-    }
-
-    @Override
-    public void setNext(final IComponent next)
-    {
-        this.next = next;
-    }
-
-    @Override
-    public String getNextReference()
-    {
-        return this.nextReference;
     }
 
     @Override
@@ -186,6 +199,57 @@ public class Processor implements IComponent
     @Override
     public String description()
     {
-        return this.function.characteristics();
+        final StringBuilder string = new StringBuilder();
+        if (this.generators.isEmpty())
+        {
+            string.append("No defined characteristic");
+        }
+        else
+        {
+            final int size = this.generators.size();
+            for (final String source : this.generators.keySet())
+            {
+                string.append("[").append(source).append(" := ");
+                string.append(this.generators.get(source).characteristics());
+                string.append("]");
+            }
+        }
+        return string.toString();
+    }
+
+    @Override
+    public Map<String, List<IGenerator>> getReferences()
+    {
+        return this.references;
+    }
+
+    /**
+     * 
+     * @param pairs
+     * @param functions
+     * @return 
+     */
+    public final static IComponent instance(final Map<String, String> pairs,
+            final List<IGenerator> functions)
+    {
+        String label = null;
+        boolean monitor = false;
+        for (final String parameter : pairs.keySet())
+        {
+            switch (parameter)
+            {
+                case Vocabulary.NAME:
+                    label = pairs.get(parameter);
+                    break;
+                case Vocabulary.MONITOR:
+                    monitor = pairs.get(parameter).toLowerCase().contains("y");
+                    break;
+                default:
+                    break;
+            }
+        }
+        final IComponent processor
+                = new Processor(label, functions, monitor);
+        return processor;
     }
 }

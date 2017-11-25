@@ -19,6 +19,9 @@
  */
 package org.amity.simulator.generators;
 
+import java.util.Map;
+import org.amity.simulator.elements.IComponent;
+import org.amity.simulator.language.Vocabulary;
 import org.apache.commons.math3.random.GaussianRandomGenerator;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
@@ -35,6 +38,9 @@ public class Gaussian implements IGenerator
     private final double deviation;
     private final double minimum;
     private final double maximum;
+    private final String source;
+    private final String reference;
+    private IComponent next;
     private final RandomGenerator generator = new JDKRandomGenerator();
     private final GaussianRandomGenerator gaussian
             = new GaussianRandomGenerator(generator);
@@ -48,6 +54,9 @@ public class Gaussian implements IGenerator
         this.offset = 0;
         this.minimum = 0;
         this.maximum = 0;
+        this.source = Vocabulary.DEFAULT;
+        this.reference = null;
+        this.next = null;
     }
 
     /**
@@ -55,8 +64,11 @@ public class Gaussian implements IGenerator
      *
      * @param minimum smallest time interval to be produced
      * @param maximum largest time interval to be produced
+     * @param source name of associated event source
+     * @param reference name of downstream component
      */
-    public Gaussian(final double minimum, final double maximum)
+    public Gaussian(final double minimum, final double maximum,
+            final String source, final String reference)
     {
         final double max = Math.abs(maximum);
         final double min = Math.abs(minimum);
@@ -64,6 +76,9 @@ public class Gaussian implements IGenerator
         this.maximum = Math.max(max, min);
         this.deviation = Math.abs(max - min) / 10;
         this.offset = Math.min(max, min) + deviation * 5;
+        this.source = source;
+        this.reference = reference;
+        this.next = null;
     }
 
     @Override
@@ -84,5 +99,65 @@ public class Gaussian implements IGenerator
         string.append(" - ").append(this.minimum).append(":");
         string.append(this.maximum);
         return string.toString();
+    }
+
+    @Override
+    public String getSource()
+    {
+        return source;
+    }
+
+    @Override
+    public String getReference()
+    {
+        return reference;
+    }
+
+    @Override
+    public IComponent getNext()
+    {
+        return next;
+    }
+
+    @Override
+    public void setNext(IComponent next)
+    {
+        this.next = next;
+    }
+
+    /**
+     * 
+     * @param pairs
+     * @return 
+     */
+    public final static IGenerator instance(final Map<String, String> pairs)
+    {
+        double maximum = 0;
+        double minimum = 0;
+        String reference = null;
+        String source = Vocabulary.DEFAULT;
+        for (final String parameter : pairs.keySet())
+        {
+            final String value = pairs.get(parameter);
+            switch (parameter)
+            {
+                case Vocabulary.MAXIMUM:
+                    maximum = Double.parseDouble(value);
+                    break;
+                case Vocabulary.MINIMUM:
+                    minimum = Double.parseDouble(value);
+                    break;
+                case Vocabulary.SOURCE:
+                    source = pairs.get(parameter);
+                    break;
+                case Vocabulary.NEXT:
+                    reference = pairs.get(parameter);
+                default:
+                    break;
+            }
+        }
+        final IGenerator generator = new Gaussian(minimum, maximum, source,
+                reference);
+        return generator;
     }
 }

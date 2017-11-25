@@ -21,6 +21,9 @@ package org.amity.simulator.generators;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import org.amity.simulator.elements.IComponent;
+import org.amity.simulator.language.Vocabulary;
 import org.apache.commons.math3.random.GaussianRandomGenerator;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
@@ -41,6 +44,9 @@ public class Skewed implements IGenerator
     private final double range;
     private final double skew;
     private final double bias;
+    private final String source;
+    private final String reference;
+    private IComponent next;
     private final RandomGenerator generator = new JDKRandomGenerator();
     private final GaussianRandomGenerator gaussian
             = new GaussianRandomGenerator(generator);
@@ -57,6 +63,9 @@ public class Skewed implements IGenerator
         this.range = 0;
         this.skew = 0;
         this.bias = 0;
+        this.source = Vocabulary.DEFAULT;
+        this.reference = null;
+        this.next = null;
     }
 
     /**
@@ -66,11 +75,14 @@ public class Skewed implements IGenerator
      * @param maximum largest time interval to be produced
      * @param skew the degree to which the values cluster around the mode
      * @param bias the tendency of the mode to approach the min, max
+     * @param source name of associated event source
+     * @param reference name of downstream component
      * or midpoint value; positive values bias toward max, negative values
      * toward min
      */
     public Skewed(final double minimum, final double maximum,
-            final double skew, final double bias)
+            final double skew, final double bias, final String source,
+            final String reference)
     {
         final double max = Math.abs(maximum);
         final double min = Math.abs(minimum);
@@ -81,6 +93,9 @@ public class Skewed implements IGenerator
         this.skew = Math.abs(skew);
         this.bias = bias;
         this.factor = FastMath.exp(bias);
+        this.source = source;
+        this.reference = reference;
+        this.next = null;
     }
 
     @Override
@@ -102,5 +117,73 @@ public class Skewed implements IGenerator
         string.append(this.maximum).append(":").append(this.skew).append(":");
         string.append(this.bias);
         return string.toString();
+    }
+
+    @Override
+    public String getSource()
+    {
+        return source;
+    }
+
+    @Override
+    public String getReference()
+    {
+        return reference;
+    }
+
+    @Override
+    public IComponent getNext()
+    {
+        return next;
+    }
+
+    @Override
+    public void setNext(IComponent next)
+    {
+        this.next = next;
+    }
+
+    /**
+     * 
+     * @param pairs
+     * @return 
+     */
+    public final static IGenerator instance(final Map<String, String> pairs)
+    {
+        double maximum = 0;
+        double minimum = 0;
+        double skew = 0;
+        double bias = 0;
+        String reference = null;
+        String source = Vocabulary.DEFAULT;
+        for (final String parameter : pairs.keySet())
+        {
+            final String value = pairs.get(parameter);
+            switch (parameter)
+            {
+                case Vocabulary.MAXIMUM:
+                    maximum = Double.parseDouble(value);
+                    break;
+                case Vocabulary.MINIMUM:
+                    minimum = Double.parseDouble(value);
+                    break;
+                case Vocabulary.SKEW:
+                    skew = Double.parseDouble(value);
+                    break;
+                case Vocabulary.BIAS:
+                    bias = Double.parseDouble(value);
+                    break;
+                case Vocabulary.SOURCE:
+                    source = pairs.get(parameter);
+                    break;
+                case Vocabulary.NEXT:
+                    reference = pairs.get(parameter);
+                default:
+                    break;
+            }
+        }
+        final IGenerator generator = new Skewed(minimum, maximum, skew, bias,
+                source, reference);
+        return generator;
     }
 }

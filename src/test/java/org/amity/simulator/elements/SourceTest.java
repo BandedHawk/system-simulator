@@ -21,6 +21,7 @@ package org.amity.simulator.elements;
 
 import org.amity.simulator.generators.Constant;
 import java.util.List;
+import java.util.Map;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -71,8 +72,8 @@ public class SourceTest
         final double period = 5;
         final String label = "test";
         final int eventTotal = 3;
-        final IGenerator function = new Constant(period);
-        final IComponent instance = new Source(label, function, null, false);
+        final IGenerator generator = new Constant(period, "source", "next");
+        final IComponent instance = new Source(label, generator, false);
         for (int count = 0; count < eventTotal; count++)
         {
             final Event event = instance.simulate(null);
@@ -105,8 +106,8 @@ public class SourceTest
         final double period = 5;
         final String label = "test";
         final int eventTotal = 3;
-        final IGenerator function = new Constant(period);
-        final IComponent instance = new Source(label, function, null, false);
+        final IGenerator generator = new Constant(period, "source", "next");
+        final IComponent instance = new Source(label, generator, false);
         for (int count = 0; count < eventTotal; count++)
         {
             instance.simulate(null);
@@ -139,5 +140,90 @@ public class SourceTest
             assertTrue(event.getStarted() == tick);
             assertTrue(event.getCompleted() == tick);
         }
+    }
+
+    /**
+     * Test of getLocalEvents method, of class Source.
+     */
+    @Test
+    public void testGetLocalEvents()
+    {
+        System.out.println("getLocalEvents");
+        final double period = 5;
+        final String label = "test";
+        final int eventTotal = 3;
+        final IGenerator generator = new Constant(period, "source", "next");
+        final IComponent instance = new Source(label, generator, false);
+        assertEquals(0, instance.getLocalEvents().size());
+        for (int count = 0; count < eventTotal; count++)
+        {
+            instance.simulate(null);
+        }
+        final List<Event> local = instance.getLocalEvents();
+        assertEquals(eventTotal, local.size());
+    }
+
+    /**
+     * Test of getLabel method, of class Source.
+     */
+    @Test
+    public void testGetLabel()
+    {
+        System.out.println("getLabel");
+        final double period = 5;
+        final String label = "test";
+        final IGenerator generator = new Constant(period, "source", "next");
+        final IComponent instance = new Source(label, generator, false);
+        assertEquals(label, instance.getLabel());
+    }
+
+    /**
+     * Test of getDepths method, of class Source.
+     */
+    @Test
+    public void testGetDepths()
+    {
+        System.out.println("getDepths");
+        final double period = 5;
+        final String label = "test";
+        final IGenerator generator = new Constant(period, "source", "next");
+        final IComponent instance = new Source(label, generator, false);
+        // This is invariant as a source never has any wait times
+        assertTrue(instance.getDepths() != null);
+        assertEquals(0, instance.getDepths().size());
+    }
+
+    /**
+     * Test of description method, of class Source.
+     */
+    @Test
+    public void testDescription()
+    {
+        System.out.println("description");
+        final double period = 5;
+        final String label = "test";
+        final IGenerator generator = new Constant(period, "source", "next");
+        final IComponent instance = new Source(label, generator, false);
+        assertTrue(instance.description() != null);
+        assertTrue(instance.description().endsWith("]"));
+        assertTrue(instance.description().startsWith("["));
+    }
+
+    /**
+     * Test of getReferences method, of class Source.
+     */
+    @Test
+    public void testGetReferences()
+    {
+        System.out.println("getReferences");
+        // this is invariant as source only ever has one generator
+        final double period = 5;
+        final String label = "test";
+        final String reference = "next";
+        final IGenerator generator = new Constant(period, "source", reference);
+        final IComponent instance = new Source(label, generator, false);
+        assertTrue(instance.getReferences() != null);
+        assertEquals(1, instance.getReferences().size());
+        assertEquals(generator, instance.getReferences().get(reference).get(0));
     }
 }

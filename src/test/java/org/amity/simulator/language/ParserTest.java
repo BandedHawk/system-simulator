@@ -73,7 +73,7 @@ public class ParserTest
     public void testParse()
     {
         System.out.println("parse");
-        final File file = new File("src/test/data/simulator.example.txt");
+        final File file = new File("src/test/data/test.example.txt");
         final Parser instance = new Parser();
         final Token token = instance.parse(file);
         System.out.println("  syntax rule check");

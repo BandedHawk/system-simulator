@@ -5,6 +5,13 @@
  */
 package org.amity.simulator.generators;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.amity.simulator.elements.IComponent;
+import org.amity.simulator.elements.Processor;
+import org.amity.simulator.language.Vocabulary;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -56,7 +63,10 @@ public class SkewedTest
         final double minimum = 1;
         double bias = -3;
         final double skew = 0.8;
-        IGenerator instance = new Skewed(minimum, maximum, skew, bias);
+        final String source = Vocabulary.DEFAULT;
+        final String reference = "database";
+        IGenerator instance = new Skewed(minimum, maximum, skew, bias, source,
+                reference);
         final DescriptiveStatistics statistics = new DescriptiveStatistics();
         for (int count = 0; count < eventTotal; count++)
         {
@@ -78,7 +88,7 @@ public class SkewedTest
         statistics.clear();
         System.out.println("  skew right");
         bias = 3;
-        instance = new Skewed(minimum, maximum, skew, bias);
+        instance = new Skewed(minimum, maximum, skew, bias, source, reference);
         for (int count = 0; count < eventTotal; count++)
         {
             final double value = instance.generate();
@@ -95,6 +105,107 @@ public class SkewedTest
         assertTrue(min >= minimum);
         assertTrue(max <= maximum);
         assertTrue(mean > (max + min)/2);
+    }
+
+    /**
+     * Test of characteristics method, of class Skewed.
+     */
+    @Test
+    public void testCharacteristics()
+    {
+        System.out.println("characteristics");
+        final double maximum = 3;
+        final double minimum = 1;
+        double bias = -3;
+        final double skew = 0.8;
+        final String source = Vocabulary.DEFAULT;
+        final String reference = "database";
+        final IGenerator instance = new Skewed(minimum, maximum, skew, bias,
+                source, reference);
+        assertTrue(instance.characteristics() != null);
+    }
+
+    /**
+     * Test of getSource method, of class Skewed.
+     */
+    @Test
+    public void testGetSource()
+    {
+        System.out.println("getSource");
+        final double maximum = 3;
+        final double minimum = 1;
+        double bias = -3;
+        final double skew = 0.8;
+        final String source = Vocabulary.DEFAULT;
+        final String reference = "database";
+        final IGenerator instance = new Skewed(minimum, maximum, skew, bias,
+                source, reference);
+        assertEquals(instance.getSource(), source);
+    }
+
+    /**
+     * Test of getReference method, of class Skewed.
+     */
+    @Test
+    public void testGetReference()
+    {
+        System.out.println("getReference");
+        final double maximum = 3;
+        final double minimum = 1;
+        double bias = -3;
+        final double skew = 0.8;
+        final String source = Vocabulary.DEFAULT;
+        final String reference = "database";
+        final IGenerator instance = new Skewed(minimum, maximum, skew, bias,
+                source, reference);
+        assertEquals(instance.getReference(), reference);
+    }
+
+    /**
+     * Test of getNext method, of class Skewed.
+     */
+    @Test
+    public void testGetNext()
+    {
+        System.out.println("getNext");
+        final double maximum = 3;
+        final double minimum = 1;
+        double bias = -3;
+        final double skew = 0.8;
+        final String source = Vocabulary.DEFAULT;
+        final String reference = "database";
+        final IGenerator instance = new Skewed(minimum, maximum, skew, bias,
+                source, reference);
+        final List<IGenerator> generators = new ArrayList<>();
+        generators.add(instance);
+        final IComponent component = new Processor("test", generators,
+                false);
+        instance.setNext(component);
+        assertEquals(instance.getNext(), component);
+    }
+
+    /**
+     * Test of instance method, of class Skewed.
+     */
+    @Test
+    public void testInstance()
+    {
+        System.out.println("instance");
+        Map<String, String> pairs = new HashMap<>();
+        pairs.put(Vocabulary.MAXIMUM, "121.2");
+        pairs.put(Vocabulary.MINIMUM, "37.5");
+        pairs.put(Vocabulary.SKEW, "56.4");
+        pairs.put(Vocabulary.BIAS, "98.3");
+        IGenerator result = Skewed.instance(pairs);
+        assertTrue(result != null);
+        assertEquals(result.getReference(), null);
+        assertEquals(result.getSource(), Vocabulary.DEFAULT);
+        assertEquals(result.characteristics(), "Skewed - 37.5:121.2:56.4:98.3");
+        pairs.put(Vocabulary.SOURCE, Vocabulary.COMPONENT);
+        pairs.put(Vocabulary.NEXT, Vocabulary.PROCESSOR);
+        result = Skewed.instance(pairs);
+        assertEquals(result.getSource(), Vocabulary.COMPONENT);
+        assertEquals(result.getReference(), Vocabulary.PROCESSOR);
     }
     
 }

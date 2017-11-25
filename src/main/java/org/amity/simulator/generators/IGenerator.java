@@ -19,6 +19,8 @@
  */
 package org.amity.simulator.generators;
 
+import org.amity.simulator.elements.IComponent;
+
 /**
  * Interface for the random distribution model that generates values in the
  * system simulation
@@ -43,4 +45,28 @@ public interface IGenerator
      * @return information on generator
      */
     String characteristics();
+
+    /**
+     * 
+     * @return name of associated event source
+     */
+    String getSource();
+
+    /**
+     * 
+     * @return name of downstream component
+     */
+    String getReference();
+
+    /**
+     * 
+     * @param next downstream component for this generator
+     */
+    void setNext(IComponent next);
+
+    /**
+     * 
+     * @return downstream component for this generator
+     */
+    IComponent getNext();
 }

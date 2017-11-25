@@ -7,8 +7,8 @@ component
         type: gaussian
         minimum: 5
         maximum: 6
+        next: processor 1
     }
-    next: processor 1
 } // end declaration
 component
 {
@@ -19,9 +19,9 @@ component
         type: uniform
         minimum: 5
         maximum: 6
+        next: processor 2
     }
     monitor: No
-    next: processor 2
 }
 component
 {
@@ -34,9 +34,9 @@ component
         maximum: 6.0
         skew: 0.8
         bias: -3
+        next: processor 3
     }
     monitor: Y
-    next: processor 3
 }
 component
 {
