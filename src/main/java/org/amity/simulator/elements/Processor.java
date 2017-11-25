@@ -226,11 +226,11 @@ public class Processor implements IComponent
     /**
      * 
      * @param pairs
-     * @param functions
+     * @param generators
      * @return 
      */
     public final static IComponent instance(final Map<String, String> pairs,
-            final List<IGenerator> functions)
+            final List<IGenerator> generators)
     {
         String label = null;
         boolean monitor = false;
@@ -249,7 +249,7 @@ public class Processor implements IComponent
             }
         }
         final IComponent processor
-                = new Processor(label, functions, monitor);
+                = new Processor(label, generators, monitor);
         return processor;
     }
 }

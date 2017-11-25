@@ -162,7 +162,7 @@ public class ConstantTest
     public void testInstance()
     {
         System.out.println("instance");
-        Map<String, String> pairs = new HashMap<>();
+        final Map<String, String> pairs = new HashMap<>();
         pairs.put(Vocabulary.OFFSET, "51.3");
         IGenerator result = Constant.instance(pairs);
         assertTrue(result != null);

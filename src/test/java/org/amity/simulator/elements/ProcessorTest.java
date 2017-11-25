@@ -21,6 +21,7 @@ package org.amity.simulator.elements;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import org.amity.simulator.generators.Constant;
 import java.util.List;
@@ -380,5 +381,28 @@ public class ProcessorTest
         assertEquals(1, map.get(reference2).size());
         assertEquals(generator1, map.get(reference).get(0));
         assertEquals(generator2, map.get(reference2).get(0));
+    }
+
+    /**
+     * Test of instance method, of class Processor.
+     */
+    @Test
+    public void testInstance()
+    {
+        System.out.println("instance");
+        final double period = 5;
+        final String source = Vocabulary.DEFAULT;
+        final String reference = "database";
+        final IGenerator generator = new Constant(period, source, reference);
+        final List<IGenerator> generators = new ArrayList<>();
+        generators.add(generator);
+        final Map<String, String> pairs = new HashMap<>();
+        final String name  = "CPU";
+        pairs.put(Vocabulary.NAME, name);
+        pairs.put(Vocabulary.MONITOR, "Y");
+        IComponent instance = Processor.instance(pairs, generators);
+        assertEquals(name, instance.getLabel());
+        assertEquals(1, instance.getReferences().size());
+        assertEquals(1, instance.getReferences().get(reference).size());
     }
 }

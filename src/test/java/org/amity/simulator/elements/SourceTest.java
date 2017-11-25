@@ -19,6 +19,8 @@
  */
 package org.amity.simulator.elements;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import org.amity.simulator.generators.Constant;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +31,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.amity.simulator.generators.IGenerator;
+import org.amity.simulator.language.Vocabulary;
 
 /**
  * Tests generation of incoming events is properly populated.
@@ -225,5 +228,28 @@ public class SourceTest
         assertTrue(instance.getReferences() != null);
         assertEquals(1, instance.getReferences().size());
         assertEquals(generator, instance.getReferences().get(reference).get(0));
+    }
+
+    /**
+     * Test of instance method, of class Source.
+     */
+    @Test
+    public void testInstance()
+    {
+        System.out.println("instance");
+        final double period = 5;
+        final String source = Vocabulary.DEFAULT;
+        final String reference = "database";
+        final IGenerator generator = new Constant(period, source, reference);
+        final List<IGenerator> generators = new ArrayList<>();
+        generators.add(generator);
+        final Map<String, String> pairs = new HashMap<>();
+        final String name = "source";
+        pairs.put(Vocabulary.NAME, name);
+        pairs.put(Vocabulary.MONITOR, "Y");
+        IComponent instance = Source.instance(pairs, generators);
+        assertEquals(name, instance.getLabel());
+        assertEquals(1, instance.getReferences().size());
+        assertEquals(1, instance.getReferences().get(reference).size());
     }
 }

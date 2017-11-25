@@ -191,7 +191,7 @@ public class SkewedTest
     public void testInstance()
     {
         System.out.println("instance");
-        Map<String, String> pairs = new HashMap<>();
+        final Map<String, String> pairs = new HashMap<>();
         pairs.put(Vocabulary.MAXIMUM, "121.2");
         pairs.put(Vocabulary.MINIMUM, "37.5");
         pairs.put(Vocabulary.SKEW, "56.4");

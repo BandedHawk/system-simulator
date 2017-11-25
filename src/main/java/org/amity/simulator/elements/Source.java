@@ -159,11 +159,11 @@ public class Source implements IComponent
     /**
      * 
      * @param pairs
-     * @param functions
+     * @param generators
      * @return 
      */
     public final static IComponent instance(final Map<String, String> pairs,
-            List<IGenerator> functions)
+            List<IGenerator> generators)
     {
         String label = null;
         boolean monitor = false;
@@ -181,7 +181,7 @@ public class Source implements IComponent
                     break;
             }
         }
-        final IComponent source = new Source(label, functions.get(0),
+        final IComponent source = new Source(label, generators.get(0),
                 monitor);
         return source;
     }
