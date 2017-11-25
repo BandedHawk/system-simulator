@@ -41,6 +41,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.math3.util.FastMath;
 
 /**
  * Command line entry point for running system simulation
@@ -222,6 +223,8 @@ public class Main
     private static boolean run(final File file, final double generate,
             final double start, final double end)
     {
+        final int size = 1000;
+        final int lowBuffer = 50;
         boolean error = false;
         if (start > end)
         {
@@ -260,11 +263,27 @@ public class Main
                         }
                         while (true);
                     }
-                    while (events.size() > 0)
+                    events.sort(Comparator
+                            .comparingDouble(Event::getCompleted));
+                    final LinkedList<Event> buffer = new LinkedList<>();
+                    for (int index = 0; index < size; index++)
                     {
-                        events.sort(Comparator
-                                .comparingDouble(Event::getCompleted));
-                        final Event event = events.removeFirst();
+                        if (events.isEmpty())
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            final Event event = events.removeFirst();
+                            buffer.add(event);
+                        }
+                    }
+                    buffer.sort(Comparator
+                            .comparingDouble(Event::getCompleted));
+                    double highmark = buffer.getLast().getCompleted();
+                    while (buffer.size() > 0)
+                    {
+                        final Event event = buffer.removeFirst();
                         event.simulate();
                         if (event.getComponent() == null)
                         {
@@ -272,7 +291,29 @@ public class Main
                         }
                         else
                         {
-                            events.add(event);
+                            buffer.add(event);
+                            if ((event.getCompleted() > highmark
+                                    || buffer.size() < lowBuffer)
+                                    && !events.isEmpty())
+                            {
+                                for (int index = 0; index < size; index++)
+                                {
+                                    if (events.isEmpty())
+                                    {
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        final Event copy = events.removeFirst();
+                                        buffer.add(copy);
+                                        highmark = FastMath
+                                                .max(copy.getCompleted(),
+                                                        highmark);
+                                    }
+                                }
+                            }
+                            buffer.sort(Comparator
+                                    .comparingDouble(Event::getCompleted));
                         }
                     }
                     System.out.println("Statistics for events that occurred between "
