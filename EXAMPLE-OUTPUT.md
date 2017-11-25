@@ -5,185 +5,214 @@
 ```
 Statistics for events that occurred between 500.0 and 95500.0
 Event information
-  Events completed processing: 94941
-  Throughput: 0.9993955847663716
-  Ratio of processing in lifetime: 0.9028836730647731
+  Events completed processing: 94979
+  Throughput: 0.9997953410273326
+  Ratio of processing in lifetime: 0.9032769471649128
   Event lifetime
-    Mean:3.0286837262286035
-    Standard Deviation:0.4480269854084294
-    Maximum time in system: 7.10068038218742
-    Minimum time in system: 2.2724561553040985
+    Mean:3.0287315641631465
+    Standard Deviation:0.4453376267104064
+    Median:2.95505804970162
+    Maximum time in system: 6.287263360936777
+    Minimum time in system: 2.2722765441139927
   Event in execution
-    Mean:2.7345490872887854
-    Standard Deviation:0.25144443456499505
-    Maximum time processing: 4.241311850158183
-    Minimum time processing: 2.2709584868226544
+    Mean:2.7357834010592983
+    Standard Deviation:0.2527832600980176
+    Median:2.694395079872458
+    Maximum time processing: 4.351946478182848
+    Minimum time processing: 2.272276544109408
 Component: database
   function: [default := Skewed - 0.5:1.5:0.8:-3.0]
-  Events processed: 94944
-  Utilization: 0.5813601395222406
-  Throughput: 0.9994164098446349
+  Events processed: 94982
+  Utilization: 0.5816866870115821
+  Throughput: 0.9998232935762267
   Queued events
-    Mean:0.292505979005932
-    Standard deviation:0.45506966212553634
+    Mean:0.2923594021967434
+    Standard deviation:0.4549587747631549
+    Median:0.0
     Maximum: 2.0
     Minimum: 0.0
   Wait time
-    Mean:0.08737532303285561
-    Standard deviation:0.16894798787263135
-    Maximum: 1.2659998135786736
+    Mean:0.08770134744817903
+    Standard deviation:0.16932104998670036
+    Median:0.0
+    Maximum: 1.2887391694021062
     Minimum: 0.0
   Process time
-    Mean:0.5817013786328241
-    Standard Deviation:0.0969216730763705
-    Maximum: 1.433346263896965
-    Minimum: 0.5001910920254886
+    Mean:0.5817900243856047
+    Standard Deviation:0.09710057918824969
+    Median:0.5471394497963047
+    Maximum: 1.4036559206870152
+    Minimum: 0.5002015061654674
   Visit time
-    Mean:0.6690767016656798
-    Standard Deviation:0.19472910407784783
-    Maximum: 2.3675356975581963
-    Minimum: 0.5001910920254886
+    Mean:0.6694913718337833
+    Standard Deviation:0.19455333424387222
+    Median:0.5831614137350698
+    Maximum: 1.9783919601686648
+    Minimum: 0.5002015061654674
   Arrival characteristics
-    Mean:1.0005875432120819
-    Standard Deviation:0.5823362228279145
-    Maximum: 2.8886232896165893
-    Minimum: 1.5967329090926796E-5
+    Mean:1.000182317803858
+    Standard Deviation:0.5818372516181879
+    Median:1.0004842284433835
+    Maximum: 2.7521986709616613
+    Minimum: 3.8475678593385965E-5
 Component: network 2
   function: [default := Skewed - 0.25:0.75:0.8:-2.0]
-  Events processed: 47501
-  Utilization: 0.1679736205943148
-  Throughput: 0.5000298389881427
+  Events processed: 47485
+  Utilization: 0.16818020405363537
+  Throughput: 0.49986223845582867
   Queued events
     Mean:0.0
     Standard deviation:0.0
+    Median:0.0
     Maximum: 0.0
     Minimum: 0.0
   Wait time
     Mean:0.0
     Standard deviation:0.0
+    Median:0.0
     Maximum: 0.0
     Minimum: 0.0
   Process time
-    Mean:0.3359310904798441
-    Standard Deviation:0.0796181589657758
-    Maximum: 0.736373901803745
-    Minimum: 0.25026897151838057
+    Mean:0.3364575180858601
+    Standard Deviation:0.08064582897823652
+    Median:0.3092634405911667
+    Maximum: 0.7358652763359714
+    Minimum: 0.2505083263677079
   Visit time
-    Mean:0.3359310904798441
-    Standard Deviation:0.0796181589657758
-    Maximum: 0.736373901803745
-    Minimum: 0.25026897151838057
+    Mean:0.3364575180858601
+    Standard Deviation:0.08064582897823652
+    Median:0.3092634405911667
+    Maximum: 0.7358652763359714
+    Minimum: 0.2505083263677079
   Arrival characteristics
-    Mean:1.9999224495729122
-    Standard Deviation:0.2883707892495052
-    Maximum: 2.4999987047376635
-    Minimum: 1.500011856725905
+    Mean:2.000593273482101
+    Standard Deviation:0.2884925880544451
+    Median:2.0016376443527406
+    Maximum: 2.4999984701062203
+    Minimum: 1.5000358111719834
 Component: source 1
   function: [Uniform - 1.5:2.5]
-  Events generated: 47443
-  Generation rate: 0.496787084795525
+  Events generated: 47496
+  Generation rate: 0.4973519873616136
   Generation characteristics
-    Mean:2.002400135843377
-    Standard Deviation:0.2884612072713134
-    Maximum: 2.4999974335696606
-    Minimum: 1.5000871437659953
+    Mean:2.0001628204740842
+    Standard Deviation:0.2883628633468391
+    Median:2.000844913927722
+    Maximum: 2.499949937555357
+    Minimum: 1.5000052739560488
 Component: source 2
   function: [Uniform - 1.5:2.5]
-  Events generated: 47501
-  Generation rate: 0.4974018801118338
+  Events generated: 47486
+  Generation rate: 0.4972367636214853
   Generation characteristics
-    Mean:1.9999224495729122
-    Standard Deviation:0.2883707892495052
-    Maximum: 2.4999987047376635
-    Minimum: 1.500011856725905
+    Mean:2.000592916627615
+    Standard Deviation:0.28848956079572724
+    Median:2.0016181250466616
+    Maximum: 2.4999984701062203
+    Minimum: 1.5000358111719834
 Component: network 1
   function: [default := Skewed - 0.25:0.75:0.8:-2.0]
-  Events processed: 47443
-  Utilization: 0.1678837017514001
-  Throughput: 0.4994078333814277
+  Events processed: 47496
+  Utilization: 0.16828683441795222
+  Throughput: 0.4999692713671791
   Queued events
     Mean:0.0
     Standard deviation:0.0
+    Median:0.0
     Maximum: 0.0
     Minimum: 0.0
   Wait time
     Mean:0.0
     Standard deviation:0.0
+    Median:0.0
     Maximum: 0.0
     Minimum: 0.0
   Process time
-    Mean:0.33616915945539644
-    Standard Deviation:0.07976390572039105
-    Maximum: 0.7351911787918652
-    Minimum: 0.2503836346877506
+    Mean:0.3365958834915302
+    Standard Deviation:0.07987747854798638
+    Median:0.3099020206864225
+    Maximum: 0.7388336049189093
+    Minimum: 0.2505981831927784
   Visit time
-    Mean:0.33616915945539644
-    Standard Deviation:0.07976390572039105
-    Maximum: 0.7351911787918652
-    Minimum: 0.2503836346877506
+    Mean:0.3365958834915302
+    Standard Deviation:0.07987747854798638
+    Median:0.3099020206864225
+    Maximum: 0.7388336049189093
+    Minimum: 0.2505981831927784
   Arrival characteristics
-    Mean:2.002400135843377
-    Standard Deviation:0.2884612072713134
-    Maximum: 2.4999974335696606
-    Minimum: 1.5000871437659953
+    Mean:2.0001628204740842
+    Standard Deviation:0.2883628633468391
+    Median:2.000844913927722
+    Maximum: 2.499949937555357
+    Minimum: 1.5000052739560488
 Component: web server 2
   function: [default := Skewed - 1.5:2.5:0.8:-1.0]
-  Events processed: 47501
-  Utilization: 0.9079956082355366
-  Throughput: 0.5000152711919857
+  Events processed: 47485
+  Utilization: 0.908086331150549
+  Throughput: 0.49985156714716067
   Queued events
-    Mean:0.4871876937848846
-    Standard deviation:0.5065196805599521
-    Maximum: 3.0
-    Minimum: 0.0
-  Wait time
-    Mean:0.20732616486229163
-    Standard deviation:0.34070352899357326
-    Maximum: 3.9430402605030395
-    Minimum: 0.0
-  Process time
-    Mean:1.8159307188786245
-    Standard Deviation:0.21753194030839118
-    Maximum: 2.484186896304891
-    Minimum: 1.502528144423195
-  Visit time
-    Mean:2.0232568837409266
-    Standard Deviation:0.40407182471632763
-    Maximum: 5.837244720307353
-    Minimum: 1.5028648757943301
-  Arrival characteristics
-    Mean:1.9999261751317265
-    Standard Deviation:0.3093986345546052
-    Maximum: 2.872336729782546
-    Minimum: 1.1122520999888366
-Component: web server 1
-  function: [default := Skewed - 1.5:2.5:0.8:-1.0]
-  Events processed: 47442
-  Utilization: 0.9077415222013033
-  Throughput: 0.4994014558828612
-  Queued events
-    Mean:0.48524288174282254
-    Standard deviation:0.5053254372757671
+    Mean:0.4890134080448274
+    Standard deviation:0.505537159136978
+    Median:0.0
     Maximum: 2.0
     Minimum: 0.0
   Wait time
-    Mean:0.20618979828110745
-    Standard deviation:0.3387867984154244
-    Maximum: 3.471011410027131
+    Mean:0.20366143098223205
+    Standard deviation:0.3346023223001282
+    Median:0.0
+    Maximum: 3.485141505501815
     Minimum: 0.0
   Process time
-    Mean:1.8176602914331101
-    Standard Deviation:0.2182476765197346
-    Maximum: 2.485031346053802
-    Minimum: 1.5025266495649703
+    Mean:1.816712497508781
+    Standard Deviation:0.2185719627059375
+    Median:1.768045624707156
+    Maximum: 2.485109673187253
+    Minimum: 1.502112194450092
   Visit time
-    Mean:2.0238500897142195
-    Standard Deviation:0.40249172125528226
-    Maximum: 5.148945891951371
-    Minimum: 1.5028010353635182
+    Mean:2.0203739284910176
+    Standard Deviation:0.3995144474244025
+    Median:1.93489722612685
+    Maximum: 5.298913332590018
+    Minimum: 1.502112194450092
   Arrival characteristics
-    Mean:2.002409282875349
-    Standard Deviation:0.30971374431240234
-    Maximum: 2.9242112672291114
-    Minimum: 1.0558629192091757
+    Mean:2.0005892641629637
+    Standard Deviation:0.3102732517640913
+    Median:2.001706788687443
+    Maximum: 2.889524055928632
+    Minimum: 1.1117710806283867
+Component: web server 1
+  function: [default := Skewed - 1.5:2.5:0.8:-1.0]
+  Events processed: 47495
+  Utilization: 0.9090481890951257
+  Throughput: 0.4999640611745867
+  Queued events
+    Mean:0.49095927674213924
+    Standard deviation:0.5054144994392091
+    Median:0.0
+    Maximum: 2.0
+    Minimum: 0.0
+  Wait time
+    Mean:0.20682200547273707
+    Standard deviation:0.33414535183237837
+    Median:0.0
+    Maximum: 2.815072668643552
+    Minimum: 0.0
+  Process time
+    Mean:1.8182243808924134
+    Standard Deviation:0.21909212615158793
+    Median:1.7704558694558727
+    Maximum: 2.4836513218488108
+    Minimum: 1.5026519332895987
+  Visit time
+    Mean:2.0250463863651516
+    Standard Deviation:0.39924194400508606
+    Median:1.940124999571708
+    Maximum: 4.659421515585564
+    Minimum: 1.5026519332895987
+  Arrival characteristics
+    Mean:2.0001601184949993
+    Standard Deviation:0.30933465271317234
+    Median:2.002244491588499
+    Maximum: 2.8741337098326767
+    Minimum: 1.1095585202638176
 ```
