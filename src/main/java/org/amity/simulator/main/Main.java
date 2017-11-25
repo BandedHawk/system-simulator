@@ -55,6 +55,8 @@ public class Main
     private final static String END = "end";
     private final static String GENERATE = "generate";
     private final static String FILE = "file";
+    private final static int SIZE = 1000;
+    private final static int LOW_BUFFER = 50;
 
     /**
      * Create command line options for use
@@ -220,11 +222,18 @@ public class Main
         }
     }
 
+    /**
+     * Perform the main task of creating the model and running the simulation
+     * 
+     * @param file specification for the model
+     * @param generate time span of event generation
+     * @param start low time limit for statistics sample
+     * @param end high time limit for statistics sample
+     * @return error result if any of the steps fail
+     */
     private static boolean run(final File file, final double generate,
             final double start, final double end)
     {
-        final int size = 1000;
-        final int lowBuffer = 50;
         boolean error = false;
         if (start > end)
         {
@@ -263,24 +272,16 @@ public class Main
                         }
                         while (true);
                     }
+                    // Sort primary store for all events in order of completion
                     events.sort(Comparator
                             .comparingDouble(Event::getCompleted));
+                    // Copy a fractional part of the primary store
+                    // We do this as the buffer sort will take less time
                     final LinkedList<Event> buffer = new LinkedList<>();
-                    for (int index = 0; index < size; index++)
-                    {
-                        if (events.isEmpty())
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            final Event event = events.removeFirst();
-                            buffer.add(event);
-                        }
-                    }
+                    double highmark = Main.fillBuffer(events, buffer, 0);
+                    // Sort buffer in chronological order of last completion
                     buffer.sort(Comparator
                             .comparingDouble(Event::getCompleted));
-                    double highmark = buffer.getLast().getCompleted();
                     while (buffer.size() > 0)
                     {
                         final Event event = buffer.removeFirst();
@@ -292,26 +293,18 @@ public class Main
                         else
                         {
                             buffer.add(event);
+                            // Refill buffer if modified event completion is
+                            // higher than the high watermark or we are getting
+                            // to a low buffer and we still have events in the
+                            // primary buffer
                             if ((event.getCompleted() > highmark
-                                    || buffer.size() < lowBuffer)
+                                    || buffer.size() < LOW_BUFFER)
                                     && !events.isEmpty())
                             {
-                                for (int index = 0; index < size; index++)
-                                {
-                                    if (events.isEmpty())
-                                    {
-                                        break;
-                                    }
-                                    else
-                                    {
-                                        final Event copy = events.removeFirst();
-                                        buffer.add(copy);
-                                        highmark = FastMath
-                                                .max(copy.getCompleted(),
-                                                        highmark);
-                                    }
-                                }
+                                highmark = Main.fillBuffer(events, buffer,
+                                        highmark);
                             }
+                            // Re-sort buffer after we have modified the list
                             buffer.sort(Comparator
                                     .comparingDouble(Event::getCompleted));
                         }
@@ -335,5 +328,34 @@ public class Main
             }
         }
         return error;
+    }
+
+    /**
+     * Transfer events from the primary event storage to the working area
+     * 
+     * @param primary main store for generated events
+     * @param buffer working storage for processing events
+     * @param highmark highest time boundary for events in the buffer
+     * @return updated highmark for the working area
+     */
+    private static double fillBuffer(final LinkedList<Event> primary,
+            final LinkedList<Event> buffer, final double highmark)
+    {
+        double current = highmark;
+        for (int index = 0; index < Main.SIZE; index++)
+        {
+            if (primary.isEmpty())
+            {
+                break;
+            }
+            else
+            {
+                final Event event = primary.removeFirst();
+                buffer.add(event);
+                current = FastMath.max(event.getCompleted(),
+                                current);
+            }
+        }
+        return current;
     }
 }
