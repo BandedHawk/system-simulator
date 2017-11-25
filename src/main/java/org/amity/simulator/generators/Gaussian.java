@@ -25,6 +25,7 @@ import org.amity.simulator.language.Vocabulary;
 import org.apache.commons.math3.random.GaussianRandomGenerator;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
+import org.apache.commons.math3.util.FastMath;
 
 /**
  * Implements generation of values that have a Gaussian random distribution.
@@ -70,12 +71,12 @@ public class Gaussian implements IGenerator
     public Gaussian(final double minimum, final double maximum,
             final String source, final String reference)
     {
-        final double max = Math.abs(maximum);
-        final double min = Math.abs(minimum);
-        this.minimum = Math.min(max, min);
-        this.maximum = Math.max(max, min);
-        this.deviation = Math.abs(max - min) / 10;
-        this.offset = Math.min(max, min) + deviation * 5;
+        final double max = FastMath.abs(maximum);
+        final double min = FastMath.abs(minimum);
+        this.minimum = FastMath.min(max, min);
+        this.maximum = FastMath.max(max, min);
+        this.deviation = FastMath.abs(max - min) / 10;
+        this.offset = FastMath.min(max, min) + deviation * 5;
         this.source = source;
         this.reference = reference;
         this.next = null;

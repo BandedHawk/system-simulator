@@ -24,6 +24,7 @@ import org.amity.simulator.elements.IComponent;
 import org.amity.simulator.language.Vocabulary;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
+import org.apache.commons.math3.util.FastMath;
 
 /**
  * Implements generation of values that have a uniform random distribution.
@@ -63,10 +64,10 @@ public class Uniform implements IGenerator
     public Uniform(final double minimum, final double maximum,
             final String source, final String reference)
     {
-        final double max = Math.abs(maximum);
-        final double min = Math.abs(minimum);
-        this.offset = Math.min(max, min);
-        this.width = Math.abs(max - min);
+        final double max = FastMath.abs(maximum);
+        final double min = FastMath.abs(minimum);
+        this.offset = FastMath.min(max, min);
+        this.width = FastMath.abs(max - min);
         this.source = source;
         this.reference = reference;
         this.next = null;

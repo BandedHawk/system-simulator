@@ -84,13 +84,13 @@ public class Skewed implements IGenerator
             final double skew, final double bias, final String source,
             final String reference)
     {
-        final double max = Math.abs(maximum);
-        final double min = Math.abs(minimum);
-        this.minimum = Math.min(max, min);
-        this.maximum = Math.max(max, min);
+        final double max = FastMath.abs(maximum);
+        final double min = FastMath.abs(minimum);
+        this.minimum = FastMath.min(max, min);
+        this.maximum = FastMath.max(max, min);
         this.middle = (max + min) / 2;
-        this.range = Math.abs(max - min);
-        this.skew = Math.abs(skew);
+        this.range = FastMath.abs(max - min);
+        this.skew = FastMath.abs(skew);
         this.bias = bias;
         this.factor = FastMath.exp(bias);
         this.source = source;
