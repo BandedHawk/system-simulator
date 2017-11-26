@@ -41,7 +41,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.math3.util.FastMath;
 
 /**
  * Command line entry point for running system simulation
@@ -55,8 +54,9 @@ public class Main
     private final static String END = "end";
     private final static String GENERATE = "generate";
     private final static String FILE = "file";
-    private final static int SIZE = 1000;
-    private final static int LOW_BUFFER = 50;
+    private final static int FILL = 500;
+    private final static int MIN_BUFFER = 20;
+    private final static int MAX_BUFFER = 1000;
 
     /**
      * Create command line options for use
@@ -297,12 +297,12 @@ public class Main
                             // higher than the high watermark or we are getting
                             // to a low buffer and we still have events in the
                             // primary buffer
-                            if ((event.getCompleted() > highmark
-                                    || buffer.size() < LOW_BUFFER)
-                                    && !events.isEmpty())
+                            if (!events.isEmpty()
+                                    && (buffer.size() < Main.MIN_BUFFER
+                                    || event.getCompleted() > highmark))
                             {
                                 highmark = Main.fillBuffer(events, buffer,
-                                        highmark);
+                                        event.getCompleted());
                             }
                             // Re-sort buffer after we have modified the list
                             buffer.sort(Comparator
@@ -336,24 +336,35 @@ public class Main
      * @param primary main store for generated events
      * @param buffer working storage for processing events
      * @param highmark highest time boundary for events in the buffer
-     * @return updated highmark for the working area
+     * @return updated highmark for the working buffer
      */
     private static double fillBuffer(final LinkedList<Event> primary,
             final LinkedList<Event> buffer, final double highmark)
     {
         double current = highmark;
-        for (int index = 0; index < Main.SIZE; index++)
+        if (!primary.isEmpty())
         {
-            if (primary.isEmpty())
+            // Re-calculate timeline due to out of order insertions
+            if (buffer.size() > Main.MAX_BUFFER)
             {
-                break;
+                System.out.println("System arrivals faster than system exits");
+                primary.addAll(buffer);
+                buffer.clear();
+                primary.sort(Comparator.comparingDouble(Event::getCompleted));
             }
-            else
+            // Copy events from main buffer into working buffer
+            for (int index = 0; index < Main.FILL; index++)
             {
-                final Event event = primary.removeFirst();
-                buffer.add(event);
-                current = FastMath.max(event.getCompleted(),
-                                current);
+                if (primary.isEmpty())
+                {
+                    break;
+                }
+                else
+                {
+                    final Event event = primary.removeFirst();
+                    buffer.add(event);
+                    current = event.getCompleted();
+                }
             }
         }
         return current;
