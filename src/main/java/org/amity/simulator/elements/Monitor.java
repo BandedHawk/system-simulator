@@ -85,7 +85,7 @@ public class Monitor
      *
      * @param component item to be interrogated
      */
-    public void displayStatistics(final IComponent component)
+    void displayStatistics(final IComponent component)
     {
         double last = 0;
         double idle = 0;
@@ -101,6 +101,7 @@ public class Monitor
         }
         this.arrivals.clear();
         // Collect data into statistical services
+        assert component != null : "unexpected null component";
         for (final Event event : component.getLocalEvents())
         {
             final double arrived = event.getArrived();

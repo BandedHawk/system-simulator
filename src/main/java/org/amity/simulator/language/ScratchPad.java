@@ -32,7 +32,7 @@ import org.amity.simulator.generators.IGenerator;
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public class ScratchPad
+class ScratchPad
 {
 
     public final int depth;
@@ -43,7 +43,7 @@ public class ScratchPad
     private final Map<String, Token> values;
     public final Map<String, IComponent> sources;
     public final Map<String, IComponent> components;
-    public final List<IGenerator> functions;
+    public final List<IGenerator> generators;
     private final List<String> errors;
 
     /**
@@ -59,7 +59,7 @@ public class ScratchPad
         this.values = new HashMap<>();
         this.sources = new HashMap<>();
         this.components = new HashMap<>();
-        this.functions = new ArrayList<>();
+        this.generators = new ArrayList<>();
         this.errors = new ArrayList<>();
     }
 
@@ -78,7 +78,7 @@ public class ScratchPad
         this.values = new HashMap<>();
         this.sources = new HashMap<>();
         this.components = new HashMap<>();
-        this.functions = new ArrayList<>();
+        this.generators = new ArrayList<>();
         this.errors = new ArrayList<>();
     }
 
@@ -122,11 +122,24 @@ public class ScratchPad
     public void clear()
     {
         this.names.clear();
-        this.values.clear();        
+        this.values.clear();
     }
 
     public void clearErrors()
     {
+        this.ok = true;
+        this.errors.clear();
+    }
+
+    public void reset()
+    {
+        this.label = null;
+        this.labelToken = null;
+        this.names.clear();
+        this.values.clear();
+        this.sources.clear();
+        this.generators.clear();
+        this.components.clear();
         this.ok = true;
         this.errors.clear();
     }

@@ -76,6 +76,7 @@ public class ParserTest
         final File file = new File("src/test/data/test.example.txt");
         final Parser instance = new Parser();
         final Token token = instance.parse(file);
+        final Compiler compiler = new Compiler();
         System.out.println("  syntax rule check");
         if (token.size() > 3)
         {
