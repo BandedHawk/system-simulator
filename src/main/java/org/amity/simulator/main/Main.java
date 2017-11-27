@@ -235,6 +235,7 @@ public class Main
             final double start, final double end)
     {
         boolean error = false;
+        int operations = 0;
         if (start > end)
         {
             System.err.println("Sample start time must be lower than the sample end time");
@@ -286,6 +287,7 @@ public class Main
                     {
                         final Event event = buffer.removeFirst();
                         event.simulate();
+                        operations++;
                         if (event.getComponent() == null)
                         {
                             completed.add(event);
@@ -327,6 +329,7 @@ public class Main
                 error = true;
             }
         }
+        System.out.println("Operations: " + operations);
         return error;
     }
 
@@ -344,7 +347,7 @@ public class Main
         double current = highmark;
         if (!primary.isEmpty())
         {
-            // Re-calculate timeline due to out of order insertions
+            // Re-calculate timeline due to extreme out-of-order insertions
             if (buffer.size() > Main.MAX_BUFFER)
             {
                 System.out.println("System arrivals faster than system exits");

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import org.amity.simulator.elements.IComponent;
 import org.amity.simulator.elements.Processor;
+import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.junit.After;
@@ -162,15 +163,18 @@ public class ConstantTest
     public void testInstance()
     {
         System.out.println("instance");
-        final Map<String, String> pairs = new HashMap<>();
-        pairs.put(Vocabulary.OFFSET, "51.3");
+        final List<NameValue> pairs = new ArrayList<>();
+        NameValue pair = new NameValue(Vocabulary.OFFSET, "51.3");
+        pairs.add(pair);
         IGenerator result = Constant.instance(pairs);
         assertTrue(result != null);
         assertEquals(result.getReference(), null);
         assertEquals(result.getSource(), Vocabulary.DEFAULT);
         assertEquals(result.characteristics(), "Constant - 51.3");
-        pairs.put(Vocabulary.SOURCE, Vocabulary.COMPONENT);
-        pairs.put(Vocabulary.NEXT, Vocabulary.PROCESSOR);
+        pair = new NameValue(Vocabulary.SOURCE, Vocabulary.COMPONENT);
+        pairs.add(pair);
+        pair = new NameValue(Vocabulary.NEXT, Vocabulary.PROCESSOR);
+        pairs.add(pair);
         result = Constant.instance(pairs);
         assertEquals(result.getSource(), Vocabulary.COMPONENT);
         assertEquals(result.getReference(), Vocabulary.PROCESSOR);

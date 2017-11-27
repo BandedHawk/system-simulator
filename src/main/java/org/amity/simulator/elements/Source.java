@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.amity.simulator.generators.IGenerator;
+import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
 
 /**
@@ -162,20 +163,20 @@ public class Source implements IComponent
      * @param generators
      * @return 
      */
-    public final static IComponent instance(final Map<String, String> pairs,
+    public final static IComponent instance(final List<NameValue> pairs,
             List<IGenerator> generators)
     {
         String label = null;
         boolean monitor = false;
-        for (final String parameter : pairs.keySet())
+        for (final NameValue parameter : pairs)
         {
-            switch (parameter)
+            switch (parameter.name)
             {
                 case Vocabulary.NAME:
-                    label = pairs.get(parameter);
+                    label = parameter.value;
                     break;
                 case Vocabulary.MONITOR:
-                    monitor = pairs.get(parameter).toLowerCase().contains("y");
+                    monitor = parameter.value.toLowerCase().contains("y");
                     break;
                 default:
                     break;

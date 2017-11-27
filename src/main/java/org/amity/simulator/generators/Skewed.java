@@ -21,8 +21,8 @@ package org.amity.simulator.generators;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.amity.simulator.elements.IComponent;
+import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
 import org.apache.commons.math3.random.GaussianRandomGenerator;
 import org.apache.commons.math3.random.JDKRandomGenerator;
@@ -148,7 +148,7 @@ public class Skewed implements IGenerator
      * @param pairs
      * @return 
      */
-    public final static IGenerator instance(final Map<String, String> pairs)
+    public final static IGenerator instance(final List<NameValue> pairs)
     {
         double maximum = 0;
         double minimum = 0;
@@ -156,28 +156,27 @@ public class Skewed implements IGenerator
         double bias = 0;
         String reference = null;
         String source = Vocabulary.DEFAULT;
-        for (final String parameter : pairs.keySet())
+        for (final NameValue parameter : pairs)
         {
-            final String value = pairs.get(parameter);
-            switch (parameter)
+            switch (parameter.name)
             {
                 case Vocabulary.MAXIMUM:
-                    maximum = Double.parseDouble(value);
+                    maximum = Double.parseDouble(parameter.value);
                     break;
                 case Vocabulary.MINIMUM:
-                    minimum = Double.parseDouble(value);
+                    minimum = Double.parseDouble(parameter.value);
                     break;
                 case Vocabulary.SKEW:
-                    skew = Double.parseDouble(value);
+                    skew = Double.parseDouble(parameter.value);
                     break;
                 case Vocabulary.BIAS:
-                    bias = Double.parseDouble(value);
+                    bias = Double.parseDouble(parameter.value);
                     break;
                 case Vocabulary.SOURCE:
-                    source = pairs.get(parameter);
+                    source = parameter.value;
                     break;
                 case Vocabulary.NEXT:
-                    reference = pairs.get(parameter);
+                    reference = parameter.value;
                 default:
                     break;
             }

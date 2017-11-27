@@ -33,6 +33,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.amity.simulator.generators.IGenerator;
+import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
 
 /**
@@ -396,10 +397,12 @@ public class ProcessorTest
         final IGenerator generator = new Constant(period, source, reference);
         final List<IGenerator> generators = new ArrayList<>();
         generators.add(generator);
-        final Map<String, String> pairs = new HashMap<>();
+        final List<NameValue> pairs = new ArrayList<>();
         final String name  = "CPU";
-        pairs.put(Vocabulary.NAME, name);
-        pairs.put(Vocabulary.MONITOR, "Y");
+        NameValue pair = new NameValue(Vocabulary.NAME, name);
+        pairs.add(pair);
+        pair = new NameValue(Vocabulary.MONITOR, "Y");
+        pairs.add(pair);
         IComponent instance = Processor.instance(pairs, generators);
         assertEquals(name, instance.getLabel());
         assertEquals(1, instance.getReferences().size());

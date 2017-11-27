@@ -225,65 +225,92 @@ class Compiler
     /**
      * Manufactures the actual system simulation components for the model
      * 
-     * @param local nest level scratchpad for collecting compilation
+     * @param local nest level scratch-pad for collecting compilation
      * information
      */
     private void compileObject(final Token token, final ScratchPad local)
     {
         if (local.containsName(Vocabulary.TYPE_NAME))
         {
-            final String type = local.value(Vocabulary.TYPE_NAME);
-            if (Vocabulary.containsDefinition(type, local.depth - 1))
+            final List<Pair> types = local.value(Vocabulary.TYPE_NAME);
+            // type should only be ever declared once
+            if (types.size() == 1)
             {
-                final Map<String, Definition> parameters
-                        = Vocabulary.get(type, local.depth - 1);
-                final Map<String, String> pairs = new HashMap<>();
-                for (final String name : local.values())
+                // Get type declared
+                final String type = types.get(0).value.getValue();
+                final List<NameValue> pairs = new ArrayList<>();
+                if (Vocabulary.containsDefinition(type, local.depth - 1))
                 {
-                    if (parameters.containsKey(name))
+                    // Obtain parsing information for valid values forms
+                    final Map<String, Definition> parameters
+                            = Vocabulary.get(type, local.depth - 1);
+                    // Look through collected name-values pairs
+                    for (final String name : local.values())
                     {
-                        final String pairValue = local.value(name);
-                        final Matcher matcher = parameters.get(name)
-                                .getPattern().matcher(pairValue);
-                        if (matcher.find())
+                        // Compare name of pair to valid names
+                        if (parameters.containsKey(name))
                         {
-                            pairs.put(name, pairValue);
+                            final Definition definition = parameters.get(name);
+                            final List<Pair> pair = local.value(name);
+                            // process for multiple values for same name
+                            if (pair.size() > 1 && definition.getMultivalue())
+                            {
+                            }
+                            // 
+                            else if (pair.size() == 1 && !definition.getMultivalue())
+                            {
+                                final String pairValue
+                                        = pair.get(0).value.getValue();
+                                final Matcher matcher = definition
+                                        .getPattern().matcher(pairValue);
+                                if (matcher.find())
+                                {
+                                    final NameValue parameter
+                                            = new NameValue(name, pairValue);
+                                    pairs.add(parameter);
+                                }
+                                // Parameter values does not match requirements
+                                else
+                                {
+                                    final StringBuilder error =
+                                            new StringBuilder(name);
+                                    error.append(" does not have a valid value at ");
+                                    error.append(local.location(name));
+                                    local.addError(error.toString());
+                                }
+                            }
+                            else
+                            {
+                                
+                            }
                         }
-                        // Parameter value does not match requirements
-                        else
+                        // Unexpected name in value pair
+                        else if (!name.equals(Vocabulary.TYPE_NAME))
                         {
                             final StringBuilder error =
                                     new StringBuilder(name);
-                            error.append(" does not have a valid value at ");
-                            error.append(local.location(name));
-                            local.addError(error.toString());
-                        }
-                    }
-                    else if (!name.equals(Vocabulary.TYPE_NAME))
-                    {
-                        final StringBuilder error =
-                                new StringBuilder(name);
-                        error.append(" is not a valid parameter at ");
-                        error.append(token.line).append(", ")
-                                .append(token.position);
-                        local.addError(error.toString());
-                    }
-                }
-                for (final String parameter : parameters.keySet())
-                {
-                    if (parameters.get(parameter).getMandatory())
-                    {
-                        final boolean specified
-                                = local.containsName(parameter);
-                        if (!specified)
-                        {
-                            final StringBuilder error =
-                                    new StringBuilder("Mandatory parameter ");
-                            error.append(parameter)
-                                    .append(" was not defined at ");
+                            error.append(" is not a valid parameter at ");
                             error.append(token.line).append(", ")
                                     .append(token.position);
                             local.addError(error.toString());
+                        }
+                    }
+                    for (final String parameter : parameters.keySet())
+                    {
+                        if (parameters.get(parameter).getMandatory())
+                        {
+                            final boolean specified
+                                    = local.containsName(parameter);
+                            if (!specified)
+                            {
+                                final StringBuilder error =
+                                        new StringBuilder("Mandatory parameter ");
+                                error.append(parameter)
+                                        .append(" was not defined at ");
+                                error.append(token.line).append(", ")
+                                        .append(token.position);
+                                local.addError(error.toString());
+                            }
                         }
                     }
                 }
@@ -291,20 +318,20 @@ class Compiler
                 if (local.ok())
                 {
                     // Get generators for the component being compiled
-                    List<IGenerator> functions = local.depth == 1
+                    List<IGenerator> generators = local.depth == 1
                             ? this.scratch[local.depth + 1].generators
                             : null;
                     switch (type)
                     {
                         case Vocabulary.SOURCE:
                             final IComponent source
-                                    = Source.instance(pairs, functions);
+                                    = Source.instance(pairs, generators);
                             local.components.put(source.getLabel(), source);
                             local.sources.put(source.getLabel(), source);
                             break;
                         case Vocabulary.PROCESSOR:
                             final IComponent processor
-                                    = Processor.instance(pairs, functions);
+                                    = Processor.instance(pairs, generators);
                             local.components.put(processor.getLabel(),
                                     processor);
                             break;
@@ -337,7 +364,7 @@ class Compiler
             {
                 final StringBuilder error =
                         new StringBuilder("Unrecognized type ");
-                error.append(type).append(" at ")
+                error.append(token.value).append(" at ")
                         .append(local.location(Vocabulary.TYPE_NAME));
                 local.addError(error.toString());
             }

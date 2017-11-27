@@ -6,11 +6,10 @@
 package org.amity.simulator.generators;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.amity.simulator.elements.IComponent;
 import org.amity.simulator.elements.Processor;
+import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.junit.After;
@@ -191,18 +190,24 @@ public class SkewedTest
     public void testInstance()
     {
         System.out.println("instance");
-        final Map<String, String> pairs = new HashMap<>();
-        pairs.put(Vocabulary.MAXIMUM, "121.2");
-        pairs.put(Vocabulary.MINIMUM, "37.5");
-        pairs.put(Vocabulary.SKEW, "56.4");
-        pairs.put(Vocabulary.BIAS, "98.3");
+        final List<NameValue> pairs = new ArrayList<>();
+        NameValue pair = new NameValue(Vocabulary.MAXIMUM, "121.2");
+        pairs.add(pair);
+        pair = new NameValue(Vocabulary.MINIMUM, "37.5");
+        pairs.add(pair);
+        pair = new NameValue(Vocabulary.SKEW, "56.4");
+        pairs.add(pair);
+        pair = new NameValue(Vocabulary.BIAS, "98.3");
+        pairs.add(pair);
         IGenerator result = Skewed.instance(pairs);
         assertTrue(result != null);
         assertEquals(result.getReference(), null);
         assertEquals(result.getSource(), Vocabulary.DEFAULT);
         assertEquals(result.characteristics(), "Skewed - 37.5:121.2:56.4:98.3");
-        pairs.put(Vocabulary.SOURCE, Vocabulary.COMPONENT);
-        pairs.put(Vocabulary.NEXT, Vocabulary.PROCESSOR);
+        pair = new NameValue(Vocabulary.SOURCE, Vocabulary.COMPONENT);
+        pairs.add(pair);
+        pair = new NameValue(Vocabulary.NEXT, Vocabulary.PROCESSOR);
+        pairs.add(pair);
         result = Skewed.instance(pairs);
         assertEquals(result.getSource(), Vocabulary.COMPONENT);
         assertEquals(result.getReference(), Vocabulary.PROCESSOR);

@@ -17,5 +17,13 @@ component
     {
         type: constant
         offset: 2
+        source: generator
+    }
+    function
+    {
+        type: uniform
+        minimum: 2
+        maximum: 4
+        source: default
     }
 }

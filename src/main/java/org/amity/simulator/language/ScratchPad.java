@@ -39,8 +39,7 @@ class ScratchPad
     public String label;
     public Token labelToken;
     private boolean ok;
-    private final Map<String, Token> names;
-    private final Map<String, Token> values;
+    private final Map<String, List<Pair>> pairs;
     public final Map<String, IComponent> sources;
     public final Map<String, IComponent> components;
     public final List<IGenerator> generators;
@@ -55,8 +54,7 @@ class ScratchPad
         this.label = null;
         this.labelToken = null;
         this.ok = true;
-        this.names = new HashMap<>();
-        this.values = new HashMap<>();
+        this.pairs = new HashMap<>();
         this.sources = new HashMap<>();
         this.components = new HashMap<>();
         this.generators = new ArrayList<>();
@@ -74,8 +72,7 @@ class ScratchPad
         this.label = null;
         this.labelToken = null;
         this.ok = true;
-        this.names = new HashMap<>();
-        this.values = new HashMap<>();
+        this.pairs = new HashMap<>();
         this.sources = new HashMap<>();
         this.components = new HashMap<>();
         this.generators = new ArrayList<>();
@@ -121,8 +118,7 @@ class ScratchPad
 
     public void clear()
     {
-        this.names.clear();
-        this.values.clear();
+        this.pairs.clear();
     }
 
     public void clearErrors()
@@ -135,8 +131,7 @@ class ScratchPad
     {
         this.label = null;
         this.labelToken = null;
-        this.names.clear();
-        this.values.clear();
+        this.pairs.clear();
         this.sources.clear();
         this.generators.clear();
         this.components.clear();
@@ -146,30 +141,34 @@ class ScratchPad
 
     public boolean containsName(final String name)
     {
-        return this.names.containsKey(name);
+        return this.pairs.containsKey(name);
     }
 
-    public String value(final String name)
+    public List<Pair> value(final String name)
     {
-        return this.values.get(name).getValue();
+        return this.pairs.get(name);
     }
 
     public Set<String> values()
     {
-        return this.values.keySet();
+        return pairs.keySet();
     }
 
     public String location(final String name)
     {
-        final String line = Integer.toString(this.values.get(name).getLine());
-        StringBuilder error = new StringBuilder(line);
-        error.append(", ").append(this.values.get(name).getPosition());
+        StringBuilder error = new StringBuilder();
         return error.toString();
     }
 
     public void put(final Token name, final Token value)
     {
-        this.names.put(name.getValue(), name);
-        this.values.put(name.getValue(), value);
+        final String label = name.getValue();
+        final Pair pair = new Pair(name, value);
+        final List<Pair> list
+                = this.pairs.containsKey(label)
+                ? this.pairs.get(label)
+                : new ArrayList<>();
+        list.add(pair);
+        pairs.putIfAbsent(label, list);
     }
 }

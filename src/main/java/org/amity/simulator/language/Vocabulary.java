@@ -42,6 +42,8 @@ public class Vocabulary
     public final static String OFFSET = "offset";
     public final static String SKEW = "skew";
     public final static String BIAS = "bias";
+    public final static String ROUNDROBIN = "round-robin";
+    public final static String SMART = "smart";
     public final static String SKEWED = "skewed";
     public final static String UNIFORM = "uniform";
     public final static String CONSTANT = "constant";
@@ -50,28 +52,33 @@ public class Vocabulary
     public final static String SOURCE = "source";
     public final static String DEFAULT = "default";
     public final static String PROCESSOR = "processor";
+    public final static String BALANCER = "balancer";
     public final static String NEXT = "next";
     public final static String NAME = "name";
     public final static String COMPONENT = "component";
 
     static
     {
-        TYPE_PATTERN = Pattern.compile("^\\s*[a-zA-Z][\\s|\\w]*$");
+        TYPE_PATTERN = Pattern.compile("^\\s*[a-zA-Z][\\s\\w]*[\\-]*[\\s\\w]*$");
         final Map<String, Map<String, Definition>> blocks = new HashMap<>();
         final Map<String, Definition> component = new HashMap<>();
+        final Map<String, Definition> balancer = new HashMap<>();
         final Pattern words = Pattern.compile("^\\s*[a-zA-Z][\\s|\\w]*$");
         final Pattern positiveDecimal = Pattern.compile("^\\+?\\d*\\.?\\d+$");
         final Pattern decimal = Pattern.compile("^[\\+\\-]?\\d*\\.?\\d+$");
         final Pattern binaryResponse = Pattern.compile("^[Yy]([Ee][Ss])*|[Nn][Oo]*$");
-        final Definition mandatoryWords = new Definition(words, true);
-        final Definition optionalWords = new Definition(words, false);
-        final Definition monitor = new Definition(binaryResponse, false);
+        final Definition mandatoryWords = new Definition(words, true, false);
+        final Definition optionalWords = new Definition(words, false, false);
+        final Definition monitor = new Definition(binaryResponse, false, false);
         final Definition mandatoryDecimal =
-                new Definition(positiveDecimal, true);
+                new Definition(positiveDecimal, true, false);
         final Definition biasDecimal =
-                new Definition(decimal, true);
+                new Definition(decimal, true, false);
+        final Definition multiWords = new Definition(words, true, true);
+        balancer.put(Vocabulary.NAME, mandatoryWords);
         component.put(Vocabulary.NAME, mandatoryWords);
         component.put(Vocabulary.MONITOR, monitor);
+        blocks.put(Vocabulary.BALANCER, balancer);
         blocks.put(Vocabulary.SOURCE, component);
         blocks.put(Vocabulary.PROCESSOR, component);
         final Map<String, Map<String, Definition>> functions = new HashMap<>();
@@ -85,15 +92,22 @@ public class Vocabulary
         complex.put(Vocabulary.SKEW, mandatoryDecimal);
         final Map<String, Definition> offset = new HashMap<>();
         offset.put(Vocabulary.OFFSET, mandatoryDecimal);
+        final Map<String, Definition> divert = new HashMap<>();
+        divert.put(Vocabulary.NEXT, multiWords);
+        // Define vocabulary definitions for each function
         functions.put(Vocabulary.UNIFORM, bounds);
         functions.put(Vocabulary.CONSTANT, offset);
         functions.put(Vocabulary.GAUSSIAN, bounds);
         functions.put(Vocabulary.SKEWED, complex);
-        for (final Map<String, Definition> function : functions.values())
+        // Add these only to generators and not to balancers
+        for (final Map<String, Definition> generator : functions.values())
         {
-            function.put(Vocabulary.NEXT, optionalWords);
-            function.put(Vocabulary.SOURCE, optionalWords);
+            generator.put(Vocabulary.NEXT, optionalWords);
+            generator.put(Vocabulary.SOURCE, optionalWords);
         }
+        // These are for balancers
+        functions.put(Vocabulary.ROUNDROBIN, divert);
+        functions.put(Vocabulary.SMART, divert);
         final List<String> components = new ArrayList<>();
         components.add(Vocabulary.COMPONENT);
         final List<String> subcomponents = new ArrayList<>();

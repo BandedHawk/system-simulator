@@ -30,6 +30,7 @@ public class Definition
 {
     private final Pattern pattern;
     private final boolean mandatory;
+    private final boolean multivalue;
 
     /**
      * Default constructor - intentionally hidden
@@ -37,19 +38,23 @@ public class Definition
     private Definition()
     {
         this.pattern = null;
-        mandatory = false;
+        this.mandatory = false;
+        this.multivalue = false;
     }
 
     /**
      * Create immutable specification for name-value pair
      * 
      * @param pattern regular expression to test value token
-     * @param mandatory required name-value pair if <code>true</code> 
+     * @param mandatory required name-value pair if <code>true</code>
+     * @param multivalue multiple values allowed if <code>true</code>
      */
-    public Definition(final Pattern pattern, final boolean mandatory)
+    public Definition(final Pattern pattern, final boolean mandatory,
+            final boolean multivalue)
     {
         this.pattern = pattern;
         this.mandatory = mandatory;
+        this.multivalue = multivalue;
     }
 
     /**
@@ -68,5 +73,14 @@ public class Definition
     public boolean getMandatory()
     {
         return mandatory;
+    }
+
+    /**
+     * 
+     * @return multiple values allowed if <code>true</code>
+     */
+    public boolean getMultivalue()
+    {
+        return multivalue;
     }
 }
