@@ -35,6 +35,17 @@ public class Smart implements IDistributor
     private final List<String> references;
     private final IComponent[] next;
 
+    private Smart()
+    {
+        this.references = new ArrayList<>();
+        this.next = new IComponent[0];
+    }
+
+    /**
+     * Constructor for creating balancing algorithm
+     * 
+     * @param references list of downstream components
+     */
     public Smart(final List<String> references)
     {
         this.references = references;
@@ -45,16 +56,18 @@ public class Smart implements IDistributor
     @Override
     public Event assign(final Event event)
     {
+        // Find downstream component with lowest wait time
         double minimum = Double.MAX_VALUE;
         IComponent component = null;
-        for (int index = 0; index < next.length; index++)
+        for (final IComponent item : next)
         {
-            if (next[index].getAvailable() < minimum)
+            if (item.getAvailable() < minimum)
             {
-                minimum = next[index].getAvailable();
-                component = next[index];
+                minimum = item.getAvailable();
+                component = item;
             }
         }
+        // Direct event to next available component
         event.setComponent(component);
         return event;
     }
@@ -93,7 +106,13 @@ public class Smart implements IDistributor
     {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
+    /**
+     * Create algorithm object given raw name-value pairs
+     * 
+     * @param pairs list of name-values to convert into variables
+     * @return manufactured balancer algorithm object
+     */
     public final static IDistributor instance(final List<NameValue> pairs)
     {
         List<String> references = new ArrayList<>();
@@ -109,5 +128,11 @@ public class Smart implements IDistributor
         }
         final IDistributor distributor = new Smart(references);
         return distributor;
+    }
+
+    @Override
+    public IComponent[] connections()
+    {
+        return this.next;
     }
 }

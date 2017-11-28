@@ -57,4 +57,11 @@ public interface IDistributor extends IFunction
      * @param component downstream module for balancer
      */
     void addNext(IComponent component);
+
+    /**
+     * Obtain a list of components participating in the balancing
+     * 
+     * @return list of downstream connections
+     */
+    IComponent[] connections();
 }

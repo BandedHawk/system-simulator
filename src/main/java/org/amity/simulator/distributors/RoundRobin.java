@@ -52,8 +52,9 @@ public class RoundRobin implements IDistributor
     }
 
     /**
+     * Constructor for creating balancing algorithm
      * 
-     * @param references 
+     * @param references list of downstream components
      */
     public RoundRobin(final List<String> references)
     {
@@ -112,9 +113,10 @@ public class RoundRobin implements IDistributor
     }
 
     /**
+     * Create algorithm object given raw name-value pairs
      * 
-     * @param pairs
-     * @return 
+     * @param pairs list of name-values to convert into variables
+     * @return manufactured balancer algorithm object
      */
     public final static IDistributor instance(final List<NameValue> pairs)
     {
@@ -131,5 +133,11 @@ public class RoundRobin implements IDistributor
         }
         final IDistributor distributor = new RoundRobin(references);
         return distributor;
+    }
+
+    @Override
+    public IComponent[] connections()
+    {
+        return this.next;
     }
 }

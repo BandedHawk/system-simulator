@@ -40,6 +40,9 @@ public class Balancer implements IComponent
     private final boolean monitor;
     private double available;
 
+    /**
+     * Default constructor - intentionally hidden
+     */
     private Balancer()
     {
         this.label = "dummy";
@@ -50,6 +53,13 @@ public class Balancer implements IComponent
         this.available = 0;
     }
 
+    /**
+     * 
+     * 
+     * @param label name of component
+     * @param distributor algorithm implementation for balancing
+     * @param monitor monitor if <code>true</code>
+     */
     public Balancer(final String label, final IDistributor distributor,
             final boolean monitor)
     {
@@ -75,7 +85,14 @@ public class Balancer implements IComponent
         {
             this.distributor.reset();
         }
-        // Todo: Clear downstream components
+        final IComponent[] components = this.distributor.connections();
+        if (components != null)
+        {
+            for (final IComponent component : components)
+            {
+                component.reset();
+            }
+        }
     }
 
     @Override
@@ -156,12 +173,12 @@ public class Balancer implements IComponent
         return this.available;
     }
 
-
     /**
+     * Create Balancer object given raw name-value pairs and algorithm
      * 
-     * @param pairs
-     * @param distributors
-     * @return 
+     * @param pairs list of name-values to convert into variables
+     * @param distributors list of distribution/balancing algorithms
+     * @return manufactured Balancer object
      */
     public final static IComponent instance(final List<NameValue> pairs,
             final List<IDistributor> distributors)
