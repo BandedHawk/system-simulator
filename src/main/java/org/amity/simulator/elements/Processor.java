@@ -37,7 +37,7 @@ public class Processor implements IComponent
 
     private final String label;
     private final Map<String, IGenerator> generators;
-    private final Map<String, List<IGenerator>> references;
+    private final Map<String, List<IFunction>> references;
     private final List<Event> local;
     private final boolean monitor;
     private double available;
@@ -92,7 +92,7 @@ public class Processor implements IComponent
             final String reference = generator.getReference();
             if (reference != null)
             {
-                final List<IGenerator> list
+                final List<IFunction> list
                         = this.references.containsKey(reference)
                         ? this.references.get(reference)
                         : new ArrayList<>();
@@ -207,7 +207,6 @@ public class Processor implements IComponent
         }
         else
         {
-            final int size = this.generators.size();
             for (final String source : this.generators.keySet())
             {
                 string.append("[").append(source).append(" := ");
@@ -219,7 +218,7 @@ public class Processor implements IComponent
     }
 
     @Override
-    public Map<String, List<IGenerator>> getReferences()
+    public Map<String, List<IFunction>> getReferences()
     {
         return this.references;
     }
@@ -252,5 +251,11 @@ public class Processor implements IComponent
         final IComponent processor
                 = new Processor(label, generators, monitor);
         return processor;
+    }
+
+    @Override
+    public double getAvailable()
+    {
+        return this.available;
     }
 }

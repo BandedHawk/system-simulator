@@ -38,11 +38,12 @@ public class Source implements IComponent
 
     private final String label;
     private final IGenerator generator;
-    private final Map<String, List<IGenerator>> generators;
+    private final Map<String, List<IFunction>> generators;
     private final List<Event> local;
     private final boolean monitor;
     private int counter;
     private double time;
+    private double available;
 
     private Source()
     {
@@ -53,6 +54,7 @@ public class Source implements IComponent
         this.monitor = false;
         this.counter = 0;
         this.time = 0;
+        this.available = 0;
     }
 
     /**
@@ -68,7 +70,7 @@ public class Source implements IComponent
         this.label = label;
         this.generator = generator;
         this.generators = new HashMap<>();
-        final List<IGenerator> list = new ArrayList<>();
+        final List<IFunction> list = new ArrayList<>();
         list.add(generator);
         if (this.generator != null && generator != null)
         {
@@ -78,6 +80,7 @@ public class Source implements IComponent
         this.monitor = monitor;
         this.counter = 0;
         this.time = 0;
+        this.available = 0;
     }
 
     @Override
@@ -101,6 +104,7 @@ public class Source implements IComponent
         final Event global =
                 new Event(this.local.get(this.local.size() - 1));
         global.setComponent(this.generator.getNext());
+        this.available = global.getCompleted();
         return global;
     }
 
@@ -152,7 +156,7 @@ public class Source implements IComponent
     }
 
     @Override
-    public Map<String, List<IGenerator>> getReferences()
+    public Map<String, List<IFunction>> getReferences()
     {
         return this.generators;
     }
@@ -185,5 +189,11 @@ public class Source implements IComponent
         final IComponent source = new Source(label, generators.get(0),
                 monitor);
         return source;
+    }
+
+    @Override
+    public double getAvailable()
+    {
+        return this.available;
     }
 }

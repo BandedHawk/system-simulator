@@ -135,12 +135,11 @@ public class Token
     }
 
     /**
-     * Compiles the simulation model from the token chain
+     * Parses the token chain and generates the compiled system model
      * 
-     * @param compiler object responsible for building simulation model
      * @return simulation model information
      */
-    public Model compile()
+    public Model parse()
     {
         final Compiler compiler = new Compiler();
         return compiler.compile(this);

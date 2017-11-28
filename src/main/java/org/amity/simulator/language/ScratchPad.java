@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.amity.simulator.distributors.IDistributor;
 import org.amity.simulator.elements.IComponent;
 import org.amity.simulator.generators.IGenerator;
 
@@ -43,6 +44,7 @@ class ScratchPad
     public final Map<String, IComponent> sources;
     public final Map<String, IComponent> components;
     public final List<IGenerator> generators;
+    public final List<IDistributor> distributors;
     private final List<String> errors;
 
     /**
@@ -58,6 +60,7 @@ class ScratchPad
         this.sources = new HashMap<>();
         this.components = new HashMap<>();
         this.generators = new ArrayList<>();
+        this.distributors = new ArrayList<>();
         this.errors = new ArrayList<>();
     }
 
@@ -76,6 +79,7 @@ class ScratchPad
         this.sources = new HashMap<>();
         this.components = new HashMap<>();
         this.generators = new ArrayList<>();
+        this.distributors = new ArrayList<>();
         this.errors = new ArrayList<>();
     }
 
@@ -102,6 +106,10 @@ class ScratchPad
         }
     }
 
+    /**
+     * 
+     * @return 
+     */
     public List<String> errors()
     {
         return this.errors;
@@ -116,48 +124,66 @@ class ScratchPad
         return this.ok;
     }
 
+    /**
+     * 
+     */
     public void clear()
     {
         this.pairs.clear();
     }
 
+    /**
+     * 
+     */
     public void clearErrors()
     {
         this.ok = true;
         this.errors.clear();
     }
 
+    /**
+     * 
+     */
     public void reset()
     {
         this.label = null;
         this.labelToken = null;
         this.pairs.clear();
         this.sources.clear();
+        this.distributors.clear();
         this.generators.clear();
         this.components.clear();
         this.ok = true;
         this.errors.clear();
     }
 
+    /**
+     * 
+     * @param name
+     * @return 
+     */
     public boolean containsName(final String name)
     {
         return this.pairs.containsKey(name);
     }
 
+    /**
+     * 
+     * @param name
+     * @return 
+     */
     public List<Pair> value(final String name)
     {
         return this.pairs.get(name);
     }
 
+    /**
+     * 
+     * @return 
+     */
     public Set<String> values()
     {
         return pairs.keySet();
-    }
-
-    public String location(final String name)
-    {
-        StringBuilder error = new StringBuilder();
-        return error.toString();
     }
 
     public void put(final Token name, final Token value)

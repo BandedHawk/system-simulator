@@ -322,7 +322,6 @@ public class ProcessorTest
         assertTrue(period > sourcePeriod);
         final String sourceLabel = "source";
         final String label = "delay";
-        final int eventTotal = 4;
         final IGenerator sourceGenerator = new Constant(sourcePeriod,
                 sourceLabel, label);
         final IGenerator generator = new Constant(period, sourceLabel, null);
@@ -363,7 +362,7 @@ public class ProcessorTest
         generators.add(generator1);
         generators.add(generator2);
         IComponent instance = new Processor(label, generators, false);
-        Map<String, List<IGenerator>> map = instance.getReferences();
+        Map<String, List<IFunction>> map = instance.getReferences();
         assertEquals(1, map.size());
         assertEquals(2, map.get(reference).size());
         assertEquals(generator2, map.get(reference).get(0));

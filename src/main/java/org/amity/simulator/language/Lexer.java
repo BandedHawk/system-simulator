@@ -1,5 +1,5 @@
 /*
- * Parser.java
+ * Lexer.java
  *
  * (C) Copyright 2017 Jon Barnett.
  *
@@ -31,7 +31,7 @@ import java.util.regex.Matcher;
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public class Parser
+public class Lexer
 {
 
     /**
@@ -42,7 +42,7 @@ public class Parser
      * @return start of the linked list of tokens if the text was
      * syntactically correct otherwise <code>null</code>
      */
-    public Token parse(final File file)
+    public Token analyze(final File file)
     {
         Token token = null;
         try (final Scanner scanner = new Scanner(file, "UTF-8"))

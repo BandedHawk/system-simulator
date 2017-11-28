@@ -103,6 +103,12 @@ public class Constant implements IGenerator
     {
         this.next = next;
     }
+
+    /**
+     * 
+     * @param pairs
+     * @return 
+     */
     public final static IGenerator instance(final List<NameValue> pairs)
     {
         double offset = 0;

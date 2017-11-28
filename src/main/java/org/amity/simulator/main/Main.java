@@ -32,7 +32,7 @@ import org.amity.simulator.elements.Event;
 import org.amity.simulator.elements.IComponent;
 import org.amity.simulator.elements.Model;
 import org.amity.simulator.elements.Monitor;
-import org.amity.simulator.language.Parser;
+import org.amity.simulator.language.Lexer;
 import org.amity.simulator.language.Token;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -247,12 +247,12 @@ public class Main
         }
         if (!error)
         {
-            final Parser parser = new Parser();
-            final Token token = parser.parse(file);
+            final Lexer parser = new Lexer();
+            final Token token = parser.analyze(file);
             if (token != null)
             {
                 System.out.println("Completed syntax parsing");
-                final Model model = token.compile();
+                final Model model = token.parse();
                 if (model.compiled)
                 {
                     System.out.println("Completed compilation");

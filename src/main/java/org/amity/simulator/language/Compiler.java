@@ -24,7 +24,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
+import org.amity.simulator.distributors.IDistributor;
+import org.amity.simulator.distributors.RoundRobin;
+import org.amity.simulator.elements.Balancer;
 import org.amity.simulator.elements.IComponent;
+import org.amity.simulator.elements.IFunction;
 import org.amity.simulator.elements.Model;
 import org.amity.simulator.elements.Processor;
 import org.amity.simulator.elements.Source;
@@ -55,9 +59,10 @@ class Compiler
     }
 
     /**
+     * Converst the chain of tokens into a system simulation model
      * 
-     * @param token
-     * @return 
+     * @param token start of token chain
+     * @return system model to run simulation
      */
     Model compile(final Token token)
     {
@@ -68,26 +73,26 @@ class Compiler
         {
             final Map<String, IComponent> components =
                     this.scratch[1].components;
-            // Create list of references and associated generators that need
+            // Create list of references and associated functions that need
             // target components
-            final Map<String, List<IGenerator>> references = new HashMap<>();
+            final Map<String, List<IFunction>> references = new HashMap<>();
             // Determine references to resolve by component
             for (final IComponent component: components.values())
             {
-                // Get list of generators and the references in the component
-                final Map<String, List<IGenerator>> generators
+                // Get list of functions and the references in the component
+                final Map<String, List<IFunction>> functions
                         = component.getReferences();
                 // Get references in the component
-                for (final String reference : generators.keySet())
+                for (final String reference : functions.keySet())
                 {
-                    // Add list of generators per reference into global list
+                    // Add list of functions per reference into global list
                     if (reference != null)
                     {
-                        final List<IGenerator> list =
+                        final List<IFunction> list =
                                 references.containsKey(reference)
                                 ? references.get(reference) :
                                 new ArrayList<>();
-                        list.addAll(generators.get(reference));
+                        list.addAll(functions.get(reference));
                         references.putIfAbsent(reference, list);
                     }
                 }
@@ -110,10 +115,40 @@ class Compiler
                     // Resolve references
                     else
                     {
-                        for (final IGenerator referee
+                        for (final IFunction referee
                                 : references.get(reference))
                         {
-                            referee.setNext(component);
+                            if (referee instanceof IGenerator)
+                            {
+                                final IGenerator generator
+                                        = (IGenerator)referee;
+                                generator.setNext(component);
+                            }
+                            else if (referee instanceof IDistributor)
+                            {
+                                if (component instanceof Balancer)
+                                {
+                                    final StringBuilder error =
+                                            new StringBuilder(reference);
+                                    error.append(" is a balancer and cannot");
+                                    error.append(" be directly downstream");
+                                    error.append(" from a balancer");
+                                    local.addError(error.toString());
+                                }
+                                else
+                                {
+                                    final IDistributor distributor
+                                            = (IDistributor)referee;
+                                    distributor.addNext(component);
+                                }
+                            }
+                            else
+                            {
+                                final StringBuilder error =
+                                        new StringBuilder("Referee");
+                                error.append(" is an unknown function");
+                                local.addError(error.toString());
+                            }
                         }
                     }
                 }
@@ -147,6 +182,7 @@ class Compiler
     /**
      * Compilation at the nested level in the language syntax
      *
+     * @param token current point of parsing
      * @param local nest level scratchpad for collecting compilation
      * information
      */
@@ -201,7 +237,7 @@ class Compiler
                 local.put(local.labelToken, token);
                 break;
             case CLOSE:
-                this.compileObject(token, this.scratch[local.depth]);
+                this.assemble(token, this.scratch[local.depth]);
                 current -= 1;
                 // Copy errors to upper scratch
                 this.scratch[current].addErrors(local.errors());
@@ -225,10 +261,11 @@ class Compiler
     /**
      * Manufactures the actual system simulation components for the model
      * 
+     * @param token current point of parsing
      * @param local nest level scratch-pad for collecting compilation
      * information
      */
-    private void compileObject(final Token token, final ScratchPad local)
+    private void assemble(final Token token, final ScratchPad local)
     {
         if (local.containsName(Vocabulary.TYPE_NAME))
         {
@@ -236,62 +273,77 @@ class Compiler
             // type should only be ever declared once
             if (types.size() == 1)
             {
+                final Token value = types.get(0).value;
+                final Token name = types.get(0).name;
                 // Get type declared
-                final String type = types.get(0).value.getValue();
+                final String type = value.getValue();
                 final List<NameValue> pairs = new ArrayList<>();
                 if (Vocabulary.containsDefinition(type, local.depth - 1))
                 {
                     // Obtain parsing information for valid values forms
                     final Map<String, Definition> parameters
                             = Vocabulary.get(type, local.depth - 1);
-                    // Look through collected name-values pairs
-                    for (final String name : local.values())
+                    // Look through collected label-values pairs
+                    for (final String label : local.values())
                     {
-                        // Compare name of pair to valid names
-                        if (parameters.containsKey(name))
+                        // Compare label of list to valid names
+                        if (parameters.containsKey(label))
                         {
-                            final Definition definition = parameters.get(name);
-                            final List<Pair> pair = local.value(name);
-                            // process for multiple values for same name
-                            if (pair.size() > 1 && definition.getMultivalue())
+                            final Definition definition = parameters.get(label);
+                            final List<Pair> list = local.value(label);
+                            // Unexpected condition
+                            if (list.isEmpty())
                             {
+                                final StringBuilder error =
+                                        new StringBuilder(label);
+                                error.append(" does not have any values near ");
+                                error.append(this.location(token));
+                                local.addError(error.toString());
+                            }
+                            // Process if valid number of values
+                            else if (list.size() == 1
+                                    || definition.getMultivalue())
+                            {
+                                for(final Pair tokens : list)
+                                {
+                                    final String pairValue
+                                            = tokens.value.getValue();
+                                    final Matcher matcher = definition
+                                            .getPattern().matcher(pairValue);
+                                    if (matcher.find())
+                                    {
+                                        final NameValue parameter
+                                                = new NameValue(label, pairValue);
+                                        pairs.add(parameter);
+                                    }
+                                    // Parameter values does not match requirements
+                                    else
+                                    {
+                                        final StringBuilder error =
+                                                new StringBuilder(label);
+                                        error.append(" does not have a valid value at ");
+                                        error.append(this.location(tokens.value));
+                                        local.addError(error.toString());
+                                    }
+                                }
                             }
                             // 
-                            else if (pair.size() == 1 && !definition.getMultivalue())
-                            {
-                                final String pairValue
-                                        = pair.get(0).value.getValue();
-                                final Matcher matcher = definition
-                                        .getPattern().matcher(pairValue);
-                                if (matcher.find())
-                                {
-                                    final NameValue parameter
-                                            = new NameValue(name, pairValue);
-                                    pairs.add(parameter);
-                                }
-                                // Parameter values does not match requirements
-                                else
-                                {
-                                    final StringBuilder error =
-                                            new StringBuilder(name);
-                                    error.append(" does not have a valid value at ");
-                                    error.append(local.location(name));
-                                    local.addError(error.toString());
-                                }
-                            }
                             else
                             {
-                                
+                                final StringBuilder error =
+                                        new StringBuilder(label);
+                                error.append(" declared more than once near  ");
+                                error.append(this.location(token));
+                                local.addError(error.toString());
                             }
                         }
-                        // Unexpected name in value pair
-                        else if (!name.equals(Vocabulary.TYPE_NAME))
+                        // Unexpected label in value list
+                        else if (!label.equals(Vocabulary.TYPE_NAME))
                         {
                             final StringBuilder error =
-                                    new StringBuilder(name);
+                                    new StringBuilder(label);
                             error.append(" is not a valid parameter at ");
-                            error.append(token.line).append(", ")
-                                    .append(token.position);
+                            error.append(this.location(name));
                             local.addError(error.toString());
                         }
                     }
@@ -304,68 +356,27 @@ class Compiler
                             if (!specified)
                             {
                                 final StringBuilder error =
-                                        new StringBuilder("Mandatory parameter ");
+                                        new StringBuilder("Mandatory parameter '");
                                 error.append(parameter)
-                                        .append(" was not defined at ");
-                                error.append(token.line).append(", ")
-                                        .append(token.position);
+                                        .append("' was not defined near ");
+                                error.append(this.location(token));
                                 local.addError(error.toString());
                             }
                         }
                     }
                 }
-                // Only compile if there have been no errors
+                // Only build if there have been no errors
                 if (local.ok())
                 {
-                    // Get generators for the component being compiled
-                    List<IGenerator> generators = local.depth == 1
-                            ? this.scratch[local.depth + 1].generators
-                            : null;
-                    switch (type)
-                    {
-                        case Vocabulary.SOURCE:
-                            final IComponent source
-                                    = Source.instance(pairs, generators);
-                            local.components.put(source.getLabel(), source);
-                            local.sources.put(source.getLabel(), source);
-                            break;
-                        case Vocabulary.PROCESSOR:
-                            final IComponent processor
-                                    = Processor.instance(pairs, generators);
-                            local.components.put(processor.getLabel(),
-                                    processor);
-                            break;
-                        case Vocabulary.UNIFORM:
-                            final IGenerator uniform
-                                    = Uniform.instance(pairs);
-                            local.generators.add(uniform);
-                            break;
-                        case Vocabulary.GAUSSIAN:
-                            final IGenerator gaussian
-                                    = Gaussian.instance(pairs);
-                            local.generators.add(gaussian);
-                            break;
-                        case Vocabulary.CONSTANT:
-                            final IGenerator constant
-                                    = Constant.instance(pairs);
-                            local.generators.add(constant);
-                            break;
-                        case Vocabulary.SKEWED:
-                            final IGenerator skewed
-                                    = Skewed.instance(pairs);
-                            local.generators.add(skewed);
-                            break;
-                        default:
-                            break;
-                    }
+                    this.build(type, token, pairs, local);
                 }
             }
             else
             {
                 final StringBuilder error =
-                        new StringBuilder("Unrecognized type ");
-                error.append(token.value).append(" at ")
-                        .append(local.location(Vocabulary.TYPE_NAME));
+                        new StringBuilder("Unrecognized type '");
+                error.append(token.value).append("' at ")
+                        .append(this.location(token));
                 local.addError(error.toString());
             }
         }
@@ -384,5 +395,193 @@ class Compiler
         {
             this.scratch[local.depth + 1].generators.clear();
         }
+    }
+
+    /**
+     * Produces the actual objects for the system model and final rule checks
+     * 
+     * @param type category of token
+     * @param token current point of parsing
+     * @param local scratch-pad for current nested level
+     */
+    private void build(final String type, final Token token,
+            final List<NameValue> pairs, final ScratchPad local)
+    {
+        // Get functions for the component being compiled
+        List<IGenerator> generators = local.depth == 1
+                ? this.scratch[local.depth + 1].generators
+                : null;
+        List<IDistributor> distributors = local.depth == 1
+                ? this.scratch[local.depth + 1].distributors
+                : new ArrayList<>();
+        switch (type)
+        {
+            case Vocabulary.SOURCE:
+                if (generators.size() == 1
+                        && distributors.isEmpty())
+                {
+                    final IComponent source
+                            = Source.instance(pairs, generators);
+                    if (local.components.containsKey(source.getLabel()))
+                    {
+                        final StringBuilder error =
+                                new StringBuilder("Component with label '");
+                        error.append(source.getLabel());
+                        error.append("' already exists before ");
+                        error.append(this.location(token));
+                        local.addError(error.toString());                                
+                    }
+                    else
+                    {
+                        local.components.put(source.getLabel(), source);
+                        local.sources.put(source.getLabel(), source);
+                    }
+                }
+                else if (generators.size() < 1)
+                {
+                    final StringBuilder error =
+                            new StringBuilder("No declared source generation function near ");
+                    error.append(this.location(token));
+                    local.addError(error.toString());                                
+                }
+                else if (distributors.size() > 0)
+                {
+                    final StringBuilder error =
+                            new StringBuilder("Balancer function cannot be used in a source near ");
+                    error.append(this.location(token));
+                    local.addError(error.toString());                                
+                }
+                else
+                {
+                    final StringBuilder error =
+                            new StringBuilder("Source generation function already exists near ");
+                    error.append(this.location(token));
+                    local.addError(error.toString());                                
+                }
+                break;
+            case Vocabulary.PROCESSOR:
+                if (distributors.isEmpty())
+                {
+                    final IComponent processor
+                            = Processor.instance(pairs, generators);
+                    if (local.components.containsKey(processor.getLabel()))
+                    {
+                        final StringBuilder error =
+                                new StringBuilder("Component with label '");
+                        error.append(processor.getLabel());
+                        error.append("' already exists before ");
+                        error.append(this.location(token));
+                        local.addError(error.toString());                                
+                    }
+                    else
+                    {
+                        local.components.put(processor.getLabel(),
+                                processor);
+                    }
+                }
+                else
+                {
+                    final StringBuilder error =
+                            new StringBuilder("Balancer function cannot be used in a processor near ");
+                    error.append(this.location(token));
+                    local.addError(error.toString());                                
+                }
+                break;
+            case Vocabulary.UNIFORM:
+                final IGenerator uniform
+                        = Uniform.instance(pairs);
+                local.generators.add(uniform);
+                break;
+            case Vocabulary.GAUSSIAN:
+                final IGenerator gaussian
+                        = Gaussian.instance(pairs);
+                local.generators.add(gaussian);
+                break;
+            case Vocabulary.CONSTANT:
+                final IGenerator constant
+                        = Constant.instance(pairs);
+                local.generators.add(constant);
+                break;
+            case Vocabulary.SKEWED:
+                final IGenerator skewed
+                        = Skewed.instance(pairs);
+                local.generators.add(skewed);
+                break;
+            case Vocabulary.BALANCER:
+                if (distributors.size() == 1
+                        && generators.isEmpty())
+                {
+                    final IComponent balancer
+                            = Balancer.instance(pairs,
+                                    distributors);
+                    if (local.components.containsKey(balancer.getLabel()))
+                    {
+                        final StringBuilder error =
+                                new StringBuilder("Component with label '");
+                        error.append(balancer.getLabel());
+                        error.append("' already exists before ");
+                        error.append(this.location(token));
+                        local.addError(error.toString());                                
+                    }
+                    else
+                    {
+                        local.components.put(balancer.getLabel(),
+                                balancer);
+                    }
+                }
+                else if (distributors.size() < 1)
+                {
+                    final StringBuilder error =
+                            new StringBuilder("No declared balancer function near ");
+                    error.append(this.location(token));
+                    local.addError(error.toString());                                
+                }
+                else if (generators.size() > 0)
+                {
+                    final StringBuilder error =
+                            new StringBuilder("Generation function cannot be used in a balancer near ");
+                    error.append(this.location(token));
+                    local.addError(error.toString());                                
+                }
+                else
+                {
+                    final StringBuilder error =
+                            new StringBuilder("Balancer function already exists near ");
+                    error.append(this.location(token));
+                    local.addError(error.toString());                                
+                }
+                break;
+            case Vocabulary.ROUNDROBIN:
+                final IDistributor roundRobin
+                        = RoundRobin.instance(pairs);
+                local.distributors.add(roundRobin);
+                break;
+            case Vocabulary.SMART:
+                System.out.println("SMART");
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Convenience method to generate line and position information for errors
+     * 
+     * @param token parsed object where problem occurred
+     * @return file location information for token
+     */
+    private String location(final Token token)
+    {
+        final StringBuilder string = new StringBuilder();
+        if (token != null)
+        {
+            string.append(Integer.toString(token.getLine()));
+            string.append(", ").append(Integer.toString(token.getPosition()));
+        }
+        else
+        {
+            string.append("unknown location ");
+        }
+        return string.toString();
     }
 }

@@ -6,7 +6,7 @@ component
     {
         type: constant
         offset: 1
-        next: delay
+        next: balancer
     }
 }
 component
@@ -25,5 +25,15 @@ component
         minimum: 2
         maximum: 4
         source: default
+    }
+}
+component
+{
+    type: balancer
+    name: balancer
+    function
+    {
+        type: round-robin
+        next: delay
     }
 }

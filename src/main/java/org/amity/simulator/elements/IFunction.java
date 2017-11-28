@@ -1,5 +1,5 @@
 /*
- * Pair.java
+ * IFunction.java
  *
  * (C) Copyright 2017 Jon Barnett.
  *
@@ -17,36 +17,20 @@
  *
  * Created on November 26, 2017
  */
-package org.amity.simulator.language;
+package org.amity.simulator.elements;
 
 /**
- * Name-value pair as token representation
+ * Common interface for generators and distributors
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public class Pair
+public interface IFunction
 {
-    final public Token name;
-    final public Token value;
 
     /**
-     * Default constructor - hidden
-     */
-    private Pair()
-    {
-        this.name = null;
-        this.value = null;
-    }
-
-    /**
-     * Constructor for name-value pair tokens
+     * Returns information on the configuration and type of generator
      * 
-     * @param name token containing name of pair
-     * @param value token containing value of pair
+     * @return information on generator
      */
-    public Pair(final Token name, final Token value)
-    {
-        this.name = name;
-        this.value = value;
-    }
+    String characteristics();    
 }

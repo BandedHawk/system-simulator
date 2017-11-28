@@ -1,5 +1,5 @@
 /*
- * ParserTest.java
+ * LexerTest.java
  *
  * (C) Copyright 2017 Jon Barnett.
  *
@@ -39,10 +39,10 @@ import static org.junit.Assert.*;
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public class ParserTest
+public class LexerTest
 {
     
-    public ParserTest()
+    public LexerTest()
     {
     }
     
@@ -67,15 +67,15 @@ public class ParserTest
     }
 
     /**
-     * Test of parse method, of class Parser.
+     * Test of analyze method, of class Lexer.
      */
     @Test
-    public void testParse()
+    public void testAnalyze()
     {
-        System.out.println("parse");
+        System.out.println("analyze");
         final File file = new File("src/test/data/test.example.txt");
-        final Parser instance = new Parser();
-        final Token token = instance.parse(file);
+        final Lexer instance = new Lexer();
+        final Token token = instance.analyze(file);
         System.out.println("  syntax rule check");
         if (token.size() > 3)
         {
@@ -108,8 +108,8 @@ public class ParserTest
                         break;
                 }
                 current = current.getNext();
-                token.compile();
             }
+            token.parse();
             System.out.println("  check balanced parentheses");
             assertTrue(depth == 0);
         }
@@ -122,12 +122,12 @@ public class ParserTest
         final double period = 2;
         final double sourcePeriod = 1;
         final int eventTotal = 4;
-        final Token testToken = instance.parse(test);
-        final Model model = testToken.compile();
+        final Token testToken = instance.analyze(test);
+        final Model model = testToken.parse();
         final LinkedList<Event> events = new LinkedList<>();
         System.out.println("    check components");
         assertTrue(model.sources.size() == 1);
-        assertTrue(model.components.size() == 2);
+        assertTrue(model.components.size() == 3);
         for (final IComponent source : model.sources)
         {
             for (int count = 0; count < eventTotal; count++)

@@ -50,7 +50,7 @@ public interface IComponent
      * the event.
      * 
      * @param event entity passing into component in chronological order
-     * @return entity with modified timing data due to component interaction
+     * @return entity with modified data due to component interaction
      */
     Event simulate(final Event event);
 
@@ -64,7 +64,7 @@ public interface IComponent
      * 
      * @return list of named references and associated generators
      */
-    Map<String, List<IGenerator>> getReferences();
+    Map<String, List<IFunction>> getReferences();
 
     /**
      * 
@@ -85,4 +85,10 @@ public interface IComponent
      * @return description of function
      */
     String description();
+
+    /**
+     * 
+     * @return next time component can process something
+     */
+    double getAvailable();
 }

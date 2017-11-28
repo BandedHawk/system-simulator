@@ -1,0 +1,83 @@
+component
+{
+    type: source
+    name: source
+    function
+    {
+        type: uniform
+        minimum: 0.75
+        maximum: 1.25
+        next: network
+    }
+    monitor: Yes
+}
+component
+{
+    type: processor
+    name: network
+    function // 
+    {
+        type: skewed
+        minimum: 0.20
+        maximum: 0.30
+        skew: 0.8
+        bias: -2.0
+        next: load balancer
+    }
+    monitor: Y
+}
+component
+{
+    type: balancer
+    name: load balancer
+    function
+    {
+        type: round-robin
+        next: web server 1
+        next: web server 2
+    }
+}
+component
+{
+    type: processor
+    name: web server 1
+    function 
+    {
+        type: skewed
+        minimum: 1.5
+        maximum: 2.5
+        skew: 0.8
+        bias: -1.0
+        next: database
+    }
+    monitor: Y
+}
+component
+{
+    type: processor
+    name: web server 2
+    function 
+    {
+        type: skewed
+        minimum: 1.5
+        maximum: 2.5
+        skew: 0.8
+        bias: -1.0
+        next: database
+    }
+    monitor: Y
+}
+component
+{
+    type: processor
+    name: database
+    function
+    {
+        type: skewed
+        minimum: 0.5
+        maximum: 1.5
+        skew: 0.8
+        bias: -3.0
+    }
+    monitor: Y
+}

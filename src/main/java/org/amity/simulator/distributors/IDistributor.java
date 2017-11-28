@@ -1,5 +1,5 @@
 /*
- * IGenerator.java
+ * IDistributor.java
  *
  * (C) Copyright 2017 Jon Barnett.
  *
@@ -15,52 +15,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Created on November 7, 2017
+ * Created on November 26, 2017
  */
-package org.amity.simulator.generators;
+package org.amity.simulator.distributors;
 
+import java.util.List;
+import org.amity.simulator.elements.Event;
 import org.amity.simulator.elements.IComponent;
 import org.amity.simulator.elements.IFunction;
 
 /**
- * Interface for the distribution model that generates values in the
- * system simulation
+ * Interface for the distributor that sends events to other active components
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public interface IGenerator extends IFunction
+public interface IDistributor extends IFunction
 {
 
     /**
-     * Returns a list of timing values, that depends on the generation model
-     * being used - currently supports uniform random distribution, Gaussian
-     * distribution or constant value.
+     * Assigns event to downstream component
      *
-     * @return value based on the generation model
+     * @param event entity passing into component in chronological order
+     * @return entity with modified data due to component interaction
      */
-    double generate();
+    Event assign(Event event);
+
+    /**
+     * Clears the distributor function;
+     */
+    void reset();
 
     /**
      * 
-     * @return name of associated event source
+     * @return labels for downstream components
      */
-    String getSource();
+    List<String> getReferences();
 
     /**
+     * Adds component as downstream distribution sink
      * 
-     * @return name of downstream component
+     * @param components downstream module for balancer
      */
-    String getReference();
-
-    /**
-     * 
-     * @param next downstream component for this generator
-     */
-    void setNext(IComponent next);
-
-    /**
-     * 
-     * @return downstream component for this generator
-     */
-    IComponent getNext();
+    void addNext(IComponent components);
 }
