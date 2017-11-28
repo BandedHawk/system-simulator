@@ -54,7 +54,7 @@ public interface IDistributor extends IFunction
     /**
      * Adds component as downstream distribution sink
      * 
-     * @param components downstream module for balancer
+     * @param component downstream module for balancer
      */
-    void addNext(IComponent components);
+    void addNext(IComponent component);
 }

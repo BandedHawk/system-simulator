@@ -6,7 +6,7 @@ component
     {
         type: uniform
         minimum: 0.75
-        maximum: 1.25
+        maximum: 1.15
         next: network
     }
     monitor: Yes
@@ -32,7 +32,7 @@ component
     name: load balancer
     function
     {
-        type: round-robin
+        type: smart
         next: web server 1
         next: web server 2
     }

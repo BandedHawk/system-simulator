@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import org.amity.simulator.distributors.IDistributor;
 import org.amity.simulator.distributors.RoundRobin;
+import org.amity.simulator.distributors.Smart;
 import org.amity.simulator.elements.Balancer;
 import org.amity.simulator.elements.IComponent;
 import org.amity.simulator.elements.IFunction;
@@ -394,6 +395,7 @@ class Compiler
         if (local.depth == 1)
         {
             this.scratch[local.depth + 1].generators.clear();
+            this.scratch[local.depth + 1].distributors.clear();
         }
     }
 
@@ -512,8 +514,7 @@ class Compiler
                         && generators.isEmpty())
                 {
                     final IComponent balancer
-                            = Balancer.instance(pairs,
-                                    distributors);
+                            = Balancer.instance(pairs, distributors);
                     if (local.components.containsKey(balancer.getLabel()))
                     {
                         final StringBuilder error =
@@ -552,12 +553,34 @@ class Compiler
                 }
                 break;
             case Vocabulary.ROUNDROBIN:
-                final IDistributor roundRobin
-                        = RoundRobin.instance(pairs);
-                local.distributors.add(roundRobin);
+                if (distributors.isEmpty())
+                {
+                    final IDistributor roundRobin
+                            = RoundRobin.instance(pairs);
+                    local.distributors.add(roundRobin);
+                }
+                else
+                {
+                    final StringBuilder error =
+                            new StringBuilder("Balancer function already exists near ");
+                    error.append(this.location(token));
+                    local.addError(error.toString());                                
+                }
                 break;
             case Vocabulary.SMART:
-                System.out.println("SMART");
+                if (distributors.isEmpty())
+                {
+                    final IDistributor smart
+                            = Smart.instance(pairs);
+                    local.distributors.add(smart);
+                }
+                else
+                {
+                    final StringBuilder error =
+                            new StringBuilder("Balancer function already exists near ");
+                    error.append(this.location(token));
+                    local.addError(error.toString());                                
+                }
                 break;
             default:
                 break;

@@ -1,5 +1,5 @@
 /*
- * RoundRobin.java
+ * Smart.java
  *
  * (C) Copyright 2017 Jon Barnett.
  *
@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Created on November 26, 2017
+ * Created on November 27, 2017
  */
 package org.amity.simulator.distributors;
 
@@ -27,60 +27,57 @@ import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
 
 /**
- * Distribution function that uses a round-robin algorithm to split between
- * downstream processing units
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public class RoundRobin implements IDistributor
+public class Smart implements IDistributor
 {
-
     private final List<String> references;
     private final IComponent[] next;
-    private final int modulus;
-    private int current;
 
-    /**
-     * Default constructor - hidden
-     */
-    private RoundRobin()
-    {
-        this.references = null;
-        this.modulus = 0;
-        this.current = 0;
-        this.next = new IComponent[0];
-    }
-
-    /**
-     * 
-     * @param references 
-     */
-    public RoundRobin(final List<String> references)
+    public Smart(final List<String> references)
     {
         this.references = references;
-        this.modulus = references != null ? references.size() : 0;
-        this.current = 0;
-        this.next = new IComponent[this.modulus];
+        final int size = references != null ? references.size() : 0;
+        this.next = new IComponent[size];
     }
 
     @Override
     public Event assign(final Event event)
     {
-        if (event != null && this.modulus > 0)
+        double minimum = Double.MAX_VALUE;
+        IComponent component = null;
+        for (int index = 0; index < next.length; index++)
         {
-            event.setComponent(this.next[current]);
-            current = (current + 1) % modulus;
+            if (next[index].getAvailable() < minimum)
+            {
+                minimum = next[index].getAvailable();
+                component = next[index];
+            }
         }
+        event.setComponent(component);
         return event;
+    }
+
+    @Override
+    public void reset()
+    {
+        // Explicitly empty
+    }
+
+    @Override
+    public List<String> getReferences()
+    {
+        return this.references;
     }
 
     @Override
     public void addNext(final IComponent component)
     {
-        if (component != null && this.modulus != 0)
+        if (component != null)
         {
             // Add component in reference list order
-            for (int index = 0; index < this.modulus; index++)
+            for (int index = 0; index < this.next.length; index++)
             {
                 final String reference = references.get(index);
                 if (reference.equals(component.getLabel()))
@@ -94,28 +91,9 @@ public class RoundRobin implements IDistributor
     @Override
     public String characteristics()
     {
-        final StringBuilder string
-                = new StringBuilder(this.getClass().getSimpleName());
-        return string.toString();
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
-    @Override
-    public void reset()
-    {
-        this.current = 0;
-    }
-
-    @Override
-    public List<String> getReferences()
-    {
-        return this.references;
-    }
-
-    /**
-     * 
-     * @param pairs
-     * @return 
-     */
+    
     public final static IDistributor instance(final List<NameValue> pairs)
     {
         List<String> references = new ArrayList<>();
@@ -129,7 +107,7 @@ public class RoundRobin implements IDistributor
                     break;
             }
         }
-        final IDistributor distributor = new RoundRobin(references);
+        final IDistributor distributor = new Smart(references);
         return distributor;
     }
 }

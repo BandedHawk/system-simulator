@@ -64,7 +64,7 @@ public class Balancer implements IComponent
     @Override
     public List<Event> getLocalEvents()
     {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.local;
     }
 
     @Override
