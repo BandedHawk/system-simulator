@@ -104,7 +104,6 @@ public class Balancer implements IComponent
         this.available = arrived;
         // Non-delay component so no assofiated wait time
         event.setValues(arrived, arrived, arrived);
-        event.setExecuted(0);
         // Copy current event to local stats
         final Event current = new Event(event);
         current.setComponent(null);
