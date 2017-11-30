@@ -20,9 +20,7 @@
 package org.amity.simulator.generators;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.amity.simulator.elements.IComponent;
 import org.amity.simulator.elements.Processor;
 import org.amity.simulator.language.NameValue;
