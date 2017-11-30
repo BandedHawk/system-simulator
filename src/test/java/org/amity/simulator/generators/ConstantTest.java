@@ -162,7 +162,7 @@ public class ConstantTest
     {
         System.out.println("instance");
         final List<NameValue> pairs = new ArrayList<>();
-        NameValue pair = new NameValue(Vocabulary.OFFSET, "51.3");
+        NameValue pair = new NameValue(Vocabulary.PERIOD, "51.3");
         pairs.add(pair);
         IGenerator result = Constant.instance(pairs);
         assertTrue(result != null);

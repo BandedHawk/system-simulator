@@ -5,7 +5,7 @@ component
     function
     {
         type: constant
-        offset: 1
+        period: 1
         next: balancer
     }
 }
@@ -16,7 +16,7 @@ component
     function
     {
         type: constant
-        offset: 2
+        period: 2
         source: generator
     }
     function

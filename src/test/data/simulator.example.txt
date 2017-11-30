@@ -45,7 +45,7 @@ component
     function // 
     {
         type: constant
-        offset: 1
+        period: 1
     }
     monitor: yes
 }

@@ -4,9 +4,8 @@ component
     name: source
     function
     {
-        type: uniform
-        minimum: 0.75
-        maximum: 1.15
+        type: constant
+        period: 0.8
         next: network
     }
     monitor: Yes
@@ -35,6 +34,7 @@ component
         type: smart
         next: web server 1
         next: web server 2
+        next: web server 3
     }
 }
 component
@@ -70,12 +70,27 @@ component
 component
 {
     type: processor
+    name: web server 3
+    function 
+    {
+        type: skewed
+        minimum: 1.5
+        maximum: 2.5
+        skew: 0.8
+        bias: -1.0
+        next: database
+    }
+    monitor: Y
+}
+component
+{
+    type: processor
     name: database
     function
     {
         type: skewed
-        minimum: 0.5
-        maximum: 1.5
+        minimum: 0.3
+        maximum: 0.6
         skew: 0.8
         bias: -3.0
     }

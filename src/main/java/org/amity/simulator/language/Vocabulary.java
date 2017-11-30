@@ -39,7 +39,7 @@ public class Vocabulary
     public final static String MONITOR = "monitor";
     public final static String MAXIMUM = "maximum";
     public final static String MINIMUM = "minimum";
-    public final static String OFFSET = "offset";
+    public final static String PERIOD = "period";
     public final static String SKEW = "skew";
     public final static String BIAS = "bias";
     public final static String ROUNDROBIN = "round-robin";
@@ -91,7 +91,7 @@ public class Vocabulary
         complex.put(Vocabulary.BIAS, biasDecimal);
         complex.put(Vocabulary.SKEW, mandatoryDecimal);
         final Map<String, Definition> offset = new HashMap<>();
-        offset.put(Vocabulary.OFFSET, mandatoryDecimal);
+        offset.put(Vocabulary.PERIOD, mandatoryDecimal);
         final Map<String, Definition> divert = new HashMap<>();
         divert.put(Vocabulary.NEXT, multiWords);
         // Define vocabulary definitions for each function

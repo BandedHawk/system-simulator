@@ -52,14 +52,14 @@ public class Constant implements IGenerator
     /**
      * Construct constant timing generator
      * 
-     * @param offset constant time interval
+     * @param period constant time interval
      * @param source name of associated event source
      * @param reference name of downstream component
      */
-    public Constant(final double offset, final String source,
+    public Constant(final double period, final String source,
             final String reference)
     {
-        this.period = offset;
+        this.period = period;
         this.source = source;
         this.reference = reference;
         this.next = null;
@@ -111,15 +111,15 @@ public class Constant implements IGenerator
      */
     public final static IGenerator instance(final List<NameValue> pairs)
     {
-        double offset = 0;
+        double period = 0;
         String reference = null;
         String source = Vocabulary.DEFAULT;
         for (final NameValue parameter : pairs)
         {
             switch (parameter.name)
             {
-                case Vocabulary.OFFSET:
-                    offset = Double.parseDouble(parameter.value);
+                case Vocabulary.PERIOD:
+                    period = Double.parseDouble(parameter.value);
                     break;
                 case Vocabulary.SOURCE:
                     source = parameter.value;
@@ -130,7 +130,7 @@ public class Constant implements IGenerator
                     break;
             }
         }
-        final IGenerator generator = new Constant(offset, source, reference);
+        final IGenerator generator = new Constant(period, source, reference);
         return generator;
     }
 }
