@@ -21,7 +21,6 @@ package org.amity.simulator.elements;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedList;
 import org.amity.simulator.generators.Constant;
 import java.util.List;
@@ -97,7 +96,7 @@ public class ProcessorTest
             events.add(event);
         }
         // sort events by arrival time
-        events.sort(Comparator.comparingDouble(Event::getArrived));
+        events.sort(Comparator.comparingDouble(Event::getCompleted));
         assertTrue(events.size() == eventTotal);
         while (events.size() > 0)
         {
@@ -106,7 +105,7 @@ public class ProcessorTest
             if (event.getComponent() != null)
             {
                 events.add(event);
-                events.sort(Comparator.comparingDouble(Event::getArrived));
+                events.sort(Comparator.comparingDouble(Event::getCompleted));
             }
         }
         System.out.println("  check events are preserved");
@@ -165,7 +164,7 @@ public class ProcessorTest
             events.add(event);
         }
         // sort events by arrival time
-        events.sort(Comparator.comparingDouble(Event::getArrived));
+        events.sort(Comparator.comparingDouble(Event::getCompleted));
         assertTrue(events.size() == eventTotal);
         while (events.size() > 0)
         {
@@ -174,7 +173,7 @@ public class ProcessorTest
             if (event.getComponent() != null)
             {
                 events.add(event);
-                events.sort(Comparator.comparingDouble(Event::getArrived));
+                events.sort(Comparator.comparingDouble(Event::getCompleted));
             }
         }
         final List<Event> local = instance.getLocalEvents();
@@ -189,7 +188,7 @@ public class ProcessorTest
             events.add(event);
         }
         // sort events by arrival time
-        events.sort(Comparator.comparingDouble(Event::getArrived));
+        events.sort(Comparator.comparingDouble(Event::getCompleted));
         assertTrue(events.size() == eventTotal);
         while (events.size() > 0)
         {
@@ -198,7 +197,7 @@ public class ProcessorTest
             if (event.getComponent() != null)
             {
                 events.add(event);
-                events.sort(Comparator.comparingDouble(Event::getArrived));
+                events.sort(Comparator.comparingDouble(Event::getCompleted));
             }
         }
         assertTrue(local.size() == eventTotal);
@@ -269,21 +268,11 @@ public class ProcessorTest
         assertTrue(period > sourcePeriod);
         final String sourceLabel = "source";
         final String label = "delay";
-        final int eventTotal = 4;
-        final IGenerator sourceGenerator = new Constant(sourcePeriod,
-                sourceLabel, label);
         final IGenerator generator = new Constant(period, sourceLabel, null);
         final List<IGenerator> generators = new ArrayList<>();
         generators.add(generator);
         final IComponent instance = new Processor(label, generators, false);
-        final LinkedList<Event> events = new LinkedList<>();
-        final IComponent source
-                = new Source(sourceLabel, sourceGenerator, false);
-        sourceGenerator.setNext(instance);
         assertEquals(label, instance.getLabel());
-        // No way to adequately test this except under load
-        assertTrue(instance.getDepths() != null);
-        assertEquals(0, instance.getDepths().size());
     }
 
     /**
@@ -298,16 +287,49 @@ public class ProcessorTest
         assertTrue(period > sourcePeriod);
         final String sourceLabel = "source";
         final String label = "delay";
+        final String label1 = "processor";
         final int eventTotal = 4;
         final IGenerator sourceGenerator = new Constant(sourcePeriod,
                 sourceLabel, label);
         final IGenerator generator = new Constant(period, sourceLabel, null);
         final List<IGenerator> generators = new ArrayList<>();
         generators.add(generator);
+        final IGenerator generator1 = new Constant(period, sourceLabel, null);
+        final List<IGenerator> generators1 = new ArrayList<>();
+        generators1.add(generator1);
         final IComponent instance = new Processor(label, generators, false);
+        final IComponent processor = new Processor(label1, generators1, false);
         final LinkedList<Event> events = new LinkedList<>();
         final IComponent source
                 = new Source(sourceLabel, sourceGenerator, false);
+        generator.setNext(processor);
+        sourceGenerator.setNext(instance);
+        for (int count = 0; count < eventTotal; count++)
+        {
+            final Event event = source.simulate(null);
+            events.add(event);
+        }
+        System.out.println("  Pre-simulate checks");
+        assertTrue(events.size() == eventTotal);
+        // sort events by arrival time
+        System.out.println("  Check basic statistics");
+        events.sort(Comparator.comparingDouble(Event::getCompleted));
+        while (events.size() > 0)
+        {
+            final Event event = events.removeFirst();
+            event.simulate();
+            if (event.getComponent() != null)
+            {
+                events.add(event);
+                events.sort(Comparator.comparingDouble(Event::getCompleted));
+            }
+        }
+        assertTrue(instance.getLocalEvents().size() == eventTotal);
+        assertTrue(processor.getLocalEvents().size() == eventTotal);
+        System.out.println("  Check depth");
+        // No way to adequately test this except under load
+        assertTrue(instance.getDepths() != null);
+        assertEquals(eventTotal, instance.getDepths().size());
     }
 
     /**
@@ -406,5 +428,51 @@ public class ProcessorTest
         assertEquals(name, instance.getLabel());
         assertEquals(1, instance.getReferences().size());
         assertEquals(1, instance.getReferences().get(reference).size());
+    }
+
+    /**
+     * Test of getAvailable method, of class Processor.
+     */
+    @Test
+    public void testGetAvailable()
+    {
+        System.out.println("getAvailable");
+        final double sourcePeriod = 1;
+        final double period = 2;
+        assertTrue(period > sourcePeriod);
+        final String sourceLabel = "source";
+        final String label = "delay";
+        final int eventTotal = 4;
+        final IGenerator sourceGenerator = new Constant(sourcePeriod,
+                sourceLabel, label);
+        final IGenerator generator = new Constant(period, sourceLabel, null);
+        final List<IGenerator> generators = new ArrayList<>();
+        generators.add(generator);
+        final IComponent instance = new Processor(label, generators, false);
+        final LinkedList<Event> events = new LinkedList<>();
+        final IComponent source
+                = new Source(sourceLabel, sourceGenerator, false);
+        sourceGenerator.setNext(instance);
+        for (int count = 0; count < eventTotal; count++)
+        {
+            final Event event = source.simulate(null);
+            events.add(event);
+        }
+        // sort events by arrival time
+        events.sort(Comparator.comparingDouble(Event::getCompleted));
+        assertTrue(events.size() == eventTotal);
+        int[] state = {3, 5, 7, 9};
+        int index = 0;
+        while (events.size() > 0)
+        {
+            final Event event = events.removeFirst();
+            event.simulate();
+            if (event.getComponent() != null)
+            {
+                events.add(event);
+                events.sort(Comparator.comparingDouble(Event::getCompleted));
+            }
+            assertTrue(instance.getAvailable() == state[index++]);
+        }
     }
 }

@@ -138,7 +138,7 @@ public class LexerTest
         }
         System.out.println("    check generated events");
         // sort events by arrival time
-        events.sort(Comparator.comparingDouble(Event::getArrived));
+        events.sort(Comparator.comparingDouble(Event::getCompleted));
         assertTrue(events.size() == eventTotal);
         System.out.println("    simulate system");
         while (events.size() > 0)
@@ -148,7 +148,7 @@ public class LexerTest
             if (event.getComponent() != null)
             {
                 events.add(event);
-                events.sort(Comparator.comparingDouble(Event::getArrived));
+                events.sort(Comparator.comparingDouble(Event::getCompleted));
             }
         }
         final List<Event> local = new ArrayList<>();
