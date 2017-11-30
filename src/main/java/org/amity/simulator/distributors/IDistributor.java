@@ -64,4 +64,6 @@ public interface IDistributor extends IFunction
      * @return list of downstream connections
      */
     IComponent[] connections();
+
+    double available();
 }

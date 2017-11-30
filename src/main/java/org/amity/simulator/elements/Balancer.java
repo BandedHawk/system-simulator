@@ -169,7 +169,7 @@ public class Balancer implements IComponent
     @Override
     public double getAvailable()
     {
-        return this.available;
+        return this.distributor.available();
     }
 
     /**

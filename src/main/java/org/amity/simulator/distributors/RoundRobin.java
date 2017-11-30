@@ -140,4 +140,10 @@ public class RoundRobin implements IDistributor
     {
         return this.next;
     }
+
+    @Override
+    public double available()
+    {
+        return this.next[current].getAvailable();
+    }
 }

@@ -127,21 +127,9 @@ class Compiler
                             }
                             else if (referee instanceof IDistributor)
                             {
-                                if (component instanceof Balancer)
-                                {
-                                    final StringBuilder error =
-                                            new StringBuilder(reference);
-                                    error.append(" is a balancer and cannot");
-                                    error.append(" be directly downstream");
-                                    error.append(" from a balancer");
-                                    local.addError(error.toString());
-                                }
-                                else
-                                {
-                                    final IDistributor distributor
-                                            = (IDistributor)referee;
-                                    distributor.addNext(component);
-                                }
+                                final IDistributor distributor
+                                        = (IDistributor)referee;
+                                distributor.addNext(component);
                             }
                             else
                             {

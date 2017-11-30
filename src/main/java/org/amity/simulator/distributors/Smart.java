@@ -135,4 +135,18 @@ public class Smart implements IDistributor
     {
         return this.next;
     }
+
+    @Override
+    public double available()
+    {
+        double minimum = Double.MAX_VALUE;
+        for (final IComponent item : next)
+        {
+            if (item.getAvailable() < minimum)
+            {
+                minimum = item.getAvailable();
+            }
+        }
+        return minimum;
+    }
 }
