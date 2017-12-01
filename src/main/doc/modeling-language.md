@@ -67,9 +67,7 @@ Everything except <i>next</i> is mandatory.
 This generates values within a certain range but skewed to the left or right, depending on the <i>bias</i> value. This is useful in depicting real-world systems where the response or delay is normally at the lower end, but may occasionally go higher - a right-skewed generator.
 
 Mathematically, the function is:
-$$
-\frac{maximum + minimum}{2}
-$$
+![alt text](https://raw.githubusercontent.com/BandedHawk/system-simulator/master/src/main/doc/skewed.png "Skewing function")
 
 Additional information on the skewing calculation can be found <a href="https://stackoverflow.com/questions/5853187/skewing-java-random-number-generation-toward-a-certain-number">here</a>.
 ```javascript
