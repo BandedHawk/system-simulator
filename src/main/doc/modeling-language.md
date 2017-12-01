@@ -13,7 +13,7 @@ The <i>balancer</i> provides a mechanism to switch an event to a downstream comp
 System connectivity is defined within functions, and not by the components. This allows a certain amount of flexibility as we will see later.
 #### General language syntax
 Given the above, the language has a consistent form for definition - a component, within which is nested a function or functions that describe the component and connectivity to downstream components. The language is case-sensitive. All values are defined in name-value pairs. The name-value pairs do not have to be given in any particular order. Components must always define a <i>name</i> and a <i>type</i>. Everything else is optional. Functions must always define a <i>type</i>. The type of function will dictate legal and mandatory values. Connectivity is defined by the <i>next</i> name-value pair. Double forward slashes define the start of a comment that is ignored by the model compiler. An example of the form is:
-```javascript
+```R
 // Start of a component definition
 component
 {
@@ -30,8 +30,8 @@ component
 ```
 ### Generator functions
 #### Constant
-As the functional definition for a source, this will generate events a constant interval apart, as set by the value of <i>period</i>. Otherwise, for a processor, this represents a fixed delay of <i>period</i>. The definition is:
-```javascript
+As the functional definition for a source, this will generate events a constant interval apart, as set by the value of <i>period</i>. Otherwise for a processor, this represents a fixed delay of <i>period</i>. The definition is:
+```R
 function
 {
     type: constant
@@ -42,7 +42,7 @@ function
 Everything except <i>next</i> is mandatory.
 #### Uniform
 This produces a uniformally random distribution of values between <i>minimum</i> and <i>maximum</i>. For a source, events are separated by the generated value. For processors, the delay is the generated value.
-```javascript
+```R
 function
 {
     type: uniform
@@ -53,7 +53,7 @@ function
 ```
 #### Gaussian
 The Gaussian function generates values that are normally distributed between <i>minimum</i> and <i>maximum</i>. For sources, this represents the event separation function and for processors, this is the delay caused by the component.
-```javascript
+```R
 function
 {
     type: gaussian
@@ -74,7 +74,7 @@ A negative <i>bias</i> value skews the distribution right and a positive value s
 The <i>skew</i> should be between 0 and 1. The higher the value, the more clustered the distribution is around the mode.
 
 Additional information on the skewing calculation can be found <a href="https://stackoverflow.com/questions/5853187/skewing-java-random-number-generation-toward-a-certain-number">here</a>.
-```javascript
+```R
 function
 {
     type: skewed
@@ -114,4 +114,85 @@ component
     }
 }
 ```
-This modification allows different modeling to be applied based on incoming event origins such as different web requests and also different downstream paths. At this point in time, the statistics generated aren't as useful for throughput measurements bit wait times, and utilization of components will still be true, as will overall processing ratios.
+This modification allows different modeling to be applied based on incoming event origins such as different web requests and also allows different downstream paths based on event origin. At this point in time, the statistics generated aren't as useful for throughput measurements bit wait times, and utilization of components will still be true, as will overall processing ratios.
+### Distributor functions
+####Round-robin
+The distribution strategy is to cycle sequentially through the given list of targets, sending each subsequent event through the next in the sequence. At the end of the sequence, the allocation will return to the top of the list. There is no theoretical limit to the number of downstream components that can be listed.
+```R
+function
+{
+    type: round-robin
+    next: web server 1
+    next: web server 2
+}
+```
+####Smart
+This is an ideal distribution strategy. It diverts an event to the next available downstream target. There is no theoretical limit to the number of downstream components that can be listed.
+```R
+function
+{
+    type: smart
+    next: web server 1
+    next: web server 2
+}
+```
+### Components
+#### Source
+A <i>source</i> is the system entry point for events, and their arrival rate is modeled by the source function. The <i>source</i> can only have one function. The <i>monitor</i> name-value pair toggles monitoring output at the end of the simulation.
+
+The <i>source</i> component cannot be connected downstream of any other component. Only a generator function can be declared in the <i>source</i>.
+```R
+component
+{
+    type: source
+    name: source
+    function
+    {
+        type: uniform
+        minimum: 1.5
+        maximum: 2.5
+        next: network
+    }
+    monitor: Yes
+}
+```
+#### Processor
+The <i>processor</i> is modeled as a delay element in the system. It is a single unit since when it is processing an event, all other events waiting for the <i>processor</i> must wait until the processing is complete. Only a generator function can be declared in the <i>processor</i>.
+
+Real servers can be approximated by parallel copies of a processor model, exhibiting the delay characteristics of the real system. Typically, 3 to 4 parallel units would be sufficient to represent a real server. The maximum incoming rate before non-linear effects prevail will inform as to how many parallel processors would model the complex server adequately. It is beyond the scope of this text to explain modeling approximations but suffice to say that these are generally good enough to give insight into the operation of the wider system under load.
+
+Processors can have multiple generators declared but they must specify <i>source</i> targets, and have one default. Specifying the <i>source</i> in a generator indicates the generator delay characyeristics will apply to events that came from that source. This was described [earlier](#special-cases). The simplest form of processor declaration is given here.
+```R
+component
+{
+    type: processor
+    name: network
+    {
+        type: skewed
+        minimum: 0.20
+        maximum: 0.30
+        skew: 0.8
+        bias: -2.0
+        next: load balancer
+    }
+    monitor: Y
+}
+```
+#### Balancer
+The <i>balancer</i> is merely a means for distributing an event to one of many downstream components. It has no inherent delay characteristics itself. Only a distributor function can be declared in the <i>source</i>.
+```R
+component
+{
+    type: balancer
+    name: load balancer
+    function
+    {
+        type: smart
+        next: web server 1
+        next: web server 2
+        next: web server 3
+    }
+}
+```
+#### Connectivity
+Multiple upstream components can be connected to a downstream component.This combined with the other features of the implemented modeler allows a wide range of options to approximate the real world systems.
