@@ -38,7 +38,6 @@ public class Balancer implements IComponent
     private final List<Event> local;
     private final List<Integer> depths;
     private final boolean monitor;
-    private double available;
 
     /**
      * Default constructor - intentionally hidden
@@ -50,7 +49,6 @@ public class Balancer implements IComponent
         this.monitor = false;
         this.local = new ArrayList<>();
         this.depths = new ArrayList<>();
-        this.available = 0;
     }
 
     /**
@@ -68,7 +66,6 @@ public class Balancer implements IComponent
         this.monitor = monitor;
         this.local = new ArrayList<>();
         this.depths = new ArrayList<>();
-        this.available = 0;
     }
 
     @Override
@@ -101,7 +98,6 @@ public class Balancer implements IComponent
         // Arrival at this component is time event completed
         // processing at last component
         final double arrived = event.getCompleted();
-        this.available = arrived;
         // Non-delay component so no assofiated wait time
         event.setValues(arrived, arrived, arrived);
         // Copy current event to local stats

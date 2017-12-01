@@ -476,7 +476,7 @@ public class BalancerTest
         // sort events by arrival time
         events.sort(Comparator.comparingDouble(Event::getCompleted));
         assertTrue(events.size() == eventTotal);
-        final int[] balancer = {0, 0, 2, 2, 2, 3, 3, 3, 4, 4, 5, 5};
+        final int[] balancer = {0, 0, 0, 3, 3, 3, 4, 4, 4, 5, 5, 6};
         final int[] state1 = {2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 5, 5};
         final int[] state2 = {0, 0, 0, 3, 3, 3, 4, 4, 4, 5, 5, 6};
         int index = 0;

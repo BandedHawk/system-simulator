@@ -59,7 +59,7 @@ public class Smart implements IDistributor
         // Find downstream component with lowest wait time
         double minimum = Double.MAX_VALUE;
         IComponent component = null;
-        for (final IComponent item : next)
+        for (final IComponent item : this.next)
         {
             if (item.getAvailable() < minimum)
             {
@@ -92,7 +92,7 @@ public class Smart implements IDistributor
             // Add component in reference list order
             for (int index = 0; index < this.next.length; index++)
             {
-                final String reference = references.get(index);
+                final String reference = this.references.get(index);
                 if (reference.equals(component.getLabel()))
                 {
                     this.next[index] = component;
@@ -106,15 +106,15 @@ public class Smart implements IDistributor
     {
         final StringBuilder string
                 = new StringBuilder(this.getClass().getSimpleName());
-        for (int index = 0; index < references.size(); index++)
+        for (int index = 0; index < this.references.size(); index++)
         {
-            final String reference = references.get(index);
+            final String reference = this.references.get(index);
             if (index == 0)
             {
                 string.append(" - ");
             }
             string.append(reference);
-            if (index != references.size() - 1)
+            if (index != this.references.size() - 1)
             {
                 string.append(", ");
             }
@@ -155,7 +155,7 @@ public class Smart implements IDistributor
     public double available()
     {
         double minimum = Double.MAX_VALUE;
-        for (final IComponent item : next)
+        for (final IComponent item : this.next)
         {
             if (item.getAvailable() < minimum)
             {

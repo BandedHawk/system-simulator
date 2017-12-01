@@ -2,7 +2,7 @@
 ![alt text](https://raw.githubusercontent.com/BandedHawk/system-simulator/master/complex-system.png "System Model for Simulation")
 
 ## Example output from a simulation
-```
+``` R
 Statistics for events that occurred between 500.0 and 95500.0
 Event information
   Events completed processing: 94979

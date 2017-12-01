@@ -69,8 +69,8 @@ public class RoundRobin implements IDistributor
     {
         if (event != null && this.modulus > 0)
         {
-            event.setComponent(this.next[current]);
-            current = (current + 1) % modulus;
+            event.setComponent(this.next[this.current]);
+            this.current = (this.current + 1) % this.modulus;
         }
         return event;
     }
@@ -97,15 +97,15 @@ public class RoundRobin implements IDistributor
     {
         final StringBuilder string
                 = new StringBuilder(this.getClass().getSimpleName());
-        for (int index = 0; index < references.size(); index++)
+        for (int index = 0; index < this.references.size(); index++)
         {
-            final String reference = references.get(index);
+            final String reference = this.references.get(index);
             if (index == 0)
             {
                 string.append(" - ");
             }
             string.append(reference);
-            if (index != references.size() - 1)
+            if (index != this.references.size() - 1)
             {
                 string.append(", ");
             }
@@ -157,6 +157,6 @@ public class RoundRobin implements IDistributor
     @Override
     public double available()
     {
-        return this.next[current].getAvailable();
+        return this.next[this.current].getAvailable();
     }
 }
