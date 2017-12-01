@@ -101,7 +101,6 @@ public class Skewed implements IGenerator
     @Override
     public double generate()
     {
-        final List<Double> values = new ArrayList<>();
         final double value = factor
                 + FastMath.exp(-gaussian.nextNormalizedDouble() / skew);
         final double modifiedValue = middle + range * (factor / value - 0.5);
