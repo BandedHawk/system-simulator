@@ -116,7 +116,7 @@ component
 ```
 This modification allows different modeling to be applied based on incoming event origins such as different web requests and also allows different downstream paths based on event origin. At this point in time, the statistics generated aren't as useful for throughput measurements bit wait times, and utilization of components will still be true, as will overall processing ratios.
 ### Distributor functions
-####Round-robin
+#### Round-robin
 The distribution strategy is to cycle sequentially through the given list of targets, sending each subsequent event through the next in the sequence. At the end of the sequence, the allocation will return to the top of the list. There is no theoretical limit to the number of downstream components that can be listed.
 ```R
 function
@@ -126,7 +126,7 @@ function
     next: web server 2
 }
 ```
-####Smart
+#### Smart
 This is an ideal distribution strategy. It diverts an event to the next available downstream target. There is no theoretical limit to the number of downstream components that can be listed.
 ```R
 function
