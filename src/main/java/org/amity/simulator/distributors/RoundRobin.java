@@ -97,6 +97,19 @@ public class RoundRobin implements IDistributor
     {
         final StringBuilder string
                 = new StringBuilder(this.getClass().getSimpleName());
+        for (int index = 0; index < references.size(); index++)
+        {
+            final String reference = references.get(index);
+            if (index == 0)
+            {
+                string.append(" - ");
+            }
+            string.append(reference);
+            if (index != references.size() - 1)
+            {
+                string.append(", ");
+            }
+        }
         return string.toString();
     }
 
