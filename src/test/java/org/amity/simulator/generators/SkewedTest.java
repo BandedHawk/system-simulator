@@ -87,39 +87,45 @@ public class SkewedTest
         {
             final double value = instance.generate();
             statistics.addValue(value);
-        };
-        System.out.println("  skew left");
+        }
+        System.out.println("  skew right");
         double mean = statistics.getMean();
+        double median = statistics.getPercentile(50);
         double sd = statistics.getStandardDeviation();
         double max = statistics.getMax();
         double min = statistics.getMin();
         System.out.println("    Mean:" + mean);
+        System.out.println("    Median:" + median);
         System.out.println("    Standard Deviation:" + sd);
         System.out.println("    Maximum: " + max);
         System.out.println("    Minimum: " + min);
         assertTrue(min >= minimum);
         assertTrue(max <= maximum);
         assertTrue(mean < (max + min)/2);
+        assertTrue(median < mean);
         statistics.clear();
-        System.out.println("  skew right");
+        System.out.println("  skew left");
         bias = 3;
         instance = new Skewed(minimum, maximum, skew, bias, source, reference);
         for (int count = 0; count < eventTotal; count++)
         {
             final double value = instance.generate();
             statistics.addValue(value);
-        };
+        }
         mean = statistics.getMean();
+        median = statistics.getPercentile(50);
         sd = statistics.getStandardDeviation();
         max = statistics.getMax();
         min = statistics.getMin();
         System.out.println("    Mean:" + mean);
+        System.out.println("    Median:" + median);
         System.out.println("    Standard Deviation:" + sd);
         System.out.println("    Maximum: " + max);
         System.out.println("    Minimum: " + min);
         assertTrue(min >= minimum);
         assertTrue(max <= maximum);
         assertTrue(mean > (max + min)/2);
+        assertTrue(median > mean);
     }
 
     /**
