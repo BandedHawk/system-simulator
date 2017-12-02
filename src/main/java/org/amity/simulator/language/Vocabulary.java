@@ -76,6 +76,7 @@ public class Vocabulary
                 new Definition(decimal, true, false);
         final Definition multiWords = new Definition(words, true, true);
         balancer.put(Vocabulary.NAME, mandatoryWords);
+        balancer.put(Vocabulary.MONITOR, monitor);
         component.put(Vocabulary.NAME, mandatoryWords);
         component.put(Vocabulary.MONITOR, monitor);
         blocks.put(Vocabulary.BALANCER, balancer);

@@ -284,8 +284,9 @@ class Compiler
                             if (list.isEmpty())
                             {
                                 final StringBuilder error =
-                                        new StringBuilder(label);
-                                error.append(" does not have any values near ");
+                                        new StringBuilder("'");
+                                error.append(label);
+                                error.append("' does not have any values near ");
                                 error.append(this.location(token));
                                 local.addError(error.toString());
                             }
@@ -309,8 +310,9 @@ class Compiler
                                     else
                                     {
                                         final StringBuilder error =
-                                                new StringBuilder(label);
-                                        error.append(" does not have a valid value at ");
+                                                new StringBuilder("'");
+                                        error.append(label);
+                                        error.append("' does not have a valid value at ");
                                         error.append(this.location(tokens.value));
                                         local.addError(error.toString());
                                     }
@@ -320,8 +322,9 @@ class Compiler
                             else
                             {
                                 final StringBuilder error =
-                                        new StringBuilder(label);
-                                error.append(" declared more than once near  ");
+                                        new StringBuilder("'");
+                                error.append(label);
+                                error.append("' declared more than once near  ");
                                 error.append(this.location(token));
                                 local.addError(error.toString());
                             }
@@ -330,9 +333,10 @@ class Compiler
                         else if (!label.equals(Vocabulary.TYPE_NAME))
                         {
                             final StringBuilder error =
-                                    new StringBuilder(label);
-                            error.append(" is not a valid parameter at ");
-                            error.append(this.location(name));
+                                    new StringBuilder("'");
+                            error.append(label);
+                            error.append("' is not a valid parameter near ");
+                            error.append(this.location(token));
                             local.addError(error.toString());
                         }
                     }
@@ -364,7 +368,7 @@ class Compiler
             {
                 final StringBuilder error =
                         new StringBuilder("Unrecognized type '");
-                error.append(token.value).append("' at ")
+                error.append(token.value).append("' near ")
                         .append(this.location(token));
                 local.addError(error.toString());
             }

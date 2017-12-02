@@ -93,6 +93,7 @@ public class Monitor
         double startPeriod = 0;
         boolean counted = false;
         final boolean source = component instanceof Source;
+        final boolean processor = component instanceof Processor;
         if (!source)
         {
             this.waiting.clear();
@@ -160,39 +161,45 @@ public class Monitor
             }
             System.out.println("  Events processed: " + this.waiting.getN());
             final double utilization = (timespan - idle) / timespan;
-            System.out.println("  Utilization: " + utilization);
+            if (processor)
+            {
+                System.out.println("  Utilization: " + utilization);
+            }
             System.out.println("  Throughput: " + throughput);
-            System.out.println("  Queued events");
-            System.out.println("    Mean: " + this.queue.getMean());
-            System.out.println("    Standard deviation: "
-                    + this.queue.getStandardDeviation());
-            System.out.println("    Median: " + this.queue.getPercentile(50));
-            System.out.println("    Maximum: " + this.queue.getMax());
-            System.out.println("    Minimum: " + this.queue.getMin());
-            System.out.println("  Wait time");
-            System.out.println("    Mean: " + this.waiting.getMean());
-            System.out.println("    Standard deviation: "
-                    + this.waiting.getStandardDeviation());
-            System.out.println("    Median: "
-                    + this.waiting.getPercentile(50));
-            System.out.println("    Maximum: " + this.waiting.getMax());
-            System.out.println("    Minimum: " + this.waiting.getMin());
-            System.out.println("  Process time");
-            System.out.println("    Mean: " + this.processing.getMean());
-            System.out.println("    Standard Deviation: "
-                    + this.processing.getStandardDeviation());
-            System.out.println("    Median: "
-                    + this.processing.getPercentile(50));
-            System.out.println("    Maximum: " + this.processing.getMax());
-            System.out.println("    Minimum: " + this.processing.getMin());
-            System.out.println("  Visit time");
-            System.out.println("    Mean: " + this.visiting.getMean());
-            System.out.println("    Standard Deviation: "
-                    + this.visiting.getStandardDeviation());
-            System.out.println("    Median: "
-                    + this.visiting.getPercentile(50));
-            System.out.println("    Maximum: " + this.visiting.getMax());
-            System.out.println("    Minimum: " + this.visiting.getMin());
+            if (processor)
+            {
+                System.out.println("  Queued events");
+                System.out.println("    Mean: " + this.queue.getMean());
+                System.out.println("    Standard deviation: "
+                        + this.queue.getStandardDeviation());
+                System.out.println("    Median: " + this.queue.getPercentile(50));
+                System.out.println("    Maximum: " + this.queue.getMax());
+                System.out.println("    Minimum: " + this.queue.getMin());
+                System.out.println("  Wait time");
+                System.out.println("    Mean: " + this.waiting.getMean());
+                System.out.println("    Standard deviation: "
+                        + this.waiting.getStandardDeviation());
+                System.out.println("    Median: "
+                        + this.waiting.getPercentile(50));
+                System.out.println("    Maximum: " + this.waiting.getMax());
+                System.out.println("    Minimum: " + this.waiting.getMin());
+                System.out.println("  Process time");
+                System.out.println("    Mean: " + this.processing.getMean());
+                System.out.println("    Standard Deviation: "
+                        + this.processing.getStandardDeviation());
+                System.out.println("    Median: "
+                        + this.processing.getPercentile(50));
+                System.out.println("    Maximum: " + this.processing.getMax());
+                System.out.println("    Minimum: " + this.processing.getMin());
+                System.out.println("  Visit time");
+                System.out.println("    Mean: " + this.visiting.getMean());
+                System.out.println("    Standard Deviation: "
+                        + this.visiting.getStandardDeviation());
+                System.out.println("    Median: "
+                        + this.visiting.getPercentile(50));
+                System.out.println("    Maximum: " + this.visiting.getMax());
+                System.out.println("    Minimum: " + this.visiting.getMin());
+            }
             System.out.println("  Arrival characteristics");
         }
         System.out.println("    Mean: " + this.arrivals.getMean());
