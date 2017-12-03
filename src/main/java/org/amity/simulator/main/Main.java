@@ -54,9 +54,6 @@ public class Main
     private final static String END = "end";
     private final static String GENERATE = "generate";
     private final static String FILE = "file";
-    private final static int FILL = 500;
-    private final static int MIN_BUFFER = 20;
-    private final static int MAX_BUFFER = 1000;
 
     /**
      * Create command line options for use
@@ -235,7 +232,6 @@ public class Main
             final double start, final double end)
     {
         boolean error = false;
-        int operations = 0;
         if (start > end)
         {
             System.err.println("Sample start time must be lower than the sample end time");
@@ -253,123 +249,9 @@ public class Main
             {
                 System.out.println("Completed syntax parsing");
                 final Model model = token.parse();
-                if (model.compiled)
-                {
-                    System.out.println("Completed compilation");
-                    final Monitor monitor = new Monitor(start, end);
-                    final LinkedList<Event> events = new LinkedList<>();
-                    final List<Event> completed = new ArrayList<>();
-                    System.out.println("Start simulation");
-                    for (final IComponent source : model.sources)
-                    {
-                        do
-                        {
-                            final Event event = source.simulate(null);
-                            if (event.getStarted() > generate)
-                            {
-                                break;
-                            }
-                            events.add(event);
-                        }
-                        while (true);
-                    }
-                    // Sort primary store for all events in order of completion
-                    events.sort(Comparator
-                            .comparingDouble(Event::getCompleted));
-                    // Copy a fractional part of the primary store
-                    // We do this as the buffer sort will take less time
-                    final LinkedList<Event> buffer = new LinkedList<>();
-                    double highmark = Main.fillBuffer(events, buffer, 0);
-                    // Sort buffer in chronological order of last completion
-                    buffer.sort(Comparator
-                            .comparingDouble(Event::getCompleted));
-                    while (buffer.size() > 0)
-                    {
-                        final Event event = buffer.removeFirst();
-                        event.simulate();
-                        operations++;
-                        if (event.getComponent() == null)
-                        {
-                            completed.add(event);
-                        }
-                        else
-                        {
-                            buffer.add(event);
-                            // Refill buffer if modified event completion is
-                            // higher than the high watermark or we are getting
-                            // to a low buffer and we still have events in the
-                            // primary buffer
-                            if (!events.isEmpty()
-                                    && (buffer.size() < Main.MIN_BUFFER
-                                    || event.getCompleted() > highmark))
-                            {
-                                highmark = Main.fillBuffer(events, buffer,
-                                        event.getCompleted());
-                            }
-                            // Re-sort buffer after we have modified the list
-                            buffer.sort(Comparator
-                                    .comparingDouble(Event::getCompleted));
-                        }
-                    }
-                    System.out.println("Statistics for events that occurred between "
-                            + start + " and " + end);
-                    monitor.displayStatistics(completed);
-                    for (final IComponent component : model.components.values())
-                    {
-                        component.generateStatistics(monitor);
-                    }
-                }
-                else
-                {
-                    error = true;
-                }
-            }
-            else
-            {
-                error = true;
+                error = model.execute(generate, start, end);
             }
         }
-        System.out.println("Operations: " + operations);
         return error;
-    }
-
-    /**
-     * Transfer events from the primary event storage to the working area
-     * 
-     * @param primary main store for generated events
-     * @param buffer working storage for processing events
-     * @param highmark highest time boundary for events in the buffer
-     * @return updated highmark for the working buffer
-     */
-    private static double fillBuffer(final LinkedList<Event> primary,
-            final LinkedList<Event> buffer, final double highmark)
-    {
-        double current = highmark;
-        if (!primary.isEmpty())
-        {
-            // Re-calculate timeline due to extreme out-of-order insertions
-            if (buffer.size() > Main.MAX_BUFFER)
-            {
-                System.out.println("System arrivals faster than system exits");
-                primary.addAll(buffer);
-                buffer.clear();
-                primary.sort(Comparator.comparingDouble(Event::getCompleted));
-            }
-            // Copy events from main buffer into working buffer
-            for (int index = 0; index < Main.FILL; index++)
-            {
-                if (primary.isEmpty())
-                {
-                    break;
-                }
-                else
-                {
-                    final Event event = primary.removeFirst();
-                    buffer.add(event);
-                    current = event.getCompleted();
-                }
-            }
-        }
-        return current;
     }
 }
