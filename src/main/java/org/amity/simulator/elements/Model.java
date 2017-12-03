@@ -20,12 +20,12 @@
 package org.amity.simulator.elements;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import org.amity.simulator.main.Main;
 
 /**
  * Container for system components
@@ -38,10 +38,10 @@ public class Model
     private final static int FILL = 500;
     private final static int MIN_BUFFER = 20;
     private final static int MAX_BUFFER = 2000;
-    public final List<String> errors;
-    public boolean compiled;
-    public final List<IComponent> sources;
-    public final Map<String, IComponent> components;
+    private final List<String> errors;
+    private boolean compiled;
+    final List<IComponent> sources;
+    final Map<String, IComponent> components;
 
     public Model()
     {
@@ -49,6 +49,26 @@ public class Model
         this.compiled = false;
         this.sources = new ArrayList<>();
         this.components = new HashMap<>();
+    }
+
+    /**
+     * 
+     * @param errors 
+     */
+    public void addErrors(final List<String> errors)
+    {
+        this.errors.addAll(errors);
+        this.compiled = this.errors.isEmpty();
+    }
+
+    public void addComponents(final Collection<IComponent> sources,
+            final Map<String, IComponent> components)
+    {
+        if (this.compiled)
+        {
+            this.sources.addAll(sources);
+            this.components.putAll(components);
+        }
     }
 
     /**

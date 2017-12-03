@@ -60,7 +60,7 @@ class Compiler
     }
 
     /**
-     * Converst the chain of tokens into a system simulation model
+     * Convert the chain of tokens into a system simulation model
      * 
      * @param token start of token chain
      * @return system model to run simulation
@@ -151,7 +151,7 @@ class Compiler
             }
         }
         final Model model = new Model();
-        model.errors.addAll(local.errors());
+        model.addErrors(local.errors());
         if (!local.ok())
         {
             for (final String error : local.errors())
@@ -161,9 +161,8 @@ class Compiler
         }
         else
         {
-            model.compiled = true;
-            model.sources.addAll(this.scratch[1].sources.values());
-            model.components.putAll(this.scratch[1].components);
+            model.addComponents(this.scratch[1].sources.values(),
+                    this.scratch[1].components);
         }
         return model;
     }
