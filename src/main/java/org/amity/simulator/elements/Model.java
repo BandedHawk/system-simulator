@@ -35,14 +35,14 @@ import java.util.Map;
 public class Model
 {
 
-    private final static int FILL = 500;
-    private final static int MIN_BUFFER = 20;
-    private final static int MAX_BUFFER = 2000;
     private final List<String> errors;
     private boolean compiled;
     final List<IComponent> sources;
     final Map<String, IComponent> components;
 
+    /**
+     * Default constructor for the system model
+     */
     public Model()
     {
         this.errors = new ArrayList<>();
@@ -61,6 +61,12 @@ public class Model
         this.compiled = this.errors.isEmpty();
     }
 
+    /**
+     * Load all the elements of the model into the container
+     * 
+     * @param sources
+     * @param components 
+     */
     public void addComponents(final Collection<IComponent> sources,
             final Map<String, IComponent> components)
     {
@@ -81,15 +87,61 @@ public class Model
     public boolean execute(final double generate, final double start,
             final double end)
     {
-        if (this.compiled)
+        final boolean run = this.compiled && generate > end
+                && end > start && start >= 0;
+        if (run)
         {
             System.out.println("Completed compilation");
             final Monitor monitor = new Monitor(start, end);
-            final LinkedList<Event> events = new LinkedList<>();
-            final List<Event> completed = new ArrayList<>();
             System.out.println("Start simulation");
-            int operations = 0;
-            for (final IComponent source : this.sources)
+            final Simulator simulator = new Simulator(this.sources, generate);
+            simulator.execute();
+            System.out.println("Statistics for events that occurred between "
+                    + start + " and " + end);
+            monitor.displayStatistics(simulator.completed);
+            for (final IComponent component : this.components.values())
+            {
+                component.generateStatistics(monitor);
+            }
+        }
+        return run;
+    }
+    /**
+     * Container for running simulation
+     */
+    private class Simulator
+    {
+        private final static int FILL = 500;
+        private final static int MIN_BUFFER = 20;
+        private final static int MAX_BUFFER = 2000;
+        private final LinkedList<Event> primary;
+        private final LinkedList<Event> working;
+        private final List<Event> completed;
+        private int capacity;
+        private double highmark;
+
+        private Simulator()
+        {
+            this.capacity = Simulator.FILL;
+            this.primary = new LinkedList<>();
+            this.working = new LinkedList<>();
+            this.completed = new ArrayList<>();
+            this.highmark = 0;
+        }
+
+        /**
+         * 
+         * @param sources
+         * @param generate 
+         */
+        private Simulator(final List<IComponent> sources, final double generate)
+        {
+            this.capacity = Simulator.FILL;
+            this.primary = new LinkedList<>();
+            this.working = new LinkedList<>();
+            this.completed = new ArrayList<>();
+            this.highmark = 0;
+            for (final IComponent source : sources)
             {
                 do
                 {
@@ -98,97 +150,94 @@ public class Model
                     {
                         break;
                     }
-                    events.add(event);
+                    this.primary.add(event);
                 }
                 while (true);
             }
             // Sort primary store for all events in order of completion
-            events.sort(Comparator
-                    .comparingDouble(Event::getCompleted));
+            this.primary.sort(Comparator.comparingDouble(Event::getCompleted));
             // Copy a fractional part of the primary store
-            // We do this as the buffer sort will take less time
-            final LinkedList<Event> buffer = new LinkedList<>();
-            double highmark = this.fillBuffer(events, buffer, 0);
-            // Sort buffer in chronological order of last completion
-            buffer.sort(Comparator
-                    .comparingDouble(Event::getCompleted));
-            while (buffer.size() > 0)
+            // We do this as the working sort will take less time
+            this.fill();
+            // Sort working in chronological order of last completion
+            this.working.sort(Comparator.comparingDouble(Event::getCompleted));
+        }
+
+        /**
+         * 
+         */
+        void execute()
+        {
+            int operations = 0;
+            while (this.working.size() > 0)
             {
-                final Event event = buffer.removeFirst();
+                final Event event = this.working.removeFirst();
                 event.simulate();
                 operations++;
                 if (event.getComponent() == null)
                 {
-                    completed.add(event);
+                    this.completed.add(event);
                 }
                 else
                 {
-                    buffer.add(event);
-                    // Refill buffer if modified event completion is
+                    this.working.add(event);
+                    // Refill working if modified event completion is
                     // higher than the high watermark or we are getting
-                    // to a low buffer and we still have events in the
-                    // primary buffer
-                    if (!events.isEmpty()
-                            && (buffer.size() < Model.MIN_BUFFER
-                            || event.getCompleted() > highmark))
+                    // to a low working and we still have events in the
+                    // primary working
+                    if (!this.primary.isEmpty()
+                            && (this.working.size() < Simulator.MIN_BUFFER
+                            || event.getCompleted() > this.highmark))
                     {
-                        highmark = this.fillBuffer(events, buffer,
-                                event.getCompleted());
+                        if (this.highmark < event.getCompleted()
+                                && this.capacity < Simulator.MAX_BUFFER)
+                        {
+                            this.capacity += Simulator.FILL;
+                        }
+                        this.highmark = event.getCompleted();
+                        this.fill();
                     }
-                    // Re-sort buffer after we have modified the list
-                    buffer.sort(Comparator
+                    // Re-sort working after we have modified the list
+                    this.working.sort(Comparator
                             .comparingDouble(Event::getCompleted));
                 }
             }
-            System.out.println("Statistics for events that occurred between "
-                    + start + " and " + end);
-            monitor.displayStatistics(completed);
-            for (final IComponent component : this.components.values())
-            {
-                component.generateStatistics(monitor);
-            }
-            System.out.println("Operations: " + operations);
+            System.out.println("  Simulation operations: " + operations);
         }
-        return this.compiled;
-    }
 
-    /**
-     * Transfer events from the primary event storage to the working area
-     * 
-     * @param primary main store for generated events
-     * @param buffer working storage for processing events
-     * @param highmark highest time boundary for events in the buffer
-     * @return updated highmark for the working buffer
-     */
-    private double fillBuffer(final LinkedList<Event> primary,
-            final LinkedList<Event> buffer, final double highmark)
-    {
-        double current = highmark;
-        if (!primary.isEmpty())
+        /**
+         * Transfer events from the primary event storage to the working area
+         */
+        private void fill()
         {
-            // Re-calculate timeline due to extreme out-of-order insertions
-            if (buffer.size() > Model.MAX_BUFFER)
+            double current = this.highmark;
+            if (!primary.isEmpty())
             {
-                System.out.println("System arrivals faster than system exits");
-                primary.addAll(buffer);
-                buffer.clear();
-                primary.sort(Comparator.comparingDouble(Event::getCompleted));
-            }
-            // Copy events from main buffer into working buffer
-            for (int index = 0; index < Model.FILL; index++)
-            {
-                if (primary.isEmpty())
+                // Re-calculate timeline due to extreme out-of-order insertions
+                if (this.working.size() > Simulator.MAX_BUFFER)
                 {
-                    break;
+                    System.err.println("    System arrivals faster than system exits");
+                    this.primary.addAll(this.working);
+                    this.working.clear();
+                    this.primary.sort(Comparator
+                            .comparingDouble(Event::getCompleted));
                 }
-                else
+                // Copy events from main working into working working
+                for (int index = 0; index < this.capacity; index++)
                 {
-                    final Event event = primary.removeFirst();
-                    buffer.add(event);
-                    current = event.getCompleted();
+                    if (this.primary.isEmpty())
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        final Event event = primary.removeFirst();
+                        this.working.add(event);
+                        current = event.getCompleted();
+                    }
                 }
             }
+            this.highmark = current;
         }
-        return current;
     }
 }
