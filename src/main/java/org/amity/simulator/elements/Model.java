@@ -88,6 +88,15 @@ public class Model
 
     /**
      * 
+     * @return list of error messages while building model
+     */
+    public List<String> getErrors()
+    {
+        return this.errors;
+    }
+
+    /**
+     * 
      * @param generate
      * @param start
      * @param end 

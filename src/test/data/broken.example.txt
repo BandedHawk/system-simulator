@@ -1,0 +1,39 @@
+components
+{
+    type: source
+    name: generator
+    function
+    {
+        type: constant
+        period: 1
+        next: balancer
+    }
+}
+component
+{
+    type: processor
+    name: delay
+    functions
+    {
+        type: constant
+        period: 2
+        source: generator
+    }
+    function
+    {
+        type: uniform
+        minimum: 2
+        maximum: 4
+        source: default
+    }
+}
+component
+{
+    type: balancers
+    name: balancer
+    function
+    {
+        type: robin-round
+        next: delay
+    }
+}
