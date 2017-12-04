@@ -79,6 +79,15 @@ public class Model
 
     /**
      * 
+     * @return model compiled successfully
+     */
+    public boolean isCompiled()
+    {
+        return this.compiled;
+    }
+
+    /**
+     * 
      * @param generate
      * @param start
      * @param end 

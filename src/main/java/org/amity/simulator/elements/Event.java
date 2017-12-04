@@ -33,6 +33,7 @@ public class Event
     private double started;
     private double completed;
     private double executed;
+    private String last;
     private IComponent component;
 
     /**
@@ -48,6 +49,7 @@ public class Event
         this.completed = 0;
         this.executed = 0;
         this.component = null;
+        this.last = null;
     }
 
     /**
@@ -67,6 +69,7 @@ public class Event
         this.completed = 0;
         this.executed = 0;
         this.component = null;
+        this.last = null;
     }
 
     /**
@@ -237,13 +240,28 @@ public class Event
     }
 
     /**
+     * 
+     * @return name of last component of event life
+     */
+    public String getLast()
+    {
+        return this.last;
+    }
+
+    /**
      * Simulate event passing through component
      */
     public void simulate()
     {
-        if (component != null)
+        if (this.component != null)
         {
+            final String name = this.component.getLabel();
             this.component.simulate(this);
+            // Define the component executed to reach end of life
+            if (this.component == null)
+            {
+                this.last = name;
+            }
         }
     }
 
