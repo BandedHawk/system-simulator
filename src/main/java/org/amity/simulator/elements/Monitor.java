@@ -19,7 +19,11 @@
  */
 package org.amity.simulator.elements;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.util.FastMath;
 
@@ -112,7 +116,7 @@ public class Monitor
             {
                 break;
             }
-            if (arrived >= this.start)
+            if (counted || arrived >= this.start)
             {
                 if (arrival > 0)
                 {
@@ -214,8 +218,10 @@ public class Monitor
      * Calculate statistics for events that completed processing in the system
      * 
      * @param events list of completed events
+     * @param multisource
      */
-    public void displayStatistics(final List<Event> events)
+    public void displayStatistics(final List<Event> events,
+            final boolean multisource)
     {
         waiting.clear();
         processing.clear();
@@ -223,54 +229,98 @@ public class Monitor
         arrivals.clear();
         elapsed.clear();
         executed.clear();
-        double started = 0;
-        double completed = 0;
         boolean counted = false;
-        // Collect data into statistical services
+        // Collect data for statistical services
+        final Map<String, List<Event>> sources = new HashMap<>();
+        final List<Event> general = new ArrayList<>();
+        events.sort(Comparator.comparingDouble(Event::getCreated));
         for (final Event event : events)
         {
             if (event.getCompleted() > this.end)
             {
                 break;
             }
-            if (event.getCreated() >= this.start)
+            // Short-circuit comparison
+            if (counted || event.getCreated() >= this.start)
             {
                 if (!counted)
                 {
-                    started = event.getCreated();
                     counted = true;
                 }
-                final double lifetime =
-                        event.getCompleted() - event.getCreated();
-                elapsed.addValue(lifetime);
-                executed.addValue(event.getExecuted());
-                completed = event.getCompleted();
+                general.add(event);
+                if (multisource)
+                {
+                    final List<Event> list
+                            = sources.containsKey(event.getSource())
+                            ? sources.get(event.getSource())
+                            : new ArrayList<>();
+                    sources.putIfAbsent(event.getSource(), list);
+                    list.add(event);
+                }
             }
         }
+        System.out.println("General event information");
+        generateStatistics(general, true);
+        if (multisource)
+        {
+            for (final String source : sources.keySet())
+            {
+                System.out.println("    '" + source + "' event information");
+                generateStatistics(sources.get(source), false);
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param events
+     * @param general 
+     */
+    private void generateStatistics(final List<Event> events,
+            final boolean general)
+    {
+        this.elapsed.clear();
+        this.executed.clear();
+        for (final Event event : events)
+        {
+            elapsed.addValue(event.getLifetime());
+            executed.addValue(event.getExecuted());
+        }
+        final double started = events.isEmpty() ? 0
+                : events.get(0).getCreated();
+        final double completed = events.isEmpty() ? 0
+                : events.get(events.size() - 1).getCreated();
         final double throughput = this.elapsed.getN() / (completed - started);
         final double active = this.executed.getMean() / this.elapsed.getMean();
-        System.out.println("Event information");
-        System.out.println("  Events completed processing: "
+        List<String> messages = new ArrayList<>();
+        messages.add("  Events completed processing: "
                 + this.elapsed.getN());
-        System.out.println("  Throughput: " + throughput);
-        System.out.println("  Ratio of processing in lifetime: " + active);
-        System.out.println("  Event lifetime");
-        System.out.println("    Mean:" + this.elapsed.getMean());
-        System.out.println("    Standard Deviation:"
+        messages.add("  Throughput: " + throughput);
+        messages.add("  Ratio of processing in lifetime: " + active);
+        messages.add("  Event lifetime");
+        messages.add("    Mean:" + this.elapsed.getMean());
+        messages.add("    Standard Deviation:"
                 + this.elapsed.getStandardDeviation());
-        System.out.println("    Median:" + this.elapsed.getPercentile(50));
-        System.out.println("    Maximum time in system: "
+        messages.add("    Median:" + this.elapsed.getPercentile(50));
+        messages.add("    Maximum time in system: "
                 + this.elapsed.getMax());
-        System.out.println("    Minimum time in system: "
+        messages.add("    Minimum time in system: "
                 + this.elapsed.getMin());
-        System.out.println("  Event in execution");
-        System.out.println("    Mean: " + this.executed.getMean());
-        System.out.println("    Standard Deviation: "
+        messages.add("  Event in execution");
+        messages.add("    Mean: " + this.executed.getMean());
+        messages.add("    Standard Deviation: "
                 + this.executed.getStandardDeviation());
-        System.out.println("    Median: " + this.executed.getPercentile(50));
-        System.out.println("    Maximum time processing: "
+        messages.add("    Median: " + this.executed.getPercentile(50));
+        messages.add("    Maximum time processing: "
                 + this.executed.getMax());
-        System.out.println("    Minimum time processing: "
+        messages.add("    Minimum time processing: "
                 + this.executed.getMin());
+        for(final String message : messages)
+        {
+            final StringBuilder string = general ? new StringBuilder()
+                    : new StringBuilder("    ");
+            string.append(message);
+            System.out.println(string.toString());
+        }
     }
 }

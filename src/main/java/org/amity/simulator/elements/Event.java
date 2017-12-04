@@ -33,6 +33,7 @@ public class Event
     private double started;
     private double completed;
     private double executed;
+    private double lifetime;
     private String last;
     private IComponent component;
 
@@ -48,6 +49,7 @@ public class Event
         this.started = 0;
         this.completed = 0;
         this.executed = 0;
+        this.lifetime = 0;
         this.component = null;
         this.last = null;
     }
@@ -68,6 +70,7 @@ public class Event
         this.started = 0;
         this.completed = 0;
         this.executed = 0;
+        this.lifetime = 0;
         this.component = null;
         this.last = null;
     }
@@ -86,6 +89,7 @@ public class Event
         this.started = copy.started;
         this.completed = copy.completed;
         this.executed = copy.executed;
+        this.lifetime = copy.lifetime;
         this.component = copy.component;
     }
 
@@ -241,6 +245,15 @@ public class Event
 
     /**
      * 
+     * @return lifespan of event
+     */
+    public double getLifetime()
+    {
+        return this.lifetime;
+    }
+
+    /**
+     * 
      * @return name of last component of event life
      */
     public String getLast()
@@ -261,6 +274,7 @@ public class Event
             if (this.component == null)
             {
                 this.last = name;
+                this.lifetime = this.completed - this.created;
             }
         }
     }

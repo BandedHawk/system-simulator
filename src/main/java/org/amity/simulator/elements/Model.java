@@ -116,7 +116,8 @@ public class Model
             simulator.execute();
             System.out.println("Statistics for events that occurred between "
                     + start + " and " + end);
-            monitor.displayStatistics(simulator.completed);
+            final boolean multisource = this.sources.size() > 1;
+            monitor.displayStatistics(simulator.completed, multisource);
             for (final IComponent component : this.components.values())
             {
                 component.generateStatistics(monitor);
