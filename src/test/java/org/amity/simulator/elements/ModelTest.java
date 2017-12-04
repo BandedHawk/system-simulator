@@ -89,16 +89,27 @@ public class ModelTest
     public void testIsCompiled()
     {
         System.out.println("isCompiled");
+        System.out.println("  Working specification");
         final File file = new File("src/test/data/test.example.txt");
         final Lexer lexer = new Lexer();
         final Token token = lexer.analyze(file);
+        assertTrue(token != null);
         Model model = token.parse();
         assertTrue(model.getErrors().isEmpty());
         assertTrue(model.isCompiled());
+        System.out.println("  Pre-object build broken specification");
         final File badFile = new File("src/test/data/broken.example.txt");
         final Token badToken = lexer.analyze(badFile);
+        assertTrue(badToken != null);
         model = badToken.parse();
-        assertTrue(model.getErrors().size() > 0);
+        assertTrue(model.getErrors().size() == 14);
+        assertFalse(model.isCompiled());
+        System.out.println("  Bad reference specification");
+        final File brokenFile = new File("src/test/data/broken.reference.txt");
+        final Token brokenToken = lexer.analyze(brokenFile);
+        assertTrue(brokenToken != null);
+        model = brokenToken.parse();
+        assertTrue(model.getErrors().size() == 2);
         assertFalse(model.isCompiled());
     }
 

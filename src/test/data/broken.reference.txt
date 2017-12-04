@@ -1,0 +1,46 @@
+component
+{
+    type: balancer
+    name: balancer
+    function
+    {
+        type: smart
+        next: delay
+    }
+}
+component
+{
+    type: source
+    name: source
+    function
+    {
+        type: uniform
+        minimum: 1.0
+        maximum: 2.0
+        next: delay
+    }
+}
+component
+{
+    type: processor
+    name: processor
+    function
+    {
+        type: gaussian
+        minimum: 3.0
+        maximum: 4.0
+        next: delay
+    }
+}
+component
+{
+    type: processor
+    name: database
+    function
+    {
+        type: gaussian
+        minimum: 3.0
+        maximum: 4.0
+        next: source
+    }
+}

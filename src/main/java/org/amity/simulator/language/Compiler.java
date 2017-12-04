@@ -108,9 +108,9 @@ class Compiler
                     // Make sure we don't connect to a source component
                     if (component instanceof Source)
                     {
-                        final StringBuilder error =
-                                new StringBuilder(reference);
-                        error.append(" is a source and cannot be downstream");
+                        final StringBuilder error = new StringBuilder("'");
+                        error.append(reference);
+                        error.append("' is a source and cannot be downstream");
                         local.addError(error.toString());
                     }
                     // Resolve references
@@ -143,9 +143,9 @@ class Compiler
                 }
                 else
                 {
-                    final StringBuilder error =
-                            new StringBuilder(reference);
-                    error.append(" is not defined");
+                    final StringBuilder error = new StringBuilder("'");
+                    error.append(reference);
+                    error.append("' is not defined");
                     local.addError(error.toString());
                 }
             }
@@ -192,9 +192,10 @@ class Compiler
                             if (!Vocabulary.containsDeclaration(local.label,
                                     local.depth))
                             {
-                                final StringBuilder error =
-                                        new StringBuilder(token.value);
-                                error.append(" is not recognised at ");
+                                final StringBuilder error
+                                        = new StringBuilder("'");
+                                error.append(token.value);
+                                error.append("' is not recognised at ");
                                 error.append(token.line).append(", ")
                                         .append(token.position);
                                 local.addError(error.toString());
@@ -203,9 +204,9 @@ class Compiler
                         case ASSIGN:
                             break;
                         default:
-                            final StringBuilder error =
-                                    new StringBuilder(nextToken.value);
-                            error.append(" is unexpected at ");
+                            final StringBuilder error = new StringBuilder("'");
+                            error.append(nextToken.value);
+                            error.append("' is unexpected at ");
                             error.append(nextToken.line).append(", ")
                                     .append(nextToken.position);
                             local.addError(error.toString());
@@ -366,9 +367,8 @@ class Compiler
             else
             {
                 final StringBuilder error =
-                        new StringBuilder("Unrecognized type '");
-                error.append(token.value).append("' near ")
-                        .append(this.location(token));
+                        new StringBuilder("Only a single type can be");
+                error.append(" declared near ").append(this.location(token));
                 local.addError(error.toString());
             }
         }

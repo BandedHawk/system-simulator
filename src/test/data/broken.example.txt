@@ -1,4 +1,4 @@
-components
+component
 {
     type: source
     name: generator
@@ -7,6 +7,37 @@ components
         type: constant
         period: 1
         next: balancer
+    }
+}
+component
+{
+    type: processor
+    name: delay
+    function
+    {
+        type: constant
+        period: 2
+    }
+}
+component
+{
+    type: source
+    name: generator
+    function
+    {
+        type: constant
+        period: 1
+        next: balancer
+    }
+}
+component
+{
+    type: processor
+    name: delay
+    function
+    {
+        type: constant
+        period: 2
     }
 }
 component
@@ -29,11 +60,151 @@ component
 }
 component
 {
+    type: network
+    name: delay
+    function
+    {
+        type: constant
+        period: -2
+    }
+}
+component
+{
+    type: network
+    name: delay
+    function
+    {
+        type: constant
+        period: 5
+        period: 5
+    }
+}
+component
+{
+    name: network
+    function
+    {
+        type: constant
+        period: 5
+        period: 5
+    }
+}
+component
+{
+    type: network 1
+    function
+    {
+        type: constant
+    }
+}
+component
+{
     type: balancers
     name: balancer
     function
     {
         type: robin-round
+        next: delay
+    }
+}
+component
+{
+    type: source
+    name: source 1
+}
+component
+{
+    type: source
+    name: source 1
+    function
+    {
+        type: round-robin
+        next: delay
+    }
+}
+component
+{
+    type: source
+    name: source 2
+    function
+    {
+        type: constant
+        period: 1.0
+        next: delay
+    }
+    function
+    {
+        type: uniform
+        minimum: 1.0
+        maximum: 2.0
+        next: delay
+    }
+}
+component
+{
+    type: processor
+    name: block
+    function
+    {
+        type: gaussian
+        minimum: 3.0
+        maximum: 4.0
+        next: delay
+    }
+    function
+    {
+        type: uniform
+        minimum: 1.0
+        maximum: 2.0
+        next: delay
+    }
+}
+component
+{
+    type: balancer
+    name: balancer 3
+    function
+    {
+        type: robin-round
+        next: delay
+    }
+    function
+    {
+        type: smart
+        next: delay
+    }
+}
+component
+{
+    name: source 3
+    function
+    {
+        type: uniform
+        minimum: 1.0
+        maximum: 2.0
+        next: delay
+    }
+}
+component
+{
+    type: source
+    flag: bad
+    name: source 4
+    function
+    {
+        type: round-robin
+        next: delay
+    }
+}
+component
+{
+    type: block
+    type: source
+    name: source 4
+    function
+    {
+        type: constant
+        period: 1
         next: delay
     }
 }
