@@ -107,6 +107,8 @@ public class Monitor
         this.arrivals.clear();
         // Collect data into statistical services
         assert component != null : "unexpected null component";
+        final List<Event> events = component.getLocalEvents();
+        events.sort(Comparator.comparingDouble(Event::getCreated));
         for (final Event event : component.getLocalEvents())
         {
             final double arrived = event.getArrived();
