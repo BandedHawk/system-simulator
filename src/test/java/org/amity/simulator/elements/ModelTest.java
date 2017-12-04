@@ -21,9 +21,7 @@ package org.amity.simulator.elements;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import org.amity.simulator.language.Lexer;
 import org.amity.simulator.language.Token;
 import org.junit.After;
