@@ -52,8 +52,8 @@ public class Model
     }
 
     /**
-     * 
-     * @param errors 
+     *
+     * @param errors
      */
     public void addErrors(final List<String> errors)
     {
@@ -63,9 +63,9 @@ public class Model
 
     /**
      * Load all the elements of the model into the container
-     * 
+     *
      * @param sources
-     * @param components 
+     * @param components
      */
     public void addComponents(final Collection<IComponent> sources,
             final Map<String, IComponent> components)
@@ -78,7 +78,7 @@ public class Model
     }
 
     /**
-     * 
+     *
      * @return model compiled successfully
      */
     public boolean isCompiled()
@@ -87,7 +87,7 @@ public class Model
     }
 
     /**
-     * 
+     *
      * @return list of error messages while building model
      */
     public List<String> getErrors()
@@ -96,11 +96,11 @@ public class Model
     }
 
     /**
-     * 
+     *
      * @param generate
      * @param start
-     * @param end 
-     * @return  
+     * @param end
+     * @return
      */
     public boolean execute(final double generate, final double start,
             final double end)
@@ -111,7 +111,6 @@ public class Model
         {
             System.out.println("Completed compilation");
             final Monitor monitor = new Monitor(start, end);
-            System.out.println("Start simulation");
             final Simulator simulator = new Simulator(this.sources, generate);
             simulator.execute();
             System.out.println("Statistics for events that occurred between "
@@ -125,19 +124,23 @@ public class Model
         }
         return run;
     }
+
     /**
      * Container for running simulation
      */
     private class Simulator
     {
+
         private final static int FILL = 500;
         private final static int MIN_BUFFER = 20;
         private final static int MAX_BUFFER = 2000;
+        private final static int CYCLES = 50000;
         private final LinkedList<Event> primary;
         private final LinkedList<Event> working;
         private final List<Event> completed;
         private int capacity;
         private double highmark;
+        private boolean overrun;
 
         private Simulator()
         {
@@ -146,12 +149,13 @@ public class Model
             this.working = new LinkedList<>();
             this.completed = new ArrayList<>();
             this.highmark = 0;
+            this.overrun = false;
         }
 
         /**
-         * 
+         *
          * @param sources
-         * @param generate 
+         * @param generate
          */
         private Simulator(final List<IComponent> sources, final double generate)
         {
@@ -160,6 +164,7 @@ public class Model
             this.working = new LinkedList<>();
             this.completed = new ArrayList<>();
             this.highmark = 0;
+            this.overrun = false;
             for (final IComponent source : sources)
             {
                 do
@@ -183,16 +188,17 @@ public class Model
         }
 
         /**
-         * 
+         * Step through simulation
          */
         void execute()
         {
-            int operations = 0;
+            System.out.println("  Start simulation");
+            int transitions = 0;
             while (this.working.size() > 0)
             {
                 final Event event = this.working.removeFirst();
                 event.simulate();
-                operations++;
+                transitions++;
                 if (event.getComponent() == null)
                 {
                     this.completed.add(event);
@@ -220,8 +226,20 @@ public class Model
                     this.working.sort(Comparator
                             .comparingDouble(Event::getCompleted));
                 }
+                if (transitions % Simulator.CYCLES == 0)
+                {
+                    System.out.println("    Transitions: " + transitions);
+                    System.out.println("      Time: " + event.getCompleted());
+                    System.out.println("      Events completed: "
+                            + this.completed.size());
+                    final int remaining = this.primary.size()
+                            + this.working.size();
+                    System.out.println("      Events remaining: "
+                            + remaining);
+                }
             }
-            System.out.println("  Simulation operations: " + operations);
+            System.out.println("  Simulation transitions to complete: "
+                    + transitions);
         }
 
         /**
@@ -235,11 +253,19 @@ public class Model
                 // Re-calculate timeline due to extreme out-of-order insertions
                 if (this.working.size() > Simulator.MAX_BUFFER)
                 {
-                    System.err.println("    System arrivals faster than system exits");
+                    if (!overrun)
+                    {
+                        System.err.println("        System arrivals faster than system exits");
+                        overrun = true;
+                    }
                     this.primary.addAll(this.working);
                     this.working.clear();
                     this.primary.sort(Comparator
                             .comparingDouble(Event::getCompleted));
+                }
+                else
+                {
+                    overrun = false;
                 }
                 // Copy events from main working into working working
                 for (int index = 0; index < this.capacity; index++)
