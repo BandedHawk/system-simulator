@@ -59,7 +59,7 @@ public enum Syntax
                 break;
             case 5:
                 this.pattern = 
-                        Pattern.compile("^\\s*[a-zA-Z][\\s\\w]*\\-*[\\s\\w]*$|^\\s*[\\+\\-]?\\d*\\.?\\d+\\s*$");
+                        Pattern.compile("^\\s*[a-zA-Z][\\s\\w]*\\-*[\\s\\w]*|^\\s*[\\+\\-]?\\d*\\.?\\d+\\s*");
                 break;
             case 6:
                 this.pattern = Pattern.compile("^\\s*//.*$");

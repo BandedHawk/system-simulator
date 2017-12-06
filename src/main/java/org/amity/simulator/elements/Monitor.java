@@ -108,7 +108,7 @@ public class Monitor
         // Collect data into statistical services
         assert component != null : "unexpected null component";
         final List<Event> events = component.getLocalEvents();
-        events.sort(Comparator.comparingDouble(Event::getCreated));
+        events.sort(Comparator.comparingDouble(Event::getArrived));
         for (final Event event : component.getLocalEvents())
         {
             final double arrived = event.getArrived();
@@ -181,6 +181,8 @@ public class Monitor
                 System.out.println("    Median: " + this.queue.getPercentile(50));
                 System.out.println("    Maximum: " + this.queue.getMax());
                 System.out.println("    Minimum: " + this.queue.getMin());
+                assert this.queue.getMin() >=0
+                        : "Obtained minimum below 0";
                 System.out.println("  Wait time");
                 System.out.println("    Mean: " + this.waiting.getMean());
                 System.out.println("    Standard deviation: "
@@ -189,6 +191,8 @@ public class Monitor
                         + this.waiting.getPercentile(50));
                 System.out.println("    Maximum: " + this.waiting.getMax());
                 System.out.println("    Minimum: " + this.waiting.getMin());
+                assert this.waiting.getMin() >=0
+                        : "Obtained minimum below 0";
                 System.out.println("  Process time");
                 System.out.println("    Mean: " + this.processing.getMean());
                 System.out.println("    Standard Deviation: "
@@ -197,6 +201,8 @@ public class Monitor
                         + this.processing.getPercentile(50));
                 System.out.println("    Maximum: " + this.processing.getMax());
                 System.out.println("    Minimum: " + this.processing.getMin());
+                assert this.processing.getMin() >=0
+                        : "Obtained minimum below 0";
                 System.out.println("  Visit time");
                 System.out.println("    Mean: " + this.visiting.getMean());
                 System.out.println("    Standard Deviation: "
@@ -205,6 +211,8 @@ public class Monitor
                         + this.visiting.getPercentile(50));
                 System.out.println("    Maximum: " + this.visiting.getMax());
                 System.out.println("    Minimum: " + this.visiting.getMin());
+                assert this.visiting.getMin() >=0
+                        : "Obtained minimum below 0";
             }
             System.out.println("  Arrival characteristics");
         }
@@ -214,6 +222,7 @@ public class Monitor
         System.out.println("    Median: " + this.arrivals.getPercentile(50));
         System.out.println("    Maximum: " + this.arrivals.getMax());
         System.out.println("    Minimum: " + this.arrivals.getMin());
+        assert this.arrivals.getMin() >=0 : "Obtained minimum below 0";
     }
 
     /**
@@ -238,26 +247,26 @@ public class Monitor
         events.sort(Comparator.comparingDouble(Event::getCreated));
         for (final Event event : events)
         {
-            if (event.getCompleted() > this.end)
+            // Can't guarantee events will finish in same order as creation
+            if (event.getCompleted() <= this.end)
             {
-                break;
-            }
-            // Short-circuit comparison
-            if (counted || event.getCreated() >= this.start)
-            {
-                if (!counted)
+                // Short-circuit comparison
+                if (counted || event.getCreated() >= this.start)
                 {
-                    counted = true;
-                }
-                general.add(event);
-                if (multisource)
-                {
-                    final List<Event> list
-                            = sources.containsKey(event.getSource())
-                            ? sources.get(event.getSource())
-                            : new ArrayList<>();
-                    sources.putIfAbsent(event.getSource(), list);
-                    list.add(event);
+                    if (!counted)
+                    {
+                        counted = true;
+                    }
+                    general.add(event);
+                    if (multisource)
+                    {
+                        final List<Event> list
+                                = sources.containsKey(event.getSource())
+                                ? sources.get(event.getSource())
+                                : new ArrayList<>();
+                        sources.putIfAbsent(event.getSource(), list);
+                        list.add(event);
+                    }
                 }
             }
         }
@@ -308,6 +317,7 @@ public class Monitor
                 + this.elapsed.getMax());
         messages.add("    Minimum time in system: "
                 + this.elapsed.getMin());
+        assert this.elapsed.getMin() >=0 : "Obtained minimum below 0";
         messages.add("  Event in execution");
         messages.add("    Mean: " + this.executed.getMean());
         messages.add("    Standard Deviation: "
@@ -317,6 +327,7 @@ public class Monitor
                 + this.executed.getMax());
         messages.add("    Minimum time processing: "
                 + this.executed.getMin());
+        assert this.executed.getMin() >=0 : "Obtained minimum below 0";
         for(final String message : messages)
         {
             final StringBuilder string = general ? new StringBuilder()

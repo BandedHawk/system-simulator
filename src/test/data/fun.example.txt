@@ -1,0 +1,454 @@
+component
+{
+    type: source
+    name: source 1
+    function
+    {
+        type: constant
+        period: 5
+        next: balancer
+    }
+    monitor: Yes
+}
+component
+{
+    type: source
+    name: source 2
+    function
+    {
+        type: constant
+        period: 5
+        next: balancer
+    }
+    monitor: Yes
+}
+component
+{
+    type: source
+    name: source 3
+    function
+    {
+        type: constant
+        period: 5
+        next: balancer
+    }
+    monitor: Yes
+}
+component
+{
+    type: balancer
+    name: balancer
+    monitor: Yes
+    function
+    {
+        type: random
+        next: smart balancer 1
+        next: smart balancer 2
+        next: smart balancer 3
+    }
+}
+component
+{
+    type: balancer
+    name: smart balancer 1
+    function
+    {
+        type: smart
+        next: box 1a
+        next: box 1b
+        next: box 1c
+        next: box 1d
+        next: box 1e
+    }
+}
+component
+{
+    type: processor
+    name: box 1a
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 1
+        next: balancer
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 2
+        next: balancer
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+    }
+}
+component
+{
+    type: processor
+    name: box 1b
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 1
+        next: balancer
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 2
+        next: balancer
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+    }
+}
+component
+{
+    type: processor
+    name: box 1c
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 1
+        next: balancer
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 2
+        next: balancer
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+    }
+}
+component
+{
+    type: processor
+    name: box 1d
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 1
+        next: balancer
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 2
+        next: balancer
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+    }
+}
+component
+{
+    type: processor
+    name: box 1e
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 1
+        next: balancer
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 2
+        next: balancer
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+    }
+}
+component
+{
+    type: balancer
+    name: smart balancer 2
+    function
+    {
+        type: smart
+        next: box 2a
+        next: box 2b
+        next: box 2c
+        next: box 2d
+        next: box 2e
+    }
+}
+component
+{
+    type: processor
+    name: box 2a
+    function
+    {
+        type: constant
+        period: 1.0
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 2
+        next: balancer
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 3
+        next: balancer
+    }
+}
+component
+{
+    type: processor
+    name: box 2b
+    function
+    {
+        type: constant
+        period: 1.0
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 2
+        next: balancer
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 3
+        next: balancer
+    }
+}
+component
+{
+    type: processor
+    name: box 2c
+    function
+    {
+        type: constant
+        period: 1.0
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 2
+        next: balancer
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 3
+        next: balancer
+    }
+}
+component
+{
+    type: processor
+    name: box 2d
+    function
+    {
+        type: constant
+        period: 1.0
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 2
+        next: balancer
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 3
+        next: balancer
+    }
+}
+component
+{
+    type: processor
+    name: box 2e
+    function
+    {
+        type: constant
+        period: 1.0
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 2
+        next: balancer
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 3
+        next: balancer
+    }
+}
+component
+{
+    type: balancer
+    name: smart balancer 3
+    function
+    {
+        type: smart
+        next: box 3a
+        next: box 3b
+        next: box 3c
+        next: box 3d
+        next: box 3e
+    }
+}
+component
+{
+    type: processor
+    name: box 3a
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 1
+        next: balancer
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 3
+        next: balancer
+    }
+}
+component
+{
+    type: processor
+    name: box 3b
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 1
+        next: balancer
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 3
+        next: balancer
+    }
+}
+component
+{
+    type: processor
+    name: box 3c
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 1
+        next: balancer
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 3
+        next: balancer
+    }
+    monitor: yes
+}
+component
+{
+    type: processor
+    name: box 3d
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 1
+        next: balancer
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 3
+        next: balancer
+    }
+    monitor: yes
+}
+component
+{
+    type: processor
+    name: box 3e
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 1
+        next: balancer
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+    }
+    function
+    {
+        type: constant
+        period: 1.0
+        source: source 3
+        next: balancer
+    }
+    monitor: yes
+}

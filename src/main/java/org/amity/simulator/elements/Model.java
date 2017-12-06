@@ -112,7 +112,7 @@ public class Model
             System.out.println("Completed compilation");
             final Monitor monitor = new Monitor(start, end);
             final Simulator simulator = new Simulator(this.sources, generate);
-            simulator.execute();
+            simulator.execute(generate);
             System.out.println("Statistics for events that occurred between "
                     + start + " and " + end);
             final boolean multisource = this.sources.size() > 1;
@@ -190,13 +190,18 @@ public class Model
         /**
          * Step through simulation
          */
-        void execute()
+        void execute(final double generate)
         {
             System.out.println("  Start simulation");
             int transitions = 0;
             while (this.working.size() > 0)
             {
                 final Event event = this.working.removeFirst();
+                // End of simulation time
+                if (event.getCompleted() > generate)
+                {
+                    break;
+                }
                 event.simulate();
                 transitions++;
                 if (event.getComponent() == null)
@@ -256,7 +261,9 @@ public class Model
                     if (!overrun)
                     {
                         System.err.println("        System arrivals faster than system exits");
-                        overrun = true;
+                        System.out.println("          Completed: "
+                                + this.completed.size());
+                        this.overrun = true;
                     }
                     this.primary.addAll(this.working);
                     this.working.clear();
@@ -265,7 +272,7 @@ public class Model
                 }
                 else
                 {
-                    overrun = false;
+                    this.overrun = false;
                 }
                 // Copy events from main working into working working
                 for (int index = 0; index < this.capacity; index++)
