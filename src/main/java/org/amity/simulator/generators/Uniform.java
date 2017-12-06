@@ -40,7 +40,7 @@ public class Uniform implements IGenerator
     private final String source;
     private final String reference;
     private IComponent next;
-    private final RandomGenerator generator = new JDKRandomGenerator();
+    private final RandomGenerator generator;
 
     /**
      * Hidden default constructor to avoid implicit creation
@@ -52,6 +52,7 @@ public class Uniform implements IGenerator
         this.source = Vocabulary.DEFAULT;
         this.reference = null;
         this.next = null;
+        this.generator = null;
     }
 
     /**
@@ -72,6 +73,7 @@ public class Uniform implements IGenerator
         this.source = source;
         this.reference = reference;
         this.next = null;
+        this.generator = new JDKRandomGenerator();
     }
 
     @Override

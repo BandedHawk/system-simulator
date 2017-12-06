@@ -136,7 +136,7 @@ public class TokenTest
         final File file = new File("src/test/data/test.example.txt");
         final Lexer lexer = new Lexer();
         final Token token = lexer.analyze(file);
-        assertTrue(token.size() == 75);
+        assertTrue(token.size() == 153);
     }
 
     /**
@@ -168,7 +168,7 @@ public class TokenTest
         final File file = new File("src/test/data/test.example.txt");
         final Lexer lexer = new Lexer();
         final Token token = lexer.analyze(file);
-        assertTrue(token.size() == 75);
+        assertTrue(token.size() == 153);
     }
 
     /**

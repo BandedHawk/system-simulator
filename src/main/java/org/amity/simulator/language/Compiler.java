@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import org.amity.simulator.distributors.IDistributor;
+import org.amity.simulator.distributors.Random;
 import org.amity.simulator.distributors.RoundRobin;
 import org.amity.simulator.distributors.Smart;
 import org.amity.simulator.elements.Balancer;
@@ -564,6 +565,21 @@ class Compiler
                     final IDistributor smart
                             = Smart.instance(pairs);
                     local.distributors.add(smart);
+                }
+                else
+                {
+                    final StringBuilder error =
+                            new StringBuilder("Balancer function already exists near ");
+                    error.append(this.location(token));
+                    local.addError(error.toString());                                
+                }
+                break;
+            case Vocabulary.RANDOM:
+                if (distributors.isEmpty())
+                {
+                    final IDistributor random
+                            = Random.instance(pairs);
+                    local.distributors.add(random);
                 }
                 else
                 {

@@ -183,7 +183,7 @@ public class RoundRobinTest
         final List<String> references = new ArrayList<>();
         references.add(reference1);
         references.add(reference2);
-        final RoundRobin instance = new RoundRobin(references);
+        final IDistributor instance = new RoundRobin(references);
         assertEquals(references.size(), instance.getReferences().size());
         assertTrue(instance.getReferences().contains(reference1));
         assertTrue(instance.getReferences().contains(reference2));

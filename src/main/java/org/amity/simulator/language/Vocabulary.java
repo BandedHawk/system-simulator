@@ -44,6 +44,7 @@ public class Vocabulary
     public final static String BIAS = "bias";
     public final static String ROUNDROBIN = "round-robin";
     public final static String SMART = "smart";
+    public final static String RANDOM = "random";
     public final static String SKEWED = "skewed";
     public final static String UNIFORM = "uniform";
     public final static String CONSTANT = "constant";
@@ -109,6 +110,7 @@ public class Vocabulary
         // These are for balancers
         functions.put(Vocabulary.ROUNDROBIN, divert);
         functions.put(Vocabulary.SMART, divert);
+        functions.put(Vocabulary.RANDOM, divert);
         final List<String> components = new ArrayList<>();
         components.add(Vocabulary.COMPONENT);
         final List<String> subcomponents = new ArrayList<>();

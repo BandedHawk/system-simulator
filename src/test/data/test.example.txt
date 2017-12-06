@@ -6,13 +6,13 @@ component
     {
         type: constant
         period: 1
-        next: balancer
+        next: balancer 1
     }
 }
 component
 {
     type: processor
-    name: delay
+    name: server
     function
     {
         type: constant
@@ -29,11 +29,51 @@ component
 }
 component
 {
+    type: processor
+    name: database
+    function
+    {
+        type: skewed
+        minimum: 3
+        maximum: 5
+        bias: -3
+        skew: 0.8
+        source: generator
+    }
+    function
+    {
+        type: gaussian
+        minimum: 3
+        maximum: 5
+    }
+}
+component
+{
     type: balancer
-    name: balancer
+    name: balancer 1
     function
     {
         type: round-robin
-        next: delay
+        next: server
+    }
+}
+component
+{
+    type: balancer
+    name: balancer 2
+    function
+    {
+        type: smart
+        next: server
+    }
+}
+component
+{
+    type: balancer
+    name: balancer 3
+    function
+    {
+        type: random
+        next: server
     }
 }
