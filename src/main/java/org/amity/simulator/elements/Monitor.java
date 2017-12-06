@@ -154,7 +154,10 @@ public class Monitor
         if (source)
         {
             System.out.println("  Events generated: " + this.arrivals.getN());
-            System.out.println("  Generation rate: " + throughput);
+            System.out.println("  Generation rate: " + throughput
+                    + " events per tick");
+            System.out.println("               Or: " + 1/throughput
+                    + " ticks between events");
             System.out.println("  Generation characteristics");
         }
         else
@@ -169,59 +172,74 @@ public class Monitor
             final double utilization = (timespan - idle) / timespan;
             if (processor)
             {
-                System.out.println("  Utilization: " + utilization);
+                System.out.println("  Utilization: " + utilization * 100
+                        + " %");
             }
-            System.out.println("  Throughput: " + throughput);
+            System.out.println("  Throughput: " + throughput
+                    + " events per tick");
+            System.out.println("          Or: " + 1/throughput
+                    + " ticks between events");
             if (processor)
             {
                 System.out.println("  Queued events");
                 System.out.println("    Mean: " + this.queue.getMean());
                 System.out.println("    Standard deviation: "
                         + this.queue.getStandardDeviation());
-                System.out.println("    Median: " + this.queue.getPercentile(50));
+                System.out.println("    Median: "
+                        + this.queue.getPercentile(50));
                 System.out.println("    Maximum: " + this.queue.getMax());
                 System.out.println("    Minimum: " + this.queue.getMin());
                 assert this.queue.getMin() >=0
                         : "Obtained minimum below 0";
                 System.out.println("  Wait time");
-                System.out.println("    Mean: " + this.waiting.getMean());
+                System.out.println("    Mean: " + this.waiting.getMean()
+                        + " ticks");
                 System.out.println("    Standard deviation: "
                         + this.waiting.getStandardDeviation());
                 System.out.println("    Median: "
-                        + this.waiting.getPercentile(50));
-                System.out.println("    Maximum: " + this.waiting.getMax());
-                System.out.println("    Minimum: " + this.waiting.getMin());
+                        + this.waiting.getPercentile(50) + " ticks");
+                System.out.println("    Maximum: " + this.waiting.getMax()
+                        + " ticks");
+                System.out.println("    Minimum: " + this.waiting.getMin()
+                        + " ticks");
                 assert this.waiting.getMin() >=0
                         : "Obtained minimum below 0";
                 System.out.println("  Process time");
-                System.out.println("    Mean: " + this.processing.getMean());
+                System.out.println("    Mean: " + this.processing.getMean()
+                        + " ticks");
                 System.out.println("    Standard Deviation: "
                         + this.processing.getStandardDeviation());
                 System.out.println("    Median: "
-                        + this.processing.getPercentile(50));
-                System.out.println("    Maximum: " + this.processing.getMax());
-                System.out.println("    Minimum: " + this.processing.getMin());
+                        + this.processing.getPercentile(50) + " ticks");
+                System.out.println("    Maximum: " + this.processing.getMax()
+                        + " ticks");
+                System.out.println("    Minimum: " + this.processing.getMin()
+                        + " ticks");
                 assert this.processing.getMin() >=0
                         : "Obtained minimum below 0";
                 System.out.println("  Visit time");
-                System.out.println("    Mean: " + this.visiting.getMean());
+                System.out.println("    Mean: " + this.visiting.getMean()
+                        + " ticks");
                 System.out.println("    Standard Deviation: "
                         + this.visiting.getStandardDeviation());
                 System.out.println("    Median: "
-                        + this.visiting.getPercentile(50));
-                System.out.println("    Maximum: " + this.visiting.getMax());
-                System.out.println("    Minimum: " + this.visiting.getMin());
+                        + this.visiting.getPercentile(50) + " ticks");
+                System.out.println("    Maximum: " + this.visiting.getMax()
+                        + " ticks");
+                System.out.println("    Minimum: " + this.visiting.getMin()
+                        + " ticks");
                 assert this.visiting.getMin() >=0
                         : "Obtained minimum below 0";
             }
             System.out.println("  Arrival characteristics");
         }
-        System.out.println("    Mean: " + this.arrivals.getMean());
+        System.out.println("    Mean: " + this.arrivals.getMean() + " ticks");
         System.out.println("    Standard Deviation: "
                 + this.arrivals.getStandardDeviation());
-        System.out.println("    Median: " + this.arrivals.getPercentile(50));
-        System.out.println("    Maximum: " + this.arrivals.getMax());
-        System.out.println("    Minimum: " + this.arrivals.getMin());
+        System.out.println("    Median: " + this.arrivals.getPercentile(50)
+                + " ticks");
+        System.out.println("    Maximum: " + this.arrivals.getMax() + " ticks");
+        System.out.println("    Minimum: " + this.arrivals.getMin() + " ticks");
         assert this.arrivals.getMin() >=0 : "Obtained minimum below 0";
     }
 
@@ -306,27 +324,32 @@ public class Monitor
         List<String> messages = new ArrayList<>();
         messages.add("  Events completed processing: "
                 + this.elapsed.getN());
-        messages.add("  Throughput: " + throughput);
-        messages.add("  Ratio of processing in lifetime: " + active);
+        messages.add("  Throughput: " + throughput  + " events per tick");
+        messages.add("          Or: " + 1/throughput
+                    + " ticks between events");
+        messages.add("  Ratio of processing in lifetime: " + active * 100
+                + " %");
         messages.add("  Event lifetime");
-        messages.add("    Mean:" + this.elapsed.getMean());
+        messages.add("    Mean:" + this.elapsed.getMean() + " ticks");
         messages.add("    Standard Deviation:"
                 + this.elapsed.getStandardDeviation());
-        messages.add("    Median:" + this.elapsed.getPercentile(50));
+        messages.add("    Median:" + this.elapsed.getPercentile(50)
+                + " ticks");
         messages.add("    Maximum time in system: "
-                + this.elapsed.getMax());
+                + this.elapsed.getMax() + " ticks");
         messages.add("    Minimum time in system: "
-                + this.elapsed.getMin());
+                + this.elapsed.getMin() + " ticks");
         assert this.elapsed.getMin() >=0 : "Obtained minimum below 0";
         messages.add("  Event in execution");
-        messages.add("    Mean: " + this.executed.getMean());
+        messages.add("    Mean: " + this.executed.getMean() + " ticks");
         messages.add("    Standard Deviation: "
                 + this.executed.getStandardDeviation());
-        messages.add("    Median: " + this.executed.getPercentile(50));
+        messages.add("    Median: " + this.executed.getPercentile(50)
+                + " ticks");
         messages.add("    Maximum time processing: "
-                + this.executed.getMax());
+                + this.executed.getMax() + " ticks");
         messages.add("    Minimum time processing: "
-                + this.executed.getMin());
+                + this.executed.getMin() + " ticks");
         assert this.executed.getMin() >=0 : "Obtained minimum below 0";
         for(final String message : messages)
         {
