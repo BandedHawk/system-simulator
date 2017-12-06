@@ -67,7 +67,7 @@ Everything except <i>next</i> is mandatory.
 This generates values within a certain range but skewed to the left or right, depending on the <i>bias</i> value. This is useful in depicting real-world systems where the response or delay is normally at the lower end, but may occasionally go higher - a right-skewed generator.
 
 Mathematically, the function is:<p>
-![alt text](https://raw.githubusercontent.com/BandedHawk/system-simulator/master/src/main/doc/skewed.png "Skewing function")
+![alt text](https://raw.githubusercontent.com/BandedHawk/system-simulator/master/src/main/doc/images/skewed.png "Skewing function")
 
 A negative <i>bias</i> value skews the distribution right and a positive value skews the distribution left. The larger the value, the more skewed it becomes.
 
@@ -132,6 +132,16 @@ This is an ideal distribution strategy. It diverts an event to the next availabl
 function
 {
     type: smart
+    next: web server 1
+    next: web server 2
+}
+```
+#### Random
+This is a uniform random distribution strategy. It diverts an event to random selection of downstream targets. This may be useful in complex situations involving source-based routing. There is no theoretical limit to the number of downstream components that can be listed.
+```R
+function
+{
+    type: random
     next: web server 1
     next: web server 2
 }
