@@ -1,5 +1,5 @@
 /*
- * Smartest.java
+ * SmartTest.java
  *
  * (C) Copyright 2017 Jon Barnett.
  *
@@ -236,6 +236,30 @@ public class SmartTest
         assertEquals(component2.getLabel(), connections[1].getLabel());
         assertEquals(component1, connections[0]);
         assertEquals(component2, connections[1]);
+    }
+
+    /**
+     * Test of available method, of class Smart.
+     */
+    @Test
+    public void testAvailable()
+    {
+        System.out.println("available");
+        final String label1 = "component 1";
+        final String label2 = "component 2";
+        final String label3 = "component 3";
+        final List<String> references = new ArrayList<>();
+        references.add(label1);
+        references.add(label2);
+        references.add(label3);
+        final IDistributor distributor = new Smart(references);
+        final IComponent component1 = new DummyComponent(label1, 2.0);
+        final IComponent component2 = new DummyComponent(label2, 1.0);
+        final IComponent component3 = new DummyComponent(label3, 1.5);
+        distributor.addNext(component3);
+        distributor.addNext(component2);
+        distributor.addNext(component1);
+        assertTrue(distributor.available() == 1.0);
     }
     
 }
