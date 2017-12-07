@@ -3,13 +3,16 @@ Simulation systems are always difficult to validate so you need to think of some
 
 For the implementation of this problem as a simulation model, we will make this more complex by having three event generators in parallel, and using the processor source operation to differentiate between termination and return to the start. To reduce the possibility of waiting queues, we will implement each blocks as a set of parallel processors with a smart balancer in the front. Each processor will take a constant 1 tick processing time - this equates then to the number of attempts before the event leaves the system, making our comparison to theoreticals easy. The simulation model is described the file [fun.example.txt](https://github.com/BandedHawk/system-simulator/blob/master/src/test/data/fun.example.txt).
 
-In terms of the problem itself, the theoretical calculations are straightfoward. On the first loop, an event has 1 in 3 chance of exiting. It will have 2 in 3 chance of not exiting on the first pass and then 1 in 3 chance of exiting on the second. The following shows the 
+In terms of the problem itself, the theoretical calculations are straightfoward. On the first loop, an event has 1 in 3 chance of exiting. It will have 2 in 3 chance of not exiting on the first pass and then 1 in 3 chance of exiting on the second. The following shows the supporting prbability model.
+
 ![alt text](https://github.com/BandedHawk/system-simulator/blob/master/src/main/doc/images/probability-simulation.png "Probability calculations")
 
 Based on this, we can say that the median will be 2, since the cumulative probability for exiting in 1 and 2 runs is 5 on 9 or approximately 55%. The probability distribution is skewed-right since we have a long-tail. In theory, an event might never exit the system although the probability of an event still being in the system after 60 runs is extremely small. The simulation will give an idea of the practical limit.
 
 Since this is a geometric distribution, the expected number of trials is also straightforward. Given E(X) is the expected number of trials before success and this is memoryless, we can say that the expectation after 1 trial is the probability of success and the probability of failure multiplied the Expectation plus 1 trial as below, and solving:
-![alt text](https://github.com/BandedHawk/system-simulator/blob/master/src/main/doc/images/probability-simulation.png "Expectation")
+
+![alt text](https://github.com/BandedHawk/system-simulator/blob/master/src/main/doc/images/expectation-probability.png "Expectation calculation")
+
 The average lifetime for an event should then tend to 3 for our simulation.
 
 Given all of this, running the simulation gives us this:
