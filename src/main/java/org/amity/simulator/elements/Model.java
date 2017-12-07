@@ -202,12 +202,23 @@ public class Model
                 {
                     break;
                 }
+                // Check there is no delay with execution
+                boolean zeroDelay = event.getComponent() instanceof Balancer;
                 event.simulate();
                 transitions++;
                 if (event.getComponent() == null)
                 {
                     this.completed.add(event);
                 }
+                // Load balancer with no execution delay so
+                // continue moving through event system state
+                else if (zeroDelay)
+                {
+                    // put this back on to execute first again on the next
+                    // transition as availability may have been calculated
+                    this.working.addFirst(event);
+                }
+                // Nex completion time so re-sort execution schedule
                 else
                 {
                     this.working.add(event);
