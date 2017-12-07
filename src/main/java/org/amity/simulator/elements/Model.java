@@ -203,7 +203,8 @@ public class Model
                     break;
                 }
                 // Check there is no delay with execution
-                boolean zeroDelay = event.getComponent() instanceof Balancer;
+                final boolean zeroDelay
+                        = event.getComponent() instanceof Balancer;
                 event.simulate();
                 transitions++;
                 if (event.getComponent() == null)
@@ -214,18 +215,20 @@ public class Model
                 // continue moving through event system state
                 else if (zeroDelay)
                 {
-                    // put this back on to execute first again on the next
+                    // Put this back on to execute first again on the next
                     // transition as availability may have been calculated
+                    // for this event so we need to do it first
                     this.working.addFirst(event);
                 }
-                // Nex completion time so re-sort execution schedule
+                // New completion time for current event so re-sort execution
+                // schedule
                 else
                 {
                     this.working.add(event);
-                    // Refill working if modified event completion is
+                    // Refill working buffer if modified event completion is
                     // higher than the high watermark or we are getting
-                    // to a low working and we still have events in the
-                    // primary working
+                    // to a low working buffer and we still have events in the
+                    // primary event buffer
                     if (!this.primary.isEmpty()
                             && (this.working.size() < Simulator.MIN_BUFFER
                             || event.getCompleted() > this.highmark))
@@ -238,7 +241,7 @@ public class Model
                         this.highmark = event.getCompleted();
                         this.fill();
                     }
-                    // Re-sort working after we have modified the list
+                    // Re-sort working buffer after we have modified the list
                     this.working.sort(Comparator
                             .comparingDouble(Event::getCompleted));
                 }
@@ -272,7 +275,7 @@ public class Model
                     if (!overrun)
                     {
                         System.err.println("        System arrivals faster than system exits");
-                        System.out.println("          Completed: "
+                        System.err.println("          Completed: "
                                 + this.completed.size());
                         this.overrun = true;
                     }

@@ -400,7 +400,6 @@ component
         source: source 3
         next: balancer
     }
-    monitor: yes
 }
 component
 {
@@ -425,7 +424,6 @@ component
         source: source 3
         next: balancer
     }
-    monitor: yes
 }
 component
 {
