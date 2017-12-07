@@ -24,9 +24,9 @@ General event information
           Or: 1.666648086109733 ticks between events
   Ratio of processing in lifetime: 99.99944331561233 %
   Event lifetime
-    Mean:3.0039465102926983 ticks
-    Standard Deviation:2.451049443244448
-    Median:2.0 ticks
+    Mean: 3.0039465102926983 ticks
+    Standard Deviation: 2.451049443244448
+    Median: 2.0 ticks
     Maximum time in system: 30.0 ticks
     Minimum time in system: 1.0 ticks
   Event in execution
@@ -41,9 +41,9 @@ General event information
               Or: 4.999916387959866 ticks between events
       Ratio of processing in lifetime: 99.9994434116638 %
       Event lifetime
-        Mean:3.0044481605351225 ticks
-        Standard Deviation:2.4394156310551662
-        Median:2.0 ticks
+        Mean: 3.0044481605351225 ticks
+        Standard Deviation: 2.4394156310551662
+        Median: 2.0 ticks
         Maximum time in system: 24.0 ticks
         Minimum time in system: 1.0 ticks
       Event in execution
@@ -58,9 +58,9 @@ General event information
               Or: 4.999916387959866 ticks between events
       Ratio of processing in lifetime: 100.0 %
       Event lifetime
-        Mean:3.0057190635451536 ticks
-        Standard Deviation:2.4526623976151396
-        Median:2.0 ticks
+        Mean: 3.0057190635451536 ticks
+        Standard Deviation: 2.4526623976151396
+        Median: 2.0 ticks
         Maximum time in system: 27.0 ticks
         Minimum time in system: 1.0 ticks
       Event in execution
@@ -75,9 +75,9 @@ General event information
               Or: 4.999916386561648 ticks between events
       Ratio of processing in lifetime: 99.9988857752498 %
       Event lifetime
-        Mean:3.0016722687670345 ticks
-        Standard Deviation:2.461061122044318
-        Median:2.0 ticks
+        Mean: 3.0016722687670345 ticks
+        Standard Deviation: 2.461061122044318
+        Median: 2.0 ticks
         Maximum time in system: 30.0 ticks
         Minimum time in system: 1.0 ticks
       Event in execution
