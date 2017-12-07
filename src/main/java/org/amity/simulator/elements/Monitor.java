@@ -330,10 +330,10 @@ public class Monitor
         messages.add("  Ratio of processing in lifetime: " + active * 100
                 + " %");
         messages.add("  Event lifetime");
-        messages.add("    Mean:" + this.elapsed.getMean() + " ticks");
-        messages.add("    Standard Deviation:"
+        messages.add("    Mean: " + this.elapsed.getMean() + " ticks");
+        messages.add("    Standard Deviation: "
                 + this.elapsed.getStandardDeviation());
-        messages.add("    Median:" + this.elapsed.getPercentile(50)
+        messages.add("    Median: " + this.elapsed.getPercentile(50)
                 + " ticks");
         messages.add("    Maximum time in system: "
                 + this.elapsed.getMax() + " ticks");
