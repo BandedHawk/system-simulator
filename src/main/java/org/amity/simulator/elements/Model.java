@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Container for system components
@@ -120,8 +122,13 @@ public class Model
                     + start + " and " + end);
             final boolean multisource = this.sources.size() > 1;
             monitor.displayStatistics(simulator.completed, multisource);
-            for (final IComponent component : this.components.values())
+            final Set<Map.Entry<String, IComponent>> set
+                    = new TreeSet<>(Map.Entry.comparingByKey());
+            set.addAll(this.components.entrySet());
+            for (final Map.Entry<String, IComponent> entry
+                    : set)
             {
+                final IComponent component = entry.getValue();
                 component.generateStatistics(monitor);
             }
         }

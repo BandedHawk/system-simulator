@@ -24,6 +24,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.util.FastMath;
 
@@ -292,8 +294,10 @@ public class Monitor
         generateStatistics(general, true);
         if (multisource)
         {
-            for (final Map.Entry<String, List<Event>> entry
-                    : sources.entrySet())
+            final Set<Map.Entry<String, List<Event>>> set
+                    = new TreeSet<>(Map.Entry.comparingByKey());
+            set.addAll(sources.entrySet());
+            for (final Map.Entry<String, List<Event>> entry : set)
             {
                 final String source = entry.getKey();
                 final List<Event> list = entry.getValue();
