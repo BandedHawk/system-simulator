@@ -21,17 +21,10 @@ package org.amity.simulator.main;
 
 import java.io.File;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.amity.simulator.elements.Event;
-import org.amity.simulator.elements.IComponent;
 import org.amity.simulator.elements.Model;
-import org.amity.simulator.elements.Monitor;
 import org.amity.simulator.language.Lexer;
 import org.amity.simulator.language.Token;
 import org.apache.commons.cli.CommandLine;
@@ -210,13 +203,14 @@ public class Main
                 double generate = Double.parseDouble(generateText);
                 double start = Double.parseDouble(startText);
                 double end = Double.parseDouble(endText);
-                Main.run(file, generate, start, end);
+                error = Main.run(file, generate, start, end);
             }
         }
         if (error)
         {
             System.exit(-1);
         }
+        System.exit(0);
     }
 
     /**
@@ -232,24 +226,36 @@ public class Main
             final double start, final double end)
     {
         boolean error = false;
-        if (start > end)
+        if (start >= end)
         {
             System.err.println("Sample start time must be lower than the sample end time");
             error = true;
         }
-        if (end > generate)
+        if (end >= generate)
         {
             System.err.println("Sample end time must be less than the generate time");
+            error =true;
         }
         if (!error)
         {
-            final Lexer parser = new Lexer();
-            final Token token = parser.analyze(file);
+            final Lexer lexer = new Lexer();
+            final Token token = lexer.analyze(file);
             if (token != null)
             {
                 System.out.println("Completed syntax parsing");
                 final Model model = token.parse();
-                error = model.execute(generate, start, end);
+                if (model.isCompiled())
+                {
+                    error = !model.execute(generate, start, end);
+                }
+                else
+                {
+                    error = true;
+                }
+            }
+            else
+            {
+                error = true;
             }
         }
         return error;
