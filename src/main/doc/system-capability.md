@@ -7,9 +7,9 @@ In terms of the problem itself, the theoretical calculations are straightfoward.
 
 ![alt text](https://github.com/BandedHawk/system-simulator/blob/master/src/main/doc/images/probability-simulation.png "Probability calculations")
 
-Based on this, we can say that the median will be 2, since the cumulative probability for exiting in 1 and 2 runs is 5 on 9 or approximately 55%. The probability distribution is skewed-right since we have a long-tail. In theory, an event might never exit the system although the probability of an event still being in the system after 60 runs is extremely small. The simulation will give an idea of the practical limit.
+Based on this, we can say that the median will be 2, since the cumulative probability for exiting in 1 and 2 runs is 5 on 9 or approximately 55%. The probability distribution is skewed-right since we have a long-tail. In theory, an event might never exit the system although the probability of an event still being in the system after 60 trials is extremely small. The simulation will give an idea of the practical limit.
 
-Since this is a geometric distribution, the expected number of trials is also straightforward. Given E(X) is the expected number of trials before success and this is memoryless, we can say that the expectation after 1 trial is the probability of success and the probability of failure multiplied the Expectation plus 1 trial as below, and solving:
+Since this is a geometric distribution, the expected number of trials is also straightforward. Given E(X) is the expected number of trials before success and this is memoryless, we can say that the expectation after 1 trial is the probability of success and the probability of failure multiplied by the expectation plus 1 trial as below, and solving:
 
 ![alt text](https://github.com/BandedHawk/system-simulator/blob/master/src/main/doc/images/expectation-probability.png "Expectation calculation")
 
