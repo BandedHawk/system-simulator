@@ -153,7 +153,7 @@ public class Balancer implements IComponent
         final StringBuilder string = new StringBuilder();
         if (this.distributor == null)
         {
-            string.append("No defined characteristic");
+            string.append("[No defined characteristic]");
         }
         else
         {

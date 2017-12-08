@@ -154,8 +154,17 @@ public class Source implements IComponent
     @Override
     public String description()
     {
-        final StringBuilder string = new StringBuilder("[");
-        string.append(this.generator.characteristics()).append("]");
+        final StringBuilder string = new StringBuilder();
+        if (this.generator == null)
+        {
+            string.append("[No defined characteristic]");
+        }
+        else
+        {
+            string.append("[");
+            string.append(this.generator.characteristics());
+            string.append("]");
+        }
         return string.toString();
     }
 

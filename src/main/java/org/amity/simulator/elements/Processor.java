@@ -203,14 +203,24 @@ public class Processor implements IComponent
         final StringBuilder string = new StringBuilder();
         if (this.generators.isEmpty())
         {
-            string.append("No defined characteristic");
+            string.append("[No defined characteristic]");
         }
         else
         {
-            for (final String source : this.generators.keySet())
+            for (final Map.Entry<String, IGenerator> entry
+                    : this.generators.entrySet())
             {
+                final String source = entry.getKey();
+                final IGenerator generator = entry.getValue();
                 string.append("[").append(source).append(" := ");
-                string.append(this.generators.get(source).characteristics());
+                if (generator != null)
+                {
+                    string.append(generator.characteristics());
+                }
+                else
+                {
+                    string.append("Undefined");
+                }
                 string.append("]");
             }
         }
