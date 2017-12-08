@@ -189,7 +189,7 @@ public class Monitor
                         + this.queue.getPercentile(50));
                 System.out.println("    Maximum: " + this.queue.getMax());
                 System.out.println("    Minimum: " + this.queue.getMin());
-                assert this.queue.getMin() >=0
+                assert this.queue.getMin() >= 0
                         : "Obtained minimum below 0";
                 System.out.println("  Wait time");
                 System.out.println("    Mean: " + this.waiting.getMean()
@@ -202,7 +202,7 @@ public class Monitor
                         + " ticks");
                 System.out.println("    Minimum: " + this.waiting.getMin()
                         + " ticks");
-                assert this.waiting.getMin() >=0
+                assert this.waiting.getMin() >= 0
                         : "Obtained minimum below 0";
                 System.out.println("  Process time");
                 System.out.println("    Mean: " + this.processing.getMean()
@@ -215,7 +215,7 @@ public class Monitor
                         + " ticks");
                 System.out.println("    Minimum: " + this.processing.getMin()
                         + " ticks");
-                assert this.processing.getMin() >=0
+                assert this.processing.getMin() >= 0
                         : "Obtained minimum below 0";
                 System.out.println("  Visit time");
                 System.out.println("    Mean: " + this.visiting.getMean()
@@ -228,7 +228,7 @@ public class Monitor
                         + " ticks");
                 System.out.println("    Minimum: " + this.visiting.getMin()
                         + " ticks");
-                assert this.visiting.getMin() >=0
+                assert this.visiting.getMin() >= 0
                         : "Obtained minimum below 0";
             }
             System.out.println("  Arrival characteristics");
@@ -240,7 +240,7 @@ public class Monitor
                 + " ticks");
         System.out.println("    Maximum: " + this.arrivals.getMax() + " ticks");
         System.out.println("    Minimum: " + this.arrivals.getMin() + " ticks");
-        assert this.arrivals.getMin() >=0 : "Obtained minimum below 0";
+        assert this.arrivals.getMin() >= 0 : "Obtained minimum below 0";
     }
 
     /**
@@ -292,18 +292,23 @@ public class Monitor
         generateStatistics(general, true);
         if (multisource)
         {
-            for (final String source : sources.keySet())
+            for (final Map.Entry<String, List<Event>> entry
+                    : sources.entrySet())
             {
+                final String source = entry.getKey();
+                final List<Event> list = entry.getValue();
                 System.out.println("    '" + source + "' event information");
-                generateStatistics(sources.get(source), false);
+                generateStatistics(list, false);
             }
         }
     }
 
     /**
+     * General routine for compiling the messages for display on event
+     * statistics
      * 
-     * @param events
-     * @param general 
+     * @param events set of events to be used in the calculation
+     * @param general single source set if <code>true</code>
      */
     private void generateStatistics(final List<Event> events,
             final boolean general)
@@ -339,7 +344,7 @@ public class Monitor
                 + this.elapsed.getMax() + " ticks");
         messages.add("    Minimum time in system: "
                 + this.elapsed.getMin() + " ticks");
-        assert this.elapsed.getMin() >=0 : "Obtained minimum below 0";
+        assert this.elapsed.getMin() >= 0 : "Obtained minimum below 0";
         messages.add("  Event in execution");
         messages.add("    Mean: " + this.executed.getMean() + " ticks");
         messages.add("    Standard Deviation: "
@@ -350,7 +355,7 @@ public class Monitor
                 + this.executed.getMax() + " ticks");
         messages.add("    Minimum time processing: "
                 + this.executed.getMin() + " ticks");
-        assert this.executed.getMin() >=0 : "Obtained minimum below 0";
+        assert this.executed.getMin() >= 0 : "Obtained minimum below 0";
         for(final String message : messages)
         {
             final StringBuilder string = general ? new StringBuilder()

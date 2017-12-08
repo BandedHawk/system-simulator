@@ -85,8 +85,11 @@ class Compiler
                 final Map<String, List<IFunction>> functions
                         = component.getReferences();
                 // Get references in the component
-                for (final String reference : functions.keySet())
+                for (final Map.Entry<String, List<IFunction>> entry
+                        : functions.entrySet())
                 {
+                    final String reference = entry.getKey();
+                    final List<IFunction> functionList = entry.getValue();
                     // Add list of functions per reference into global list
                     if (reference != null)
                     {
@@ -94,14 +97,16 @@ class Compiler
                                 references.containsKey(reference)
                                 ? references.get(reference) :
                                 new ArrayList<>();
-                        list.addAll(functions.get(reference));
+                        list.addAll(functionList);
                         references.putIfAbsent(reference, list);
                     }
                 }
             }
             // Look for reference component
-            for (final String reference : references.keySet())
+            for (final Map.Entry<String, List<IFunction>> entry
+                    : references.entrySet())
             {
+                final String reference = entry.getKey();
                 if (components.containsKey(reference))
                 {
                     final IComponent component =
@@ -117,8 +122,7 @@ class Compiler
                     // Resolve references
                     else
                     {
-                        for (final IFunction referee
-                                : references.get(reference))
+                        for (final IFunction referee : entry.getValue())
                         {
                             if (referee instanceof IGenerator)
                             {

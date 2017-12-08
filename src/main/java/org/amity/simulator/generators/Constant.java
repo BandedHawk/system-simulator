@@ -105,9 +105,10 @@ public class Constant implements IGenerator
     }
 
     /**
+     * Create constant period function given raw name-value pairs
      * 
-     * @param pairs
-     * @return 
+     * @param pairs list of name-values to convert into variables
+     * @return manufactured constant period generator
      */
     public final static IGenerator instance(final List<NameValue> pairs)
     {

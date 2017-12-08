@@ -28,6 +28,8 @@ import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
 
 /**
+ * Component that takes event and delivers it to one of a selection of
+ * downstream components for additional handling
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
@@ -40,7 +42,7 @@ public class Balancer implements IComponent
     private final boolean monitor;
 
     /**
-     * Default constructor - intentionally hidden
+     * Hidden default constructor to avoid implicit creation
      */
     private Balancer()
     {
@@ -52,7 +54,7 @@ public class Balancer implements IComponent
     }
 
     /**
-     * 
+     * Constructs balancer component
      * 
      * @param label name of component
      * @param distributor algorithm implementation for balancing
@@ -98,9 +100,9 @@ public class Balancer implements IComponent
         // Arrival at this component is time event completed
         // processing at last component
         final double arrived = event.getCompleted();
-        // Non-delay component so no assofiated wait time
+        // Non-delay component so no associated wait time
         event.setValues(arrived, arrived, arrived);
-        // Copy current event to local stats
+        // Copy current event to local records
         final Event current = new Event(event);
         current.setComponent(null);
         final boolean result = this.local.add(current);
@@ -173,7 +175,7 @@ public class Balancer implements IComponent
      * 
      * @param pairs list of name-values to convert into variables
      * @param distributors list of distribution/balancing algorithms
-     * @return manufactured Balancer object
+     * @return manufactured balancer component
      */
     public final static IComponent instance(final List<NameValue> pairs,
             final List<IDistributor> distributors)

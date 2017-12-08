@@ -224,10 +224,12 @@ public class Processor implements IComponent
     }
 
     /**
+     * Create Processor component given raw name-value pairs and plug-in
+     * functions
      * 
-     * @param pairs
-     * @param generators
-     * @return 
+     * @param pairs list of name-values to convert into variables
+     * @param generators time functions for processing times
+     * @return manufactured processor component
      */
     public final static IComponent instance(final List<NameValue> pairs,
             final List<IGenerator> generators)

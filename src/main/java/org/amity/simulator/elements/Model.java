@@ -52,8 +52,10 @@ public class Model
     }
 
     /**
+     * Copy batch of errors into model repository - usually in place of an
+     * actual model
      *
-     * @param errors
+     * @param errors list of strings representing collection of errors
      */
     public void addErrors(final List<String> errors)
     {
@@ -64,8 +66,8 @@ public class Model
     /**
      * Load all the elements of the model into the container
      *
-     * @param sources
-     * @param components
+     * @param sources convenience list of event sources
+     * @param components objects that represent the connected system
      */
     public void addComponents(final Collection<IComponent> sources,
             final Map<String, IComponent> components)
@@ -96,11 +98,12 @@ public class Model
     }
 
     /**
+     * Main entry point for starting the simulation using the model
      *
-     * @param generate
-     * @param start
-     * @param end
-     * @return
+     * @param generate end point in ticks for the simulation
+     * @param start beginning of statistics sample in ticks
+     * @param end final point in ticks for statistics sample
+     * @return simulation and sampling successful if <code>true</code>
      */
     public boolean execute(final double generate, final double start,
             final double end)
@@ -142,6 +145,9 @@ public class Model
         private double highmark;
         private boolean overrun;
 
+        /**
+         * Default constructor - unused
+         */
         private Simulator()
         {
             this.capacity = Simulator.FILL;
@@ -153,9 +159,10 @@ public class Model
         }
 
         /**
+         * Constructor for the simulation space
          *
-         * @param sources
-         * @param generate
+         * @param sources event generation components
+         * @param generate end-point in ticks for the simulation completion
          */
         private Simulator(final List<IComponent> sources, final double generate)
         {
@@ -189,6 +196,8 @@ public class Model
 
         /**
          * Step through simulation
+         * 
+         * @param generate end-point in ticks for the simulation completion
          */
         void execute(final double generate)
         {

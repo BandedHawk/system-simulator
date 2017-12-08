@@ -29,7 +29,7 @@ import org.amity.simulator.language.Vocabulary;
 
 /**
  * Implements an event source, generating events spread out in time as specified
- by the generation generator.
+ * by the generation generator.
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
@@ -45,6 +45,9 @@ public class Source implements IComponent
     private double time;
     private double available;
 
+    /**
+     * Hidden default constructor to avoid implicit creation
+     */
     private Source()
     {
         this.label = "dummy";
@@ -58,7 +61,8 @@ public class Source implements IComponent
     }
 
     /**
-     * 
+     * Constructs event source component
+     *
      * @param label distinguishing name of source component
      * @param generator model for the source based on generation time
      * distribution characteristic
@@ -101,8 +105,8 @@ public class Source implements IComponent
             this.local.add(injectedEvent);
         }
         // Make a global copy to pass on
-        final Event global =
-                new Event(this.local.get(this.local.size() - 1));
+        final Event global
+                = new Event(this.local.get(this.local.size() - 1));
         global.setComponent(this.generator.getNext());
         this.available = global.getCompleted();
         return global;
@@ -162,10 +166,12 @@ public class Source implements IComponent
     }
 
     /**
-     * 
-     * @param pairs
-     * @param generators
-     * @return 
+     * Create event source component given raw name-value pairs and plug-in
+     * function
+     *
+     * @param pairs list of name-values to convert into variables
+     * @param generators time functions for event creation times
+     * @return manufactured event source component
      */
     public final static IComponent instance(final List<NameValue> pairs,
             List<IGenerator> generators)

@@ -128,9 +128,10 @@ public class Gaussian implements IGenerator
     }
 
     /**
+     * Create Gaussian probability function given raw name-value pairs
      * 
-     * @param pairs
-     * @return 
+     * @param pairs list of name-values to convert into variables
+     * @return manufactured Gaussian probability generator
      */
     public final static IGenerator instance(final List<NameValue> pairs)
     {

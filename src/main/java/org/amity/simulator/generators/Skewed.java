@@ -19,7 +19,6 @@
  */
 package org.amity.simulator.generators;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.amity.simulator.elements.IComponent;
 import org.amity.simulator.language.NameValue;
@@ -143,9 +142,10 @@ public class Skewed implements IGenerator
     }
 
     /**
+     * Create skewed probability function given raw name-value pairs
      * 
-     * @param pairs
-     * @return 
+     * @param pairs list of name-values to convert into variables
+     * @return manufactured skewed probability generator
      */
     public final static IGenerator instance(final List<NameValue> pairs)
     {
