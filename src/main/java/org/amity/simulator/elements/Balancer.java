@@ -83,13 +83,13 @@ public class Balancer implements IComponent
         if (this.distributor != null)
         {
             this.distributor.reset();
-        }
-        final IComponent[] components = this.distributor.connections();
-        if (components != null)
-        {
-            for (final IComponent component : components)
+            final IComponent[] components = this.distributor.connections();
+            if (components.length > 0)
             {
-                component.reset();
+                for (final IComponent component : components)
+                {
+                    component.reset();
+                }
             }
         }
     }

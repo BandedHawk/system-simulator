@@ -220,6 +220,16 @@ public class BalancerTest
         }
         assertEquals(eventTotal / 2, processor1.getLocalEvents().size());
         assertEquals(eventTotal / 2, processor2.getLocalEvents().size());
+        System.out.println("  check when no distributor");
+        Balancer broken = new Balancer(label, null, false);
+        broken.reset();
+        assertTrue(true); // nothing broke when we reset
+        System.out.println("  check when broken distributor");
+        references.clear();
+        final IDistributor round = new RoundRobin(references);
+        broken = new Balancer(label, round, false);
+        broken.reset();
+        assertTrue(true); // nothing broke when we reset
     }
 
     /**
@@ -330,6 +340,7 @@ public class BalancerTest
         final List<String> references = new ArrayList<>();
         references.add(label1);
         references.add(label2);
+        System.out.println("  check normal operation");
         final IDistributor distributor = new RoundRobin(references);
         final IComponent instance = new Balancer(label, distributor, false);
         assertEquals(references.size(), instance.getReferences().size());
@@ -339,6 +350,9 @@ public class BalancerTest
         assertTrue(instance.getReferences().get(label2).size() == 1);
         assertEquals(distributor, instance.getReferences().get(label1).get(0));
         assertEquals(distributor, instance.getReferences().get(label2).get(0));
+        System.out.println("  check when no distributor");
+        final Balancer broken = new Balancer(label, null, false);
+        assertTrue(broken.getReferences().isEmpty());
     }
 
     /**
