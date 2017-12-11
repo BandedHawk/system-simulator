@@ -294,6 +294,9 @@ public class BalancerTest
         }
         assertEquals(eventTotal / 2, processor1.getLocalEvents().size());
         assertEquals(eventTotal / 2, processor2.getLocalEvents().size());
+        System.out.println("  check null event");
+        final Event test = instance.simulate(null);
+        assertTrue(test == null);
     }
 
     /**
@@ -519,6 +522,8 @@ public class BalancerTest
         NameValue pair = new NameValue(Vocabulary.NAME, name);
         pairs.add(pair);
         pair = new NameValue(Vocabulary.MONITOR, "Y");
+        pairs.add(pair);
+        pair = new NameValue(name, name);
         pairs.add(pair);
         IComponent instance = Balancer.instance(pairs, distributors);
         assertEquals(name, instance.getLabel());

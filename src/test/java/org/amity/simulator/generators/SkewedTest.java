@@ -230,6 +230,8 @@ public class SkewedTest
         pairs.add(pair);
         pair = new NameValue(Vocabulary.NEXT, Vocabulary.PROCESSOR);
         pairs.add(pair);
+        pair = new NameValue(Vocabulary.FUNCTION, Vocabulary.FUNCTION);
+        pairs.add(pair);
         result = Skewed.instance(pairs);
         assertEquals(result.getSource(), Vocabulary.COMPONENT);
         assertEquals(result.getReference(), Vocabulary.PROCESSOR);

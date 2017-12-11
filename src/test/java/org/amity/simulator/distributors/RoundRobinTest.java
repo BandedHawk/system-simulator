@@ -115,6 +115,7 @@ public class RoundRobinTest
         final IComponent component1 = new DummyComponent(label1, 2.0);
         final IComponent component2 = new DummyComponent(label2, 1.0);
         final IComponent component3 = new DummyComponent(label3, 0.5);
+        System.out.println("  check for normal operation");
         IDistributor distributor = new RoundRobin(references);
         distributor.addNext(component3);
         distributor.addNext(component2);
@@ -122,6 +123,16 @@ public class RoundRobinTest
         assertEquals(component1, distributor.connections()[0]);
         assertEquals(component2, distributor.connections()[1]);
         assertEquals(component3, distributor.connections()[2]);
+        System.out.println("  check when component is null");
+        distributor.addNext(null);
+        assertEquals(component1, distributor.connections()[0]);
+        assertEquals(component2, distributor.connections()[1]);
+        assertEquals(component3, distributor.connections()[2]);
+        System.out.println("  check when no references");
+        references.clear();
+        final IDistributor broken = new RoundRobin(references);
+        broken.addNext(component1);
+        assertEquals(0, broken.connections().length);
     }
 
     /**
@@ -205,8 +216,11 @@ public class RoundRobinTest
         final NameValue pair3 = new NameValue(Vocabulary.NAME, reference3);
         pairs.add(pair1);
         pairs.add(pair2);
+        final NameValue pair = new NameValue(Vocabulary.FUNCTION,
+                Vocabulary.FUNCTION);
+        pairs.add(pair);
         IDistributor instance = RoundRobin.instance(pairs);
-        assertEquals(pairs.size(), instance.getReferences().size());
+        assertEquals(pairs.size() - 1, instance.getReferences().size());
         assertTrue(instance.getReferences().contains(reference1));
         assertTrue(instance.getReferences().contains(reference2));
         pairs.add(pair3);
@@ -232,11 +246,15 @@ public class RoundRobinTest
         final IComponent component2 = new DummyComponent(label2, 2.0);
         distributor.addNext(component2);
         distributor.addNext(component1);
+        System.out.println("  check normal operation");
         final IComponent[] connections = distributor.connections();
         assertEquals(component1.getLabel(), connections[0].getLabel());
         assertEquals(component2.getLabel(), connections[1].getLabel());
         assertEquals(component1, connections[0]);
         assertEquals(component2, connections[1]);
+        System.out.println("  check when no downstream components");
+        final IDistributor round = new RoundRobin(null);
+        assertEquals(0, round.connections().length);
     }
     
 }

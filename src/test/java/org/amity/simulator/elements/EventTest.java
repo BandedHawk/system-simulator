@@ -201,4 +201,24 @@ public class EventTest
         result = instance.getExecuted();
         assertEquals(expResult, result, 0.0);
     }
+
+    /**
+     * Test of simulate method, of class Event.
+     */
+    @Test
+    public void testSimulate()
+    {
+        System.out.println("simulate");
+        System.out.println("  check event unchanged with no component");
+        final Event instance = new Event("generator", "test", 0);
+        final double arrival = 10.0;
+        final double start = 15.0;
+        final double complete = 20.0;
+        System.out.println("  Test setting values");
+        instance.setValues(arrival, start, complete);
+        instance.simulate();
+        assertEquals(arrival, instance.getArrived(), 0.0);
+        assertEquals(start, instance.getStarted(), 0.0);
+        assertEquals(complete, instance.getCompleted(), 0.0);
+    }
 }

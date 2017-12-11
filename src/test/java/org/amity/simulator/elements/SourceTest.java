@@ -263,6 +263,8 @@ public class SourceTest
         pairs.add(pair);
         pair = new NameValue(Vocabulary.MONITOR, "Y");
         pairs.add(pair);
+        pair = new NameValue(source, source);
+        pairs.add(pair);
         IComponent instance = Source.instance(pairs, generators);
         assertEquals(name, instance.getLabel());
         assertEquals(1, instance.getReferences().size());

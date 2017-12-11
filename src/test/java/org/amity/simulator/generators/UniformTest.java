@@ -188,6 +188,8 @@ public class UniformTest
         pairs.add(pair);
         pair = new NameValue(Vocabulary.NEXT, Vocabulary.PROCESSOR);
         pairs.add(pair);
+        pair = new NameValue(Vocabulary.FUNCTION, Vocabulary.FUNCTION);
+        pairs.add(pair);
         result = Uniform.instance(pairs);
         assertEquals(result.getSource(), Vocabulary.COMPONENT);
         assertEquals(result.getReference(), Vocabulary.PROCESSOR);

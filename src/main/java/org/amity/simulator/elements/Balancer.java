@@ -99,15 +99,18 @@ public class Balancer implements IComponent
     {
         // Arrival at this component is time event completed
         // processing at last component
-        final double arrived = event.getCompleted();
-        // Non-delay component so no associated wait time
-        event.setValues(arrived, arrived, arrived);
-        // Copy current event to local records
-        final Event current = new Event(event);
-        current.setComponent(null);
-        final boolean result = this.local.add(current);
-        this.depths.add(0);
-        return distributor.assign(event);
+        if (event != null)
+        {
+            final double arrived = event.getCompleted();
+            // Non-delay component so no associated wait time
+            event.setValues(arrived, arrived, arrived);
+            // Copy current event to local records
+            final Event current = new Event(event);
+            current.setComponent(null);
+            final boolean result = this.local.add(current);
+            this.depths.add(0);
+        }
+        return event == null ? event : distributor.assign(event);
     }
 
     @Override
@@ -139,7 +142,7 @@ public class Balancer implements IComponent
     }
 
     @Override
-    public void generateStatistics(Monitor monitor)
+    public void generateStatistics(final Monitor monitor)
     {
         if (this.monitor && monitor != null)
         {

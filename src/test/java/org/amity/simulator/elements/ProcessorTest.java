@@ -132,6 +132,9 @@ public class ProcessorTest
             assertTrue(event.getExecuted() == executed);
             tick = completeTick;
         }
+        System.out.println("  check null event");
+        final Event test = instance.simulate(null);
+        assertTrue(test == null);
     }
 
     /**
@@ -423,6 +426,8 @@ public class ProcessorTest
         NameValue pair = new NameValue(Vocabulary.NAME, name);
         pairs.add(pair);
         pair = new NameValue(Vocabulary.MONITOR, "Y");
+        pairs.add(pair);
+        pair = new NameValue(name, name);
         pairs.add(pair);
         IComponent instance = Processor.instance(pairs, generators);
         assertEquals(name, instance.getLabel());

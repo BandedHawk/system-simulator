@@ -98,6 +98,7 @@ public class RandomTest
         distributor.addNext(component4);
         distributor.addNext(component5);
         final double[] count = new double[references.size()];
+        System.out.println("  check for standard operation");
         Event event = new Event(sourceLabel, sourceLabel, 1.0);
         final int total = 2000000;
         for (int index = 0; index < total; index++)
@@ -129,6 +130,18 @@ public class RandomTest
             System.out.println("  Change from even distribution: "
                     + FastMath.abs(count[index]/total - 0.2));
             assertTrue(FastMath.abs(count[index]/total - 0.2) < 0.002);
+        }
+        System.out.println("  check for null event handling");
+        Event outcome = distributor.assign(null);
+        assertTrue(outcome == null);
+        System.out.println("  check when no references");
+        references.clear();
+        final IDistributor broken = new Random(references);
+        for (int index  = 0; index < 40; index++)
+        {
+            final IComponent next = event.getComponent();
+            outcome = broken.assign(event);
+            assertEquals(next, outcome.getComponent());
         }
     }
 
@@ -202,13 +215,24 @@ public class RandomTest
         final IComponent component1 = new DummyComponent(label1, 2.0);
         final IComponent component2 = new DummyComponent(label2, 1.0);
         final IComponent component3 = new DummyComponent(label3, 0.5);
-        IDistributor distributor = new Random(references);
+        System.out.println("  check for normal operation");
+        final IDistributor distributor = new Random(references);
         distributor.addNext(component3);
         distributor.addNext(component2);
         distributor.addNext(component1);
         assertEquals(component1, distributor.connections()[0]);
         assertEquals(component2, distributor.connections()[1]);
         assertEquals(component3, distributor.connections()[2]);
+        System.out.println("  check when component is null");
+        distributor.addNext(null);
+        assertEquals(component1, distributor.connections()[0]);
+        assertEquals(component2, distributor.connections()[1]);
+        assertEquals(component3, distributor.connections()[2]);
+        System.out.println("  check when no references");
+        references.clear();
+        final IDistributor broken = new Random(references);
+        broken.addNext(component1);
+        assertEquals(0, broken.connections().length);
     }
 
     /**
@@ -228,11 +252,15 @@ public class RandomTest
         final IComponent component2 = new DummyComponent(label2, 2.0);
         distributor.addNext(component2);
         distributor.addNext(component1);
+        System.out.println("  check normal operation");
         final IComponent[] connections = distributor.connections();
         assertEquals(component1.getLabel(), connections[0].getLabel());
         assertEquals(component2.getLabel(), connections[1].getLabel());
         assertEquals(component1, connections[0]);
         assertEquals(component2, connections[1]);
+        System.out.println("  check when no downstream components");
+        final IDistributor random = new Random(null);
+        assertEquals(0, random.connections().length);
     }
 
     /**
@@ -258,12 +286,35 @@ public class RandomTest
         distributor.addNext(component2);
         distributor.addNext(component1);
         Event event = new Event(sourceLabel, sourceLabel, 1.0);
-        for (int count = 0; count < 20; count++)
+        System.out.println("  check available changes with assignment");
+        int changed = 0;
+        double last = 0;
+        for (int count = 0; count < 40; count++)
         {
             final double available = distributor.available();
             event = distributor.assign(event);
-            assertTrue(event.getComponent().getAvailable() == available);
+            assertEquals(available, event.getComponent().getAvailable(), 0.0);
+            if (last > 0)
+            {
+                changed += last == available ? 0 : 1; 
+            }
+            last = available;
         }
+        assertTrue(changed > 0);
+        System.out.println("  check available remains the same when not assigned");
+        changed = 0;
+        last = 0;
+        for (int count = 0; count < 20; count++)
+        {
+            final double available = distributor.available();
+            assertEquals(available, distributor.available(), 0.0);
+            if (last > 0)
+            {
+                changed += last == available ? 0 : 1; 
+            }
+            last = available;
+        }
+        assertTrue(changed == 0);
     }
 
     /**
@@ -297,8 +348,11 @@ public class RandomTest
         final NameValue pair3 = new NameValue(Vocabulary.NAME, reference3);
         pairs.add(pair1);
         pairs.add(pair2);
+        final NameValue pair = new NameValue(Vocabulary.FUNCTION,
+                Vocabulary.FUNCTION);
+        pairs.add(pair);
         IDistributor instance = Random.instance(pairs);
-        assertEquals(pairs.size(), instance.getReferences().size());
+        assertEquals(pairs.size() - 1, instance.getReferences().size());
         assertTrue(instance.getReferences().contains(reference1));
         assertTrue(instance.getReferences().contains(reference2));
         pairs.add(pair3);
