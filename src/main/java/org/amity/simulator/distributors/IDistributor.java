@@ -31,6 +31,7 @@ import org.amity.simulator.elements.IFunction;
  */
 public interface IDistributor extends IFunction
 {
+    final static int UNKNOWN = -1;
 
     /**
      * Assigns event to downstream component

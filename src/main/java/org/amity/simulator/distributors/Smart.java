@@ -34,11 +34,13 @@ public class Smart implements IDistributor
 {
     private final List<String> references;
     private final IComponent[] next;
+    private int peek;
 
     private Smart()
     {
         this.references = new ArrayList<>();
         this.next = new IComponent[0];
+        this.peek = IDistributor.UNKNOWN;
     }
 
     /**
@@ -51,6 +53,7 @@ public class Smart implements IDistributor
         this.references = references;
         final int size = references != null ? references.size() : 0;
         this.next = new IComponent[size];
+        this.peek = IDistributor.UNKNOWN;
     }
 
     @Override
@@ -59,13 +62,23 @@ public class Smart implements IDistributor
         // Find downstream component with lowest wait time
         double minimum = Double.MAX_VALUE;
         IComponent component = null;
-        for (final IComponent item : this.next)
+        // Search if an availability check hasn't been performed
+        if (this.peek == IDistributor.UNKNOWN)
         {
-            if (item.getAvailable() < minimum)
+            for (final IComponent item : this.next)
             {
-                minimum = item.getAvailable();
-                component = item;
+                if (item.getAvailable() < minimum)
+                {
+                    minimum = item.getAvailable();
+                    component = item;
+                }
             }
+        }
+        // Otherwise use availability results and then reset
+        else
+        {
+            component = this.next[this.peek];
+            this.peek = IDistributor.UNKNOWN;
         }
         // Direct event to next available component
         event.setComponent(component);
@@ -75,7 +88,7 @@ public class Smart implements IDistributor
     @Override
     public void reset()
     {
-        // Explicitly empty
+        this.peek = IDistributor.UNKNOWN;
     }
 
     @Override
@@ -155,12 +168,23 @@ public class Smart implements IDistributor
     public double available()
     {
         double minimum = Double.MAX_VALUE;
-        for (final IComponent item : this.next)
+        // Search if we haven't already done availability
+        if (this.peek == IDistributor.UNKNOWN)
         {
-            if (item.getAvailable() < minimum)
+            for (int index = 0; index < this.next.length; index++)
             {
-                minimum = item.getAvailable();
+                final IComponent item = this.next[index];
+                if (item.getAvailable() < minimum)
+                {
+                    minimum = item.getAvailable();
+                    this.peek = index;
+                }
             }
+        }
+        // Otherwise use existing result
+        else
+        {
+            minimum = this.next[this.peek].getAvailable();
         }
         return minimum;
     }

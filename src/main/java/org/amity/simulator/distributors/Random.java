@@ -37,7 +37,6 @@ import org.apache.commons.math3.random.RandomGenerator;
  */
 public class Random implements IDistributor
 {
-    private final static int UNKNOWN = -1;
     private final List<String> references;
     private final int modulus;
     private final IComponent[] next;
@@ -53,7 +52,7 @@ public class Random implements IDistributor
         this.modulus = 0;
         this.next = new IComponent[0];
         this.generator = null;
-        this.peek = Random.UNKNOWN;
+        this.peek = IDistributor.UNKNOWN;
     }
 
     /**
@@ -67,7 +66,7 @@ public class Random implements IDistributor
         this.modulus = references != null ? references.size() : 0;
         this.next = new IComponent[this.modulus];
         this.generator = new JDKRandomGenerator();
-        this.peek = Random.UNKNOWN;
+        this.peek = IDistributor.UNKNOWN;
     }
 
     @Override
@@ -77,11 +76,11 @@ public class Random implements IDistributor
         {
             // If we were asked for availability - we already generated
             // next target so we must honor that
-            final int selection = this.peek == Random.UNKNOWN
+            final int selection = this.peek == IDistributor.UNKNOWN
                     ? generator.nextInt(this.modulus)
                     : this.peek;
             // Reset peek value
-            this.peek = Random.UNKNOWN;
+            this.peek = IDistributor.UNKNOWN;
             event.setComponent(this.next[selection]);
         }
         return event;
@@ -90,7 +89,7 @@ public class Random implements IDistributor
     @Override
     public void reset()
     {
-        this.peek = Random.UNKNOWN;
+        this.peek = IDistributor.UNKNOWN;
     }
 
     @Override
@@ -127,7 +126,10 @@ public class Random implements IDistributor
     {
         // Lookahead at what next random selection is going to be
         // to get availability of that selection
-        this.peek  = generator.nextInt(this.modulus);
+        if (this.peek == IDistributor.UNKNOWN)
+        {
+            this.peek  = generator.nextInt(this.modulus);
+        }
         return this.next[this.peek].getAvailable();
     }
 

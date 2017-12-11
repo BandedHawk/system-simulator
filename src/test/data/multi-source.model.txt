@@ -5,8 +5,8 @@ component
     function
     {
         type: uniform
-        minimum: 1.60
-        maximum: 2.40
+        minimum: 1.20
+        maximum: 2.00
         next: network balancer
     }
 }
@@ -17,8 +17,8 @@ component
     function
     {
         type: uniform
-        minimum: 0.80
-        maximum: 1.40
+        minimum: 0.60
+        maximum: 1.00
         next: network balancer
     }
 }
@@ -248,7 +248,7 @@ component
     function
     {
         type: skewed
-        minimum: 0.2
+        minimum: 0.3
         maximum: 0.4
         skew: 0.8
         bias: -3.0

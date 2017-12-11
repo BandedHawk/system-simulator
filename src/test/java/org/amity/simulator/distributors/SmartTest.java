@@ -89,6 +89,7 @@ public class SmartTest
         distributor.addNext(component1);
         Event event = new Event(sourceLabel, sourceLabel, 1.0);
         event = distributor.assign(event);
+        System.out.println("  Check basic expectation");
         assertEquals(event.getComponent(), component3);
         final IComponent component4 = new DummyComponent(label3, 1.5);
         references.clear();
@@ -99,6 +100,16 @@ public class SmartTest
         distributor.addNext(component4);
         distributor.addNext(component2);
         distributor.addNext(component1);
+        event = distributor.assign(event);
+        System.out.println("  Check operation under new scenario");
+        assertEquals(event.getComponent(), component2);
+        System.out.println("  Check operation after availability check");
+        assertTrue(distributor.available() == 1.0);
+        event = distributor.assign(event);
+        assertEquals(event.getComponent(), component2);
+        System.out.println("  Check operation after reset");
+        assertTrue(distributor.available() == 1.0);
+        distributor.reset();
         event = distributor.assign(event);
         assertEquals(event.getComponent(), component2);
     }
@@ -259,6 +270,12 @@ public class SmartTest
         distributor.addNext(component3);
         distributor.addNext(component2);
         distributor.addNext(component1);
+        System.out.println("  Check that first run works");
+        assertTrue(distributor.available() == 1.0);
+        System.out.println("  Check that peek value works");
+        assertTrue(distributor.available() == 1.0);
+        System.out.println("  Check it works after reset");
+        distributor.reset();
         assertTrue(distributor.available() == 1.0);
     }
     
