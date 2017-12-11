@@ -120,6 +120,7 @@ public class ModelTest
     public void testExecute()
     {
         System.out.println("execute");
+        System.out.println("  Test with working definition");
         double generate = 100.0;
         double start = 10.0;
         double end = 90.0;
@@ -131,6 +132,15 @@ public class ModelTest
         assertTrue(model.isCompiled());
         final boolean completed = model.execute(generate, start, end);
         assertTrue(completed);
+        System.out.println("  Test with incorrect parameters");
+        assertFalse(model.execute(generate, end, start));
+        assertFalse(model.execute(end, start, generate));
+        assertFalse(model.execute(generate, -1, end));
+        System.out.println("  Test with long execution");
+        assertTrue(model.execute(1000, 50, 900));
+        System.out.println("  Test with empty model");
+        model = new Model();
+        assertFalse(model.isCompiled());
+        assertFalse(model.execute(generate, start, end));
     }
-
 }

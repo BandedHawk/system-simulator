@@ -43,7 +43,6 @@ public class Source implements IComponent
     private final boolean monitor;
     private int counter;
     private double time;
-    private double available;
 
     /**
      * Hidden default constructor to avoid implicit creation
@@ -57,7 +56,6 @@ public class Source implements IComponent
         this.monitor = false;
         this.counter = 0;
         this.time = 0;
-        this.available = 0;
     }
 
     /**
@@ -74,17 +72,16 @@ public class Source implements IComponent
         this.label = label;
         this.generator = generator;
         this.generators = new HashMap<>();
-        final List<IFunction> list = new ArrayList<>();
-        list.add(generator);
-        if (this.generator != null && generator != null)
+        if (this.generator != null)
         {
+            final List<IFunction> list = new ArrayList<>();
+            list.add(this.generator);
             this.generators.put(generator.getReference(), list);
         }
         this.local = new ArrayList<>();
         this.monitor = monitor;
         this.counter = 0;
         this.time = 0;
-        this.available = 0;
     }
 
     @Override
@@ -108,7 +105,6 @@ public class Source implements IComponent
         final Event global
                 = new Event(this.local.get(this.local.size() - 1));
         global.setComponent(this.generator.getNext());
-        this.available = global.getCompleted();
         return global;
     }
 
@@ -209,6 +205,6 @@ public class Source implements IComponent
     @Override
     public double getAvailable()
     {
-        return this.available;
+        return this.time;
     }
 }

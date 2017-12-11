@@ -85,7 +85,7 @@ public class SourceTest
         assertTrue(local.size() == eventTotal);
         double tick = 0;
         System.out.println("  check event statistics are correct");
-        for (Event event : local)
+        for (final Event event : local)
         {
             tick += period;
             System.out.println("    " + event.getSource() + " "
@@ -96,6 +96,17 @@ public class SourceTest
             assertTrue(event.getStarted() == tick);
             assertTrue(event.getCompleted() == tick);
         }
+        System.out.println("  check passage of injected event");
+        final String source = "source";
+        tick = 1000;
+        Event event = new Event(source, label, tick);
+        event.setValues(tick, tick, tick);
+        event = instance.simulate(event);
+        assertEquals(source, event.getSource());
+        assertEquals(label, event.getLabel());
+        assertEquals(tick, event.getArrived(), 0.0);
+        assertEquals(tick, event.getStarted(), 0.0);
+        assertEquals(tick, event.getCompleted(), 0.0);
     }
 
     /**
@@ -222,11 +233,15 @@ public class SourceTest
         final double period = 5;
         final String label = "test";
         final String reference = "next";
+        System.out.println("  Check normal source definition");
         final IGenerator generator = new Constant(period, "source", reference);
         final IComponent instance = new Source(label, generator, false);
         assertTrue(instance.getReferences() != null);
         assertEquals(1, instance.getReferences().size());
         assertEquals(generator, instance.getReferences().get(reference).get(0));
+        System.out.println("  Check incorrect source definition");
+        final IComponent source = new Source(label, null, false);
+        assertEquals(0, source.getReferences().size());
     }
 
     /**
@@ -252,5 +267,24 @@ public class SourceTest
         assertEquals(name, instance.getLabel());
         assertEquals(1, instance.getReferences().size());
         assertEquals(1, instance.getReferences().get(reference).size());
+    }
+
+    /**
+     * Test of getAvailable method, of class Source.
+     */
+    @Test
+    public void testGetAvailable()
+    {
+        System.out.println("getAvailable");
+        final double period = 5;
+        final String label = "test";
+        final int eventTotal = 3;
+        final IGenerator generator = new Constant(period, "source", "next");
+        final IComponent instance = new Source(label, generator, false);
+        for (int count = 0; count < eventTotal; count++)
+        {
+            final Event event = instance.simulate(null);
+            assertEquals(event.getCompleted(), instance.getAvailable(), 0.0);
+        }
     }
 }

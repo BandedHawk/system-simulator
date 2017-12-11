@@ -36,6 +36,9 @@ public class Smart implements IDistributor
     private final IComponent[] next;
     private int peek;
 
+    /**
+     * Default constructor - not used
+     */
     private Smart()
     {
         this.references = new ArrayList<>();
