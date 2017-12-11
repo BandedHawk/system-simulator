@@ -323,7 +323,7 @@ class Compiler
                                     }
                                 }
                             }
-                            // 
+                            // Only expected label to appear once
                             else
                             {
                                 final StringBuilder error =
@@ -380,7 +380,7 @@ class Compiler
         else
         {
             final StringBuilder error =
-                    new StringBuilder("Did not specify a type at ");
+                    new StringBuilder("Did not specify a type near ");
             error.append(token.line).append(", ")
                     .append(token.position);
             local.addError(error.toString());
