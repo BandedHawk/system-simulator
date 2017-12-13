@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public class DummyComponent implements IComponent
+public class DummyComponent implements Component
 {
     private final double available;
     private final String label;
@@ -68,7 +68,7 @@ public class DummyComponent implements IComponent
     }
 
     @Override
-    public Map<String, List<IFunction>> getReferences()
+    public Map<String, List<Function>> getReferences()
     {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -95,6 +95,12 @@ public class DummyComponent implements IComponent
     public double getAvailable()
     {
         return this.available;
+    }
+
+    @Override
+    public void prioritize(Sequencer sequencer)
+    {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

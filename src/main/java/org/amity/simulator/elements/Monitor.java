@@ -91,7 +91,7 @@ public class Monitor
      *
      * @param component item to be interrogated
      */
-    void displayStatistics(final IComponent component)
+    void displayStatistics(final Component component)
     {
         double last = 0;
         double idle = 0;

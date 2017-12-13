@@ -1,5 +1,5 @@
 /*
- * IFunction.java
+ * Function.java
  *
  * (C) Copyright 2017 Jon Barnett.
  *
@@ -24,7 +24,7 @@ package org.amity.simulator.elements;
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public interface IFunction
+public interface Function
 {
 
     /**

@@ -22,18 +22,19 @@ package org.amity.simulator.distributors;
 import java.util.ArrayList;
 import java.util.List;
 import org.amity.simulator.elements.Event;
-import org.amity.simulator.elements.IComponent;
+import org.amity.simulator.elements.Sequencer;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
+import org.amity.simulator.elements.Component;
 
 /**
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public class Smart implements IDistributor
+public class Smart implements Distributor
 {
     private final List<String> references;
-    private final IComponent[] next;
+    private final Component[] next;
     private int peek;
 
     /**
@@ -42,8 +43,8 @@ public class Smart implements IDistributor
     private Smart()
     {
         this.references = new ArrayList<>();
-        this.next = new IComponent[0];
-        this.peek = IDistributor.UNKNOWN;
+        this.next = new Component[0];
+        this.peek = Distributor.UNKNOWN;
     }
 
     /**
@@ -55,8 +56,8 @@ public class Smart implements IDistributor
     {
         this.references = references;
         final int size = references != null ? references.size() : 0;
-        this.next = new IComponent[size];
-        this.peek = IDistributor.UNKNOWN;
+        this.next = new Component[size];
+        this.peek = Distributor.UNKNOWN;
     }
 
     @Override
@@ -64,11 +65,11 @@ public class Smart implements IDistributor
     {
         // Find downstream component with lowest wait time
         double minimum = Double.MAX_VALUE;
-        IComponent component = null;
+        Component component = null;
         // Search if an availability check hasn't been performed
-        if (this.peek == IDistributor.UNKNOWN)
+        if (this.peek == Distributor.UNKNOWN)
         {
-            for (final IComponent item : this.next)
+            for (final Component item : this.next)
             {
                 if (item.getAvailable() < minimum)
                 {
@@ -81,7 +82,7 @@ public class Smart implements IDistributor
         else
         {
             component = this.next[this.peek];
-            this.peek = IDistributor.UNKNOWN;
+            this.peek = Distributor.UNKNOWN;
         }
         // Direct event to next available component
         event.setComponent(component);
@@ -91,7 +92,7 @@ public class Smart implements IDistributor
     @Override
     public void reset()
     {
-        this.peek = IDistributor.UNKNOWN;
+        this.peek = Distributor.UNKNOWN;
     }
 
     @Override
@@ -101,7 +102,7 @@ public class Smart implements IDistributor
     }
 
     @Override
-    public void addNext(final IComponent component)
+    public void addNext(final Component component)
     {
         if (component != null)
         {
@@ -138,31 +139,8 @@ public class Smart implements IDistributor
         return string.toString();
     }
 
-    /**
-     * Create algorithm object given raw name-value pairs
-     * 
-     * @param pairs list of name-values to convert into variables
-     * @return manufactured balancer algorithm object
-     */
-    public final static IDistributor instance(final List<NameValue> pairs)
-    {
-        List<String> references = new ArrayList<>();
-        for (final NameValue parameter : pairs)
-        {
-            switch (parameter.name)
-            {
-                case Vocabulary.NEXT:
-                    references.add(parameter.value);
-                default:
-                    break;
-            }
-        }
-        final IDistributor distributor = new Smart(references);
-        return distributor;
-    }
-
     @Override
-    public IComponent[] connections()
+    public Component[] connections()
     {
         return this.next;
     }
@@ -172,11 +150,11 @@ public class Smart implements IDistributor
     {
         double minimum = Double.MAX_VALUE;
         // Search if we haven't already done availability
-        if (this.peek == IDistributor.UNKNOWN)
+        if (this.peek == Distributor.UNKNOWN)
         {
             for (int index = 0; index < this.next.length; index++)
             {
-                final IComponent item = this.next[index];
+                final Component item = this.next[index];
                 if (item.getAvailable() < minimum)
                 {
                     minimum = item.getAvailable();
@@ -190,5 +168,34 @@ public class Smart implements IDistributor
             minimum = this.next[this.peek].getAvailable();
         }
         return minimum;
+    }
+
+    @Override
+    public void prioritize(Sequencer sequencer)
+    {
+        this.next[this.peek].prioritize(sequencer);
+    }
+
+    /**
+     * Create algorithm object given raw name-value pairs
+     * 
+     * @param pairs list of name-values to convert into variables
+     * @return manufactured balancer algorithm object
+     */
+    public final static Distributor instance(final List<NameValue> pairs)
+    {
+        final List<String> references = new ArrayList<>();
+        for (final NameValue parameter : pairs)
+        {
+            switch (parameter.name)
+            {
+                case Vocabulary.NEXT:
+                    references.add(parameter.value);
+                default:
+                    break;
+            }
+        }
+        final Distributor distributor = new Smart(references);
+        return distributor;
     }
 }

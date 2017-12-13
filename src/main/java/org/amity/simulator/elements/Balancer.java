@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.amity.simulator.distributors.IDistributor;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
+import org.amity.simulator.distributors.Distributor;
 
 /**
  * Component that takes event and delivers it to one of a selection of
@@ -33,10 +33,10 @@ import org.amity.simulator.language.Vocabulary;
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public class Balancer implements IComponent
+public class Balancer implements Component
 {
     private final String label;
-    private final IDistributor distributor;
+    private final Distributor distributor;
     private final List<Event> local;
     private final List<Integer> depths;
     private final boolean monitor;
@@ -60,7 +60,7 @@ public class Balancer implements IComponent
      * @param distributor algorithm implementation for balancing
      * @param monitor monitor if <code>true</code>
      */
-    public Balancer(final String label, final IDistributor distributor,
+    public Balancer(final String label, final Distributor distributor,
             final boolean monitor)
     {
         this.label = label;
@@ -83,10 +83,10 @@ public class Balancer implements IComponent
         if (this.distributor != null)
         {
             this.distributor.reset();
-            final IComponent[] components = this.distributor.connections();
+            final Component[] components = this.distributor.connections();
             if (components.length > 0)
             {
-                for (final IComponent component : components)
+                for (final Component component : components)
                 {
                     component.reset();
                 }
@@ -120,14 +120,14 @@ public class Balancer implements IComponent
     }
 
     @Override
-    public Map<String, List<IFunction>> getReferences()
+    public Map<String, List<Function>> getReferences()
     {
-        final Map<String, List<IFunction>> map = new HashMap<>();
+        final Map<String, List<Function>> map = new HashMap<>();
         if (this.distributor != null)
         {
             for (final String reference : this.distributor.getReferences())
             {
-                final List<IFunction> list = new ArrayList<>();
+                final List<Function> list = new ArrayList<>();
                 list.add(this.distributor);
                 map.put(reference, list);
             }
@@ -168,6 +168,13 @@ public class Balancer implements IComponent
     }
 
     @Override
+    public void prioritize(final Sequencer sequencer)
+    {
+        sequencer.paths.add(this);
+        this.distributor.prioritize(sequencer);
+    }
+
+    @Override
     public double getAvailable()
     {
         return this.distributor.available();
@@ -180,8 +187,8 @@ public class Balancer implements IComponent
      * @param distributors list of distribution/balancing algorithms
      * @return manufactured balancer component
      */
-    public final static IComponent instance(final List<NameValue> pairs,
-            final List<IDistributor> distributors)
+    public final static Component instance(final List<NameValue> pairs,
+            final List<Distributor> distributors)
     {
         String label = null;
         boolean monitor = false;
@@ -199,7 +206,7 @@ public class Balancer implements IComponent
                     break;
             }
         }
-        final IComponent balancer
+        final Component balancer
                 = new Balancer(label, distributors.get(0), monitor);
         return balancer;
     }

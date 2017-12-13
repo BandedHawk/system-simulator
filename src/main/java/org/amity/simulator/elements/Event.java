@@ -19,6 +19,8 @@
  */
 package org.amity.simulator.elements;
 
+import java.util.List;
+
 /**
  * Element that interacts with system components
  *
@@ -35,7 +37,8 @@ public class Event
     private double executed;
     private double lifetime;
     private String last;
-    private IComponent component;
+    private Component component;
+    private final Sequencer sequencer;
 
     /**
      * Hidden default constructor to avoid implicit creation
@@ -52,6 +55,7 @@ public class Event
         this.lifetime = 0;
         this.component = null;
         this.last = null;
+        this.sequencer = new Sequencer();
     }
 
     /**
@@ -60,8 +64,10 @@ public class Event
      * @param source name of source
      * @param label distinguishing name of event
      * @param created time event was created
+     * @param sequencer
      */
-    public Event(final String source, final String label, final double created)
+    public Event(final String source, final String label, final double created,
+            final Sequencer sequencer)
     {
         this.source = source;
         this.label = label;
@@ -73,6 +79,7 @@ public class Event
         this.lifetime = 0;
         this.component = null;
         this.last = null;
+        this.sequencer = new Sequencer();
     }
 
     /**
@@ -91,6 +98,7 @@ public class Event
         this.executed = copy.executed;
         this.lifetime = copy.lifetime;
         this.component = copy.component;
+        this.sequencer = copy.sequencer;
     }
 
     /**
@@ -229,7 +237,7 @@ public class Event
      * 
      * @param component current system element event is at
      */
-    public void setComponent(final IComponent component)
+    public void setComponent(final Component component)
     {
         this.component = component;
     }
@@ -238,7 +246,7 @@ public class Event
      * 
      * @return current system element event is at
      */
-    public IComponent getComponent()
+    public Component getComponent()
     {
         return this.component;
     }
@@ -277,6 +285,11 @@ public class Event
                 this.lifetime = this.completed - this.created;
             }
         }
+    }
+
+    public Event prioritize(final List<Event> buffer, final boolean locked)
+    {
+        return locked ? this : this.sequencer.prioritize(this, buffer);
     }
 
     @Override

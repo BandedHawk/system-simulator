@@ -20,26 +20,26 @@
 package org.amity.simulator.generators;
 
 import java.util.List;
-import org.amity.simulator.elements.IComponent;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.util.FastMath;
+import org.amity.simulator.elements.Component;
 
 /**
  * Implements generation of values that have a uniform random distribution.
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public class Uniform implements IGenerator
+public class Uniform implements Generator
 {
 
     private final double offset;
     private final double width;
     private final String source;
     private final String reference;
-    private IComponent next;
+    private Component next;
     private final RandomGenerator generator;
 
     /**
@@ -106,13 +106,13 @@ public class Uniform implements IGenerator
     }
 
     @Override
-    public IComponent getNext()
+    public Component getNext()
     {
         return next;
     }
 
     @Override
-    public void setNext(IComponent next)
+    public void setNext(Component next)
     {
         this.next = next;
     }
@@ -123,7 +123,7 @@ public class Uniform implements IGenerator
      * @param pairs list of name-values to convert into variables
      * @return manufactured uniform probability generator
      */
-    public final static IGenerator instance(final List<NameValue> pairs)
+    public final static Generator instance(final List<NameValue> pairs)
     {
         double maximum = 0;
         double minimum = 0;
@@ -148,7 +148,7 @@ public class Uniform implements IGenerator
                     break;
             }
         }
-        final IGenerator generator = new Uniform(minimum, maximum, source,
+        final Generator generator = new Uniform(minimum, maximum, source,
                 reference);
         return generator;
     }

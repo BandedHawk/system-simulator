@@ -21,7 +21,6 @@ package org.amity.simulator.generators;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.amity.simulator.elements.IComponent;
 import org.amity.simulator.elements.Processor;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
@@ -32,6 +31,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.amity.simulator.elements.Component;
 
 /**
  * Tests that the resulting values follow a constant characteristic.
@@ -76,7 +76,7 @@ public class ConstantTest
         final double period = 5;
         final String source = Vocabulary.DEFAULT;
         final String reference = "database";
-        IGenerator instance = new Constant(period, source, reference);
+        Generator instance = new Constant(period, source, reference);
         final DescriptiveStatistics statistics = new DescriptiveStatistics();
         for (int count = 0; count < eventTotal; count++)
         {
@@ -103,7 +103,7 @@ public class ConstantTest
         final double period = 5;
         final String source = Vocabulary.DEFAULT;
         final String reference = "database";
-        final IGenerator instance = new Constant(period, source, reference);
+        final Generator instance = new Constant(period, source, reference);
         assertTrue(instance.characteristics() != null);
     }
 
@@ -117,7 +117,7 @@ public class ConstantTest
         final double period = 5;
         final String source = Vocabulary.DEFAULT;
         final String reference = "database";
-        final IGenerator instance = new Constant(period, source, reference);
+        final Generator instance = new Constant(period, source, reference);
         assertEquals(instance.getSource(), source);
     }
 
@@ -131,7 +131,7 @@ public class ConstantTest
         final double period = 5;
         final String source = Vocabulary.DEFAULT;
         final String reference = "database";
-        final IGenerator instance = new Constant(period, source, reference);
+        final Generator instance = new Constant(period, source, reference);
         assertEquals(instance.getReference(), reference);
     }
 
@@ -145,11 +145,12 @@ public class ConstantTest
         final double period = 5;
         final String source = Vocabulary.DEFAULT;
         final String reference = "database";
-        final IGenerator instance = new Constant(period, source, reference);
-        final List<IGenerator> generators = new ArrayList<>();
+        final Generator instance = new Constant(period, source, reference);
+        final List<Generator> generators = new ArrayList<>();
+        final List<String> priority = new ArrayList<>();
         generators.add(instance);
-        final IComponent component = new Processor("test", generators,
-                false);
+        final Component component = new Processor("test", generators,
+                priority, false);
         instance.setNext(component);
         assertEquals(instance.getNext(), component);
     }
@@ -164,7 +165,7 @@ public class ConstantTest
         final List<NameValue> pairs = new ArrayList<>();
         NameValue pair = new NameValue(Vocabulary.PERIOD, "51.3");
         pairs.add(pair);
-        IGenerator result = Constant.instance(pairs);
+        Generator result = Constant.instance(pairs);
         assertTrue(result != null);
         assertEquals(result.getReference(), null);
         assertEquals(result.getSource(), Vocabulary.DEFAULT);

@@ -22,9 +22,10 @@ package org.amity.simulator.distributors;
 import java.util.ArrayList;
 import java.util.List;
 import org.amity.simulator.elements.Event;
-import org.amity.simulator.elements.IComponent;
+import org.amity.simulator.elements.Sequencer;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
+import org.amity.simulator.elements.Component;
 
 /**
  * Distribution function that uses a round-robin algorithm to split between
@@ -32,11 +33,11 @@ import org.amity.simulator.language.Vocabulary;
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public class RoundRobin implements IDistributor
+public class RoundRobin implements Distributor
 {
 
     private final List<String> references;
-    private final IComponent[] next;
+    private final Component[] next;
     private final int modulus;
     private int current;
 
@@ -48,7 +49,7 @@ public class RoundRobin implements IDistributor
         this.references = null;
         this.modulus = 0;
         this.current = 0;
-        this.next = new IComponent[0];
+        this.next = new Component[0];
     }
 
     /**
@@ -61,7 +62,7 @@ public class RoundRobin implements IDistributor
         this.references = references;
         this.modulus = references != null ? references.size() : 0;
         this.current = 0;
-        this.next = new IComponent[this.modulus];
+        this.next = new Component[this.modulus];
     }
 
     @Override
@@ -76,7 +77,7 @@ public class RoundRobin implements IDistributor
     }
 
     @Override
-    public void addNext(final IComponent component)
+    public void addNext(final Component component)
     {
         if (component != null && this.modulus != 0)
         {
@@ -131,9 +132,9 @@ public class RoundRobin implements IDistributor
      * @param pairs list of name-values to convert into variables
      * @return manufactured balancer algorithm object
      */
-    public final static IDistributor instance(final List<NameValue> pairs)
+    public final static Distributor instance(final List<NameValue> pairs)
     {
-        List<String> references = new ArrayList<>();
+        final List<String> references = new ArrayList<>();
         for (final NameValue parameter : pairs)
         {
             switch (parameter.name)
@@ -144,12 +145,12 @@ public class RoundRobin implements IDistributor
                     break;
             }
         }
-        final IDistributor distributor = new RoundRobin(references);
+        final Distributor distributor = new RoundRobin(references);
         return distributor;
     }
 
     @Override
-    public IComponent[] connections()
+    public Component[] connections()
     {
         return this.next;
     }
@@ -158,5 +159,11 @@ public class RoundRobin implements IDistributor
     public double available()
     {
         return this.next[this.current].getAvailable();
+    }
+
+    @Override
+    public void prioritize(final Sequencer sequencer)
+    {
+        this.next[this.current].prioritize(sequencer);
     }
 }

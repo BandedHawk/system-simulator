@@ -1,5 +1,5 @@
 /*
- * IGenerator.java
+ * Generator.java
  *
  * (C) Copyright 2017 Jon Barnett.
  *
@@ -19,8 +19,8 @@
  */
 package org.amity.simulator.generators;
 
-import org.amity.simulator.elements.IComponent;
-import org.amity.simulator.elements.IFunction;
+import org.amity.simulator.elements.Component;
+import org.amity.simulator.elements.Function;
 
 /**
  * Interface for the distribution model that generates values in the
@@ -28,7 +28,7 @@ import org.amity.simulator.elements.IFunction;
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public interface IGenerator extends IFunction
+public interface Generator extends Function
 {
 
     /**
@@ -56,11 +56,11 @@ public interface IGenerator extends IFunction
      * 
      * @param next downstream component for this generator
      */
-    void setNext(IComponent next);
+    void setNext(Component next);
 
     /**
      * 
      * @return downstream component for this generator
      */
-    IComponent getNext();
+    Component getNext();
 }

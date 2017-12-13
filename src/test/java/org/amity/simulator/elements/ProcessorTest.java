@@ -31,9 +31,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.amity.simulator.generators.IGenerator;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
+import org.amity.simulator.generators.Generator;
 
 /**
  * Tests processing statistics of delay modeling a system component.
@@ -80,14 +80,16 @@ public class ProcessorTest
         final String sourceLabel = "source";
         final String label = "delay";
         final int eventTotal = 4;
-        final IGenerator sourceGenerator = new Constant(sourcePeriod,
+        final Generator sourceGenerator = new Constant(sourcePeriod,
                 sourceLabel, label);
-        final IGenerator generator = new Constant(period, sourceLabel, null);
-        final List<IGenerator> generators = new ArrayList<>();
+        final Generator generator = new Constant(period, sourceLabel, null);
+        final List<Generator> generators = new ArrayList<>();
         generators.add(generator);
-        final IComponent instance = new Processor(label, generators, false);
+        final List<String> priority = new ArrayList<>();
+        final Component instance = new Processor(label, generators,
+                priority, false);
         final LinkedList<Event> events = new LinkedList<>();
-        final IComponent source
+        final Component source
                 = new Source(sourceLabel, sourceGenerator, false);
         sourceGenerator.setNext(instance);
         for (int count = 0; count < eventTotal; count++)
@@ -151,14 +153,16 @@ public class ProcessorTest
         final String sourceLabel = "source";
         final String label = "delay";
         final int eventTotal = 4;
-        final IGenerator sourceGenerator = new Constant(sourcePeriod,
+        final Generator sourceGenerator = new Constant(sourcePeriod,
                 sourceLabel, label);
-        final IGenerator generator = new Constant(period, sourceLabel, null);
-        final List<IGenerator> generators = new ArrayList<>();
+        final Generator generator = new Constant(period, sourceLabel, null);
+        final List<Generator> generators = new ArrayList<>();
         generators.add(generator);
-        final IComponent instance = new Processor(label, generators, false);
+        final List<String> priority = new ArrayList<>();
+        final Component instance = new Processor(label, generators,
+                priority, false);
         final LinkedList<Event> events = new LinkedList<>();
-        final IComponent source
+        final Component source
                 = new Source(sourceLabel, sourceGenerator, false);
         sourceGenerator.setNext(instance);
         for (int count = 0; count < eventTotal; count++)
@@ -240,14 +244,16 @@ public class ProcessorTest
         final String sourceLabel = "source";
         final String label = "delay";
         final int eventTotal = 4;
-        final IGenerator sourceGenerator = new Constant(sourcePeriod,
+        final Generator sourceGenerator = new Constant(sourcePeriod,
                 sourceLabel, label);
-        final IGenerator generator = new Constant(period, sourceLabel, null);
-        final List<IGenerator> generators = new ArrayList<>();
+        final Generator generator = new Constant(period, sourceLabel, null);
+        final List<Generator> generators = new ArrayList<>();
         generators.add(generator);
-        final IComponent instance = new Processor(label, generators, false);
+        final List<String> priority = new ArrayList<>();
+        final Component instance = new Processor(label, generators,
+                priority, false);
         final LinkedList<Event> events = new LinkedList<>();
-        final IComponent source
+        final Component source
                 = new Source(sourceLabel, sourceGenerator, false);
         sourceGenerator.setNext(instance);
         assertEquals(0, instance.getLocalEvents().size());
@@ -271,10 +277,12 @@ public class ProcessorTest
         assertTrue(period > sourcePeriod);
         final String sourceLabel = "source";
         final String label = "delay";
-        final IGenerator generator = new Constant(period, sourceLabel, null);
-        final List<IGenerator> generators = new ArrayList<>();
+        final Generator generator = new Constant(period, sourceLabel, null);
+        final List<Generator> generators = new ArrayList<>();
         generators.add(generator);
-        final IComponent instance = new Processor(label, generators, false);
+        final List<String> priority = new ArrayList<>();
+        final Component instance = new Processor(label, generators,
+                priority, false);
         assertEquals(label, instance.getLabel());
     }
 
@@ -292,18 +300,21 @@ public class ProcessorTest
         final String label = "delay";
         final String label1 = "processor";
         final int eventTotal = 4;
-        final IGenerator sourceGenerator = new Constant(sourcePeriod,
+        final Generator sourceGenerator = new Constant(sourcePeriod,
                 sourceLabel, label);
-        final IGenerator generator = new Constant(period, sourceLabel, null);
-        final List<IGenerator> generators = new ArrayList<>();
+        final Generator generator = new Constant(period, sourceLabel, null);
+        final List<Generator> generators = new ArrayList<>();
         generators.add(generator);
-        final IGenerator generator1 = new Constant(period, sourceLabel, null);
-        final List<IGenerator> generators1 = new ArrayList<>();
+        final Generator generator1 = new Constant(period, sourceLabel, null);
+        final List<Generator> generators1 = new ArrayList<>();
         generators1.add(generator1);
-        final IComponent instance = new Processor(label, generators, false);
-        final IComponent processor = new Processor(label1, generators1, false);
+        final List<String> priority = new ArrayList<>();
+        final Component instance = new Processor(label, generators,
+                priority, false);
+        final Component processor = new Processor(label1, generators1,
+                priority, false);
         final LinkedList<Event> events = new LinkedList<>();
-        final IComponent source
+        final Component source
                 = new Source(sourceLabel, sourceGenerator, false);
         generator.setNext(processor);
         sourceGenerator.setNext(instance);
@@ -347,14 +358,16 @@ public class ProcessorTest
         assertTrue(period > sourcePeriod);
         final String sourceLabel = "source";
         final String label = "delay";
-        final IGenerator sourceGenerator = new Constant(sourcePeriod,
+        final Generator sourceGenerator = new Constant(sourcePeriod,
                 sourceLabel, label);
-        final IGenerator generator = new Constant(period, sourceLabel, null);
-        final List<IGenerator> generators = new ArrayList<>();
+        final Generator generator = new Constant(period, sourceLabel, null);
+        final List<Generator> generators = new ArrayList<>();
         generators.add(generator);
-        final IComponent instance = new Processor(label, generators, false);
+        final List<String> priority = new ArrayList<>();
+        final Component instance = new Processor(label, generators,
+                priority, false);
         final LinkedList<Event> events = new LinkedList<>();
-        final IComponent source
+        final Component source
                 = new Source(sourceLabel, sourceGenerator, false);
         sourceGenerator.setNext(instance);
         assertTrue(instance.description() != null);
@@ -376,18 +389,20 @@ public class ProcessorTest
         final String label = "delay";
         final String reference = "end";
         final String reference2 = "bad end";
-        final IGenerator sourceGenerator = new Constant(sourcePeriod,
+        final Generator sourceGenerator = new Constant(sourcePeriod,
                 sourceLabel, label);
-        final IGenerator generator1 = new Constant(period, sourceLabel,
+        final Generator generator1 = new Constant(period, sourceLabel,
                 reference);
-        IGenerator generator2 = new Constant(period, Vocabulary.DEFAULT,
+        Generator generator2 = new Constant(period, Vocabulary.DEFAULT,
                 reference);
         System.out.println("  Add 2 generators with same endpoint");
-        List<IGenerator> generators = new ArrayList<>();
+        List<Generator> generators = new ArrayList<>();
         generators.add(generator1);
         generators.add(generator2);
-        IComponent instance = new Processor(label, generators, false);
-        Map<String, List<IFunction>> map = instance.getReferences();
+        final List<String> priority = new ArrayList<>();
+        Component instance = new Processor(label, generators,
+                priority, false);
+        Map<String, List<Function>> map = instance.getReferences();
         assertEquals(1, map.size());
         assertEquals(2, map.get(reference).size());
         assertEquals(generator2, map.get(reference).get(0));
@@ -398,7 +413,7 @@ public class ProcessorTest
         generators = new ArrayList<>();
         generators.add(generator1);
         generators.add(generator2);
-        instance = new Processor(label, generators, false);
+        instance = new Processor(label, generators, priority, false);
         map = instance.getReferences();
         assertEquals(2, map.size());
         assertEquals(1, map.get(reference).size());
@@ -418,8 +433,8 @@ public class ProcessorTest
         final double period = 5;
         final String source = Vocabulary.DEFAULT;
         final String reference = "database";
-        final IGenerator generator = new Constant(period, source, reference);
-        final List<IGenerator> generators = new ArrayList<>();
+        final Generator generator = new Constant(period, source, reference);
+        final List<Generator> generators = new ArrayList<>();
         generators.add(generator);
         final List<NameValue> pairs = new ArrayList<>();
         final String name  = "CPU";
@@ -429,7 +444,7 @@ public class ProcessorTest
         pairs.add(pair);
         pair = new NameValue(name, name);
         pairs.add(pair);
-        IComponent instance = Processor.instance(pairs, generators);
+        Component instance = Processor.instance(pairs, generators);
         assertEquals(name, instance.getLabel());
         assertEquals(1, instance.getReferences().size());
         assertEquals(1, instance.getReferences().get(reference).size());
@@ -448,14 +463,16 @@ public class ProcessorTest
         final String sourceLabel = "source";
         final String label = "delay";
         final int eventTotal = 4;
-        final IGenerator sourceGenerator = new Constant(sourcePeriod,
+        final Generator sourceGenerator = new Constant(sourcePeriod,
                 sourceLabel, label);
-        final IGenerator generator = new Constant(period, sourceLabel, null);
-        final List<IGenerator> generators = new ArrayList<>();
+        final Generator generator = new Constant(period, sourceLabel, null);
+        final List<Generator> generators = new ArrayList<>();
         generators.add(generator);
-        final IComponent instance = new Processor(label, generators, false);
+        final List<String> priority = new ArrayList<>();
+        final Component instance = new Processor(label, generators,
+                priority, false);
         final LinkedList<Event> events = new LinkedList<>();
-        final IComponent source
+        final Component source
                 = new Source(sourceLabel, sourceGenerator, false);
         sourceGenerator.setNext(instance);
         for (int count = 0; count < eventTotal; count++)

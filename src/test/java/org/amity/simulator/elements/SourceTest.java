@@ -28,9 +28,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.amity.simulator.generators.IGenerator;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
+import org.amity.simulator.generators.Generator;
 
 /**
  * Tests generation of incoming events is properly populated.
@@ -74,8 +74,8 @@ public class SourceTest
         final double period = 5;
         final String label = "test";
         final int eventTotal = 3;
-        final IGenerator generator = new Constant(period, "source", "next");
-        final IComponent instance = new Source(label, generator, false);
+        final Generator generator = new Constant(period, "source", "next");
+        final Component instance = new Source(label, generator, false);
         for (int count = 0; count < eventTotal; count++)
         {
             final Event event = instance.simulate(null);
@@ -99,7 +99,8 @@ public class SourceTest
         System.out.println("  check passage of injected event");
         final String source = "source";
         tick = 1000;
-        Event event = new Event(source, label, tick);
+        final Sequencer sequencer = new Sequencer();
+        Event event = new Event(source, label, tick, sequencer);
         event.setValues(tick, tick, tick);
         event = instance.simulate(event);
         assertEquals(source, event.getSource());
@@ -119,8 +120,8 @@ public class SourceTest
         final double period = 5;
         final String label = "test";
         final int eventTotal = 3;
-        final IGenerator generator = new Constant(period, "source", "next");
-        final IComponent instance = new Source(label, generator, false);
+        final Generator generator = new Constant(period, "source", "next");
+        final Component instance = new Source(label, generator, false);
         for (int count = 0; count < eventTotal; count++)
         {
             instance.simulate(null);
@@ -165,8 +166,8 @@ public class SourceTest
         final double period = 5;
         final String label = "test";
         final int eventTotal = 3;
-        final IGenerator generator = new Constant(period, "source", "next");
-        final IComponent instance = new Source(label, generator, false);
+        final Generator generator = new Constant(period, "source", "next");
+        final Component instance = new Source(label, generator, false);
         assertEquals(0, instance.getLocalEvents().size());
         for (int count = 0; count < eventTotal; count++)
         {
@@ -185,8 +186,8 @@ public class SourceTest
         System.out.println("getLabel");
         final double period = 5;
         final String label = "test";
-        final IGenerator generator = new Constant(period, "source", "next");
-        final IComponent instance = new Source(label, generator, false);
+        final Generator generator = new Constant(period, "source", "next");
+        final Component instance = new Source(label, generator, false);
         assertEquals(label, instance.getLabel());
     }
 
@@ -199,8 +200,8 @@ public class SourceTest
         System.out.println("getDepths");
         final double period = 5;
         final String label = "test";
-        final IGenerator generator = new Constant(period, "source", "next");
-        final IComponent instance = new Source(label, generator, false);
+        final Generator generator = new Constant(period, "source", "next");
+        final Component instance = new Source(label, generator, false);
         // This is invariant as a source never has any wait times
         assertTrue(instance.getDepths() != null);
         assertEquals(0, instance.getDepths().size());
@@ -215,8 +216,8 @@ public class SourceTest
         System.out.println("description");
         final double period = 5;
         final String label = "test";
-        final IGenerator generator = new Constant(period, "source", "next");
-        final IComponent instance = new Source(label, generator, false);
+        final Generator generator = new Constant(period, "source", "next");
+        final Component instance = new Source(label, generator, false);
         assertTrue(instance.description() != null);
         assertTrue(instance.description().endsWith("]"));
         assertTrue(instance.description().startsWith("["));
@@ -234,13 +235,13 @@ public class SourceTest
         final String label = "test";
         final String reference = "next";
         System.out.println("  Check normal source definition");
-        final IGenerator generator = new Constant(period, "source", reference);
-        final IComponent instance = new Source(label, generator, false);
+        final Generator generator = new Constant(period, "source", reference);
+        final Component instance = new Source(label, generator, false);
         assertTrue(instance.getReferences() != null);
         assertEquals(1, instance.getReferences().size());
         assertEquals(generator, instance.getReferences().get(reference).get(0));
         System.out.println("  Check incorrect source definition");
-        final IComponent source = new Source(label, null, false);
+        final Component source = new Source(label, null, false);
         assertEquals(0, source.getReferences().size());
     }
 
@@ -254,8 +255,8 @@ public class SourceTest
         final double period = 5;
         final String source = Vocabulary.DEFAULT;
         final String reference = "database";
-        final IGenerator generator = new Constant(period, source, reference);
-        final List<IGenerator> generators = new ArrayList<>();
+        final Generator generator = new Constant(period, source, reference);
+        final List<Generator> generators = new ArrayList<>();
         generators.add(generator);
         final List<NameValue> pairs = new ArrayList<>();
         final String name = "source";
@@ -265,7 +266,7 @@ public class SourceTest
         pairs.add(pair);
         pair = new NameValue(source, source);
         pairs.add(pair);
-        IComponent instance = Source.instance(pairs, generators);
+        Component instance = Source.instance(pairs, generators);
         assertEquals(name, instance.getLabel());
         assertEquals(1, instance.getReferences().size());
         assertEquals(1, instance.getReferences().get(reference).size());
@@ -281,8 +282,8 @@ public class SourceTest
         final double period = 5;
         final String label = "test";
         final int eventTotal = 3;
-        final IGenerator generator = new Constant(period, "source", "next");
-        final IComponent instance = new Source(label, generator, false);
+        final Generator generator = new Constant(period, "source", "next");
+        final Component instance = new Source(label, generator, false);
         for (int count = 0; count < eventTotal; count++)
         {
             final Event event = instance.simulate(null);

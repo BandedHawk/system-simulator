@@ -24,21 +24,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
-import org.amity.simulator.distributors.IDistributor;
 import org.amity.simulator.distributors.Random;
 import org.amity.simulator.distributors.RoundRobin;
 import org.amity.simulator.distributors.Smart;
 import org.amity.simulator.elements.Balancer;
-import org.amity.simulator.elements.IComponent;
-import org.amity.simulator.elements.IFunction;
 import org.amity.simulator.elements.Model;
 import org.amity.simulator.elements.Processor;
 import org.amity.simulator.elements.Source;
 import org.amity.simulator.generators.Constant;
 import org.amity.simulator.generators.Gaussian;
-import org.amity.simulator.generators.IGenerator;
 import org.amity.simulator.generators.Skewed;
 import org.amity.simulator.generators.Uniform;
+import org.amity.simulator.distributors.Distributor;
+import org.amity.simulator.elements.Component;
+import org.amity.simulator.elements.Function;
+import org.amity.simulator.generators.Generator;
 
 /**
  * Converts Tokens into an executable model
@@ -73,27 +73,27 @@ class Compiler
         // Resolve downstream references
         if (local.ok())
         {
-            final Map<String, IComponent> components =
+            final Map<String, Component> components =
                     this.scratch[1].components;
             // Create list of references and associated functions that need
             // target components
-            final Map<String, List<IFunction>> references = new HashMap<>();
+            final Map<String, List<Function>> references = new HashMap<>();
             // Determine references to resolve by component
-            for (final IComponent component: components.values())
+            for (final Component component: components.values())
             {
                 // Get list of functions and the references in the component
-                final Map<String, List<IFunction>> functions
+                final Map<String, List<Function>> functions
                         = component.getReferences();
                 // Get references in the component
-                for (final Map.Entry<String, List<IFunction>> entry
+                for (final Map.Entry<String, List<Function>> entry
                         : functions.entrySet())
                 {
                     final String reference = entry.getKey();
-                    final List<IFunction> functionList = entry.getValue();
+                    final List<Function> functionList = entry.getValue();
                     // Add list of functions per reference into global list
                     if (reference != null)
                     {
-                        final List<IFunction> list =
+                        final List<Function> list =
                                 references.containsKey(reference)
                                 ? references.get(reference) :
                                 new ArrayList<>();
@@ -103,13 +103,13 @@ class Compiler
                 }
             }
             // Look for reference component
-            for (final Map.Entry<String, List<IFunction>> entry
+            for (final Map.Entry<String, List<Function>> entry
                     : references.entrySet())
             {
                 final String reference = entry.getKey();
                 if (components.containsKey(reference))
                 {
-                    final IComponent component =
+                    final Component component =
                             components.get(reference);
                     // Make sure we don't connect to a source component
                     if (component instanceof Source)
@@ -122,18 +122,18 @@ class Compiler
                     // Resolve references
                     else
                     {
-                        for (final IFunction referee : entry.getValue())
+                        for (final Function referee : entry.getValue())
                         {
-                            if (referee instanceof IGenerator)
+                            if (referee instanceof Generator)
                             {
-                                final IGenerator generator
-                                        = (IGenerator)referee;
+                                final Generator generator
+                                        = (Generator)referee;
                                 generator.setNext(component);
                             }
-                            else if (referee instanceof IDistributor)
+                            else if (referee instanceof Distributor)
                             {
-                                final IDistributor distributor
-                                        = (IDistributor)referee;
+                                final Distributor distributor
+                                        = (Distributor)referee;
                                 distributor.addNext(component);
                             }
                             else
@@ -406,10 +406,10 @@ class Compiler
             final List<NameValue> pairs, final ScratchPad local)
     {
         // Get functions for the component being compiled
-        List<IGenerator> generators = local.depth == 1
+        List<Generator> generators = local.depth == 1
                 ? this.scratch[local.depth + 1].generators
                 : null;
-        List<IDistributor> distributors = local.depth == 1
+        List<Distributor> distributors = local.depth == 1
                 ? this.scratch[local.depth + 1].distributors
                 : new ArrayList<>();
         switch (type)
@@ -418,7 +418,7 @@ class Compiler
                 if (generators.size() == 1
                         && distributors.isEmpty())
                 {
-                    final IComponent source
+                    final Component source
                             = Source.instance(pairs, generators);
                     if (local.components.containsKey(source.getLabel()))
                     {
@@ -460,7 +460,7 @@ class Compiler
             case Vocabulary.PROCESSOR:
                 if (distributors.isEmpty())
                 {
-                    final IComponent processor
+                    final Component processor
                             = Processor.instance(pairs, generators);
                     if (local.components.containsKey(processor.getLabel()))
                     {
@@ -486,22 +486,22 @@ class Compiler
                 }
                 break;
             case Vocabulary.UNIFORM:
-                final IGenerator uniform
+                final Generator uniform
                         = Uniform.instance(pairs);
                 local.generators.add(uniform);
                 break;
             case Vocabulary.GAUSSIAN:
-                final IGenerator gaussian
+                final Generator gaussian
                         = Gaussian.instance(pairs);
                 local.generators.add(gaussian);
                 break;
             case Vocabulary.CONSTANT:
-                final IGenerator constant
+                final Generator constant
                         = Constant.instance(pairs);
                 local.generators.add(constant);
                 break;
             case Vocabulary.SKEWED:
-                final IGenerator skewed
+                final Generator skewed
                         = Skewed.instance(pairs);
                 local.generators.add(skewed);
                 break;
@@ -509,7 +509,7 @@ class Compiler
                 if (distributors.size() == 1
                         && generators.isEmpty())
                 {
-                    final IComponent balancer
+                    final Component balancer
                             = Balancer.instance(pairs, distributors);
                     if (local.components.containsKey(balancer.getLabel()))
                     {
@@ -551,7 +551,7 @@ class Compiler
             case Vocabulary.ROUNDROBIN:
                 if (distributors.isEmpty())
                 {
-                    final IDistributor roundRobin
+                    final Distributor roundRobin
                             = RoundRobin.instance(pairs);
                     local.distributors.add(roundRobin);
                 }
@@ -566,7 +566,7 @@ class Compiler
             case Vocabulary.SMART:
                 if (distributors.isEmpty())
                 {
-                    final IDistributor smart
+                    final Distributor smart
                             = Smart.instance(pairs);
                     local.distributors.add(smart);
                 }
@@ -581,7 +581,7 @@ class Compiler
             case Vocabulary.RANDOM:
                 if (distributors.isEmpty())
                 {
-                    final IDistributor random
+                    final Distributor random
                             = Random.instance(pairs);
                     local.distributors.add(random);
                 }

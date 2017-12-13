@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.amity.simulator.elements.DummyComponent;
 import org.amity.simulator.elements.Event;
-import org.amity.simulator.elements.IComponent;
+import org.amity.simulator.elements.Sequencer;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
 import org.junit.After;
@@ -32,6 +32,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.amity.simulator.elements.Component;
 
 /**
  * Tests that implementation meets round robin operation.
@@ -80,14 +81,15 @@ public class RoundRobinTest
         references.add(label1);
         references.add(label2);
         references.add(label3);
-        final IComponent component1 = new DummyComponent(label1, 2.0);
-        final IComponent component2 = new DummyComponent(label2, 1.0);
-        final IComponent component3 = new DummyComponent(label3, 0.5);
-        IDistributor distributor = new RoundRobin(references);
+        final Component component1 = new DummyComponent(label1, 2.0);
+        final Component component2 = new DummyComponent(label2, 1.0);
+        final Component component3 = new DummyComponent(label3, 0.5);
+        final Sequencer sequencer = new Sequencer();
+        Distributor distributor = new RoundRobin(references);
         distributor.addNext(component3);
         distributor.addNext(component2);
         distributor.addNext(component1);
-        Event event = new Event(sourceLabel, sourceLabel, 1.0);
+        Event event = new Event(sourceLabel, sourceLabel, 1.0, sequencer);
         event = distributor.assign(event);
         assertEquals(event.getComponent(), component1);
         event = distributor.assign(event);
@@ -112,11 +114,11 @@ public class RoundRobinTest
         references.add(label1);
         references.add(label2);
         references.add(label3);
-        final IComponent component1 = new DummyComponent(label1, 2.0);
-        final IComponent component2 = new DummyComponent(label2, 1.0);
-        final IComponent component3 = new DummyComponent(label3, 0.5);
+        final Component component1 = new DummyComponent(label1, 2.0);
+        final Component component2 = new DummyComponent(label2, 1.0);
+        final Component component3 = new DummyComponent(label3, 0.5);
         System.out.println("  check for normal operation");
-        IDistributor distributor = new RoundRobin(references);
+        Distributor distributor = new RoundRobin(references);
         distributor.addNext(component3);
         distributor.addNext(component2);
         distributor.addNext(component1);
@@ -130,7 +132,7 @@ public class RoundRobinTest
         assertEquals(component3, distributor.connections()[2]);
         System.out.println("  check when no references");
         references.clear();
-        final IDistributor broken = new RoundRobin(references);
+        final Distributor broken = new RoundRobin(references);
         broken.addNext(component1);
         assertEquals(0, broken.connections().length);
     }
@@ -145,7 +147,7 @@ public class RoundRobinTest
         final List<String> references = new ArrayList<>(); 
         final String reference = "database";
         references.add(reference);
-        final IDistributor instance = new RoundRobin(references);
+        final Distributor instance = new RoundRobin(references);
         assertTrue(instance.characteristics() != null);
         assertTrue(instance.characteristics().contains("RoundRobin"));
     }
@@ -165,14 +167,15 @@ public class RoundRobinTest
         references.add(label1);
         references.add(label2);
         references.add(label3);
-        final IDistributor distributor = new RoundRobin(references);
-        final IComponent component1 = new DummyComponent(label1, 2.0);
-        final IComponent component2 = new DummyComponent(label2, 1.0);
-        final IComponent component3 = new DummyComponent(label3, 1.5);
+        final Distributor distributor = new RoundRobin(references);
+        final Component component1 = new DummyComponent(label1, 2.0);
+        final Component component2 = new DummyComponent(label2, 1.0);
+        final Component component3 = new DummyComponent(label3, 1.5);
+        final Sequencer sequencer = new Sequencer();
         distributor.addNext(component3);
         distributor.addNext(component2);
         distributor.addNext(component1);
-        Event event = new Event(sourceLabel, sourceLabel, 1.0);
+        Event event = new Event(sourceLabel, sourceLabel, 1.0, sequencer);
         event = distributor.assign(event);
         assertEquals(event.getComponent(), component1);
         event = distributor.assign(event);
@@ -194,7 +197,7 @@ public class RoundRobinTest
         final List<String> references = new ArrayList<>();
         references.add(reference1);
         references.add(reference2);
-        final IDistributor instance = new RoundRobin(references);
+        final Distributor instance = new RoundRobin(references);
         assertEquals(references.size(), instance.getReferences().size());
         assertTrue(instance.getReferences().contains(reference1));
         assertTrue(instance.getReferences().contains(reference2));
@@ -219,7 +222,7 @@ public class RoundRobinTest
         final NameValue pair = new NameValue(Vocabulary.FUNCTION,
                 Vocabulary.FUNCTION);
         pairs.add(pair);
-        IDistributor instance = RoundRobin.instance(pairs);
+        Distributor instance = RoundRobin.instance(pairs);
         assertEquals(pairs.size() - 1, instance.getReferences().size());
         assertTrue(instance.getReferences().contains(reference1));
         assertTrue(instance.getReferences().contains(reference2));
@@ -241,19 +244,19 @@ public class RoundRobinTest
         final List<String> references = new ArrayList<>();
         references.add(label1);
         references.add(label2);
-        final IDistributor distributor = new RoundRobin(references);
-        final IComponent component1 = new DummyComponent(label1, 1.0);
-        final IComponent component2 = new DummyComponent(label2, 2.0);
+        final Distributor distributor = new RoundRobin(references);
+        final Component component1 = new DummyComponent(label1, 1.0);
+        final Component component2 = new DummyComponent(label2, 2.0);
         distributor.addNext(component2);
         distributor.addNext(component1);
         System.out.println("  check normal operation");
-        final IComponent[] connections = distributor.connections();
+        final Component[] connections = distributor.connections();
         assertEquals(component1.getLabel(), connections[0].getLabel());
         assertEquals(component2.getLabel(), connections[1].getLabel());
         assertEquals(component1, connections[0]);
         assertEquals(component2, connections[1]);
         System.out.println("  check when no downstream components");
-        final IDistributor round = new RoundRobin(null);
+        final Distributor round = new RoundRobin(null);
         assertEquals(0, round.connections().length);
     }
     

@@ -23,11 +23,12 @@ package org.amity.simulator.distributors;
 import java.util.ArrayList;
 import java.util.List;
 import org.amity.simulator.elements.Event;
-import org.amity.simulator.elements.IComponent;
+import org.amity.simulator.elements.Sequencer;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
+import org.amity.simulator.elements.Component;
 
 /**
  * Distribution function that is a uniform random selection - useful for
@@ -35,11 +36,11 @@ import org.apache.commons.math3.random.RandomGenerator;
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public class Random implements IDistributor
+public class Random implements Distributor
 {
     private final List<String> references;
     private final int modulus;
-    private final IComponent[] next;
+    private final Component[] next;
     private final RandomGenerator generator;
     private int peek;
 
@@ -50,9 +51,9 @@ public class Random implements IDistributor
     {
         this.references = null;
         this.modulus = 0;
-        this.next = new IComponent[0];
+        this.next = new Component[0];
         this.generator = null;
-        this.peek = IDistributor.UNKNOWN;
+        this.peek = Distributor.UNKNOWN;
     }
 
     /**
@@ -64,9 +65,9 @@ public class Random implements IDistributor
     {
         this.references = references;
         this.modulus = references != null ? references.size() : 0;
-        this.next = new IComponent[this.modulus];
+        this.next = new Component[this.modulus];
         this.generator = new JDKRandomGenerator();
-        this.peek = IDistributor.UNKNOWN;
+        this.peek = Distributor.UNKNOWN;
     }
 
     @Override
@@ -76,11 +77,11 @@ public class Random implements IDistributor
         {
             // If we were asked for availability - we already generated
             // next target so we must honor that
-            final int selection = this.peek == IDistributor.UNKNOWN
+            final int selection = this.peek == Distributor.UNKNOWN
                     ? generator.nextInt(this.modulus)
                     : this.peek;
             // Reset peek value
-            this.peek = IDistributor.UNKNOWN;
+            this.peek = Distributor.UNKNOWN;
             event.setComponent(this.next[selection]);
         }
         return event;
@@ -89,7 +90,7 @@ public class Random implements IDistributor
     @Override
     public void reset()
     {
-        this.peek = IDistributor.UNKNOWN;
+        this.peek = Distributor.UNKNOWN;
     }
 
     @Override
@@ -99,7 +100,7 @@ public class Random implements IDistributor
     }
 
     @Override
-    public void addNext(IComponent component)
+    public void addNext(Component component)
     {
         if (component != null && this.modulus != 0)
         {
@@ -116,7 +117,7 @@ public class Random implements IDistributor
     }
 
     @Override
-    public IComponent[] connections()
+    public Component[] connections()
     {
         return this.next;
     }
@@ -126,7 +127,7 @@ public class Random implements IDistributor
     {
         // Lookahead at what next random selection is going to be
         // to get availability of that selection
-        if (this.peek == IDistributor.UNKNOWN)
+        if (this.peek == Distributor.UNKNOWN)
         {
             this.peek  = generator.nextInt(this.modulus);
         }
@@ -160,9 +161,9 @@ public class Random implements IDistributor
      * @param pairs list of name-values to convert into variables
      * @return manufactured balancer algorithm object
      */
-    public final static IDistributor instance(final List<NameValue> pairs)
+    public final static Distributor instance(final List<NameValue> pairs)
     {
-        List<String> references = new ArrayList<>();
+        final List<String> references = new ArrayList<>();
         for (final NameValue parameter : pairs)
         {
             switch (parameter.name)
@@ -173,7 +174,17 @@ public class Random implements IDistributor
                     break;
             }
         }
-        final IDistributor distributor = new Random(references);
+        final Distributor distributor = new Random(references);
         return distributor;
+    }
+
+    @Override
+    public void prioritize(Sequencer sequencer)
+    {
+        if (this.peek == Distributor.UNKNOWN)
+        {
+            this.peek  = generator.nextInt(this.modulus);
+        }
+        this.next[this.peek].prioritize(sequencer);
     }
 }

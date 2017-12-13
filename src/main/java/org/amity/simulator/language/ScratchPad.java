@@ -24,9 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.amity.simulator.distributors.IDistributor;
-import org.amity.simulator.elements.IComponent;
-import org.amity.simulator.generators.IGenerator;
+import org.amity.simulator.distributors.Distributor;
+import org.amity.simulator.elements.Component;
+import org.amity.simulator.generators.Generator;
 
 /**
  * Scratch area for compilation tracking
@@ -41,10 +41,10 @@ class ScratchPad
     public Token labelToken;
     private boolean ok;
     private final Map<String, List<Pair>> pairs;
-    public final Map<String, IComponent> sources;
-    public final Map<String, IComponent> components;
-    public final List<IGenerator> generators;
-    public final List<IDistributor> distributors;
+    public final Map<String, Component> sources;
+    public final Map<String, Component> components;
+    public final List<Generator> generators;
+    public final List<Distributor> distributors;
     private final List<String> errors;
 
     /**
