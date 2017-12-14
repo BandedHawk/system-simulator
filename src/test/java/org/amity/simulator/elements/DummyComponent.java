@@ -19,8 +19,10 @@
  */
 package org.amity.simulator.elements;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -98,9 +100,14 @@ public class DummyComponent implements Component
     }
 
     @Override
-    public void prioritize(Sequencer sequencer)
+    public void prioritize(final Sequencer sequencer)
     {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        final String[] sources = new String[]{"source 1", "source 2"};
+        sequencer.sources = sources;
+        sequencer.paths.add(this);
+        final Set<String> priorities = new HashSet<>();
+        priorities.add("source 1");
+        priorities.add("source 2");
+        sequencer.priorities = priorities;
     }
-    
 }

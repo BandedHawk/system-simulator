@@ -244,7 +244,7 @@ public class Model
                     // for this event so we need to do it first
                     this.working.add(0, priority);
                     // Don't re-check priority next iteration as we're
-                    // exzecuting on this set priority
+                    // executing on this event
                     locked = true;
                 }
                 // New completion time for current event so re-sort execution

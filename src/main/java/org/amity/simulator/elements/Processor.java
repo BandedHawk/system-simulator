@@ -21,8 +21,10 @@ package org.amity.simulator.elements;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
 import org.amity.simulator.generators.Generator;
@@ -38,7 +40,8 @@ public class Processor implements Component
     private final String label;
     private final Map<String, Generator> generators;
     private final Map<String, List<Function>> references;
-    private final String[] priorities;
+    private final String[] sources;
+    private final Set<String> priorities;
     private final List<Event> local;
     private final boolean monitor;
     private double available;
@@ -58,7 +61,8 @@ public class Processor implements Component
         this.available = 0;
         this.depths = new ArrayList<>();
         this.depth = 0;
-        this.priorities = new String[0];
+        this.sources = new String[0];
+        this.priorities = new HashSet<>();
     }
 
     /**
@@ -102,15 +106,22 @@ public class Processor implements Component
                 references.putIfAbsent(reference, list);
             }
         }
-        this.priorities = priorities == null ? new String[0]
+        this.sources = priorities == null ? new String[0]
                 : new String[priorities.size()];
-        if (this.priorities.length > 0)
+        if (this.sources.length > 0)
         {
             int index = 0;
+            // Priority order array
             for (final String source : priorities)
             {
-                this.priorities[index++] = source;
+                this.sources[index++] = source;
             }
+            // Convenience to avoid downstream conversion
+            this.priorities = new HashSet<>(priorities);
+        }
+        else
+        {
+            this.priorities = new HashSet<>();
         }
     }
 
@@ -254,7 +265,8 @@ public class Processor implements Component
     @Override
     public void prioritize(final Sequencer sequencer)
     {
-        sequencer.sources = this.priorities;
+        sequencer.sources = this.sources;
+        sequencer.priorities = this.priorities;
         sequencer.paths.add(this);
     }
 
