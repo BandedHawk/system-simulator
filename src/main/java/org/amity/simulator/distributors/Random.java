@@ -179,12 +179,12 @@ public class Random implements Distributor
     }
 
     @Override
-    public void prioritize(Sequencer sequencer)
+    public void prioritize(final Sequencer sequencer, final boolean explore)
     {
         if (this.peek == Distributor.UNKNOWN)
         {
             this.peek  = generator.nextInt(this.modulus);
         }
-        this.next[this.peek].prioritize(sequencer);
+        this.next[this.peek].prioritize(sequencer, explore);
     }
 }

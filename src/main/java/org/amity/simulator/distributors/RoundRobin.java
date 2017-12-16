@@ -162,8 +162,8 @@ public class RoundRobin implements Distributor
     }
 
     @Override
-    public void prioritize(final Sequencer sequencer)
+    public void prioritize(final Sequencer sequencer, final boolean explore)
     {
-        this.next[this.current].prioritize(sequencer);
+        this.next[this.current].prioritize(sequencer, explore);
     }
 }

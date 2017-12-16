@@ -100,14 +100,21 @@ public class DummyComponent implements Component
     }
 
     @Override
-    public void prioritize(final Sequencer sequencer)
+    public void prioritize(final Sequencer sequencer, final boolean explore)
     {
         final String[] sources = new String[]{"source 1", "source 2"};
-        sequencer.sources = sources;
-        sequencer.paths.add(this);
         final Set<String> priorities = new HashSet<>();
-        priorities.add("source 1");
-        priorities.add("source 2");
-        sequencer.priorities = priorities;
+        if (explore)
+        {
+            sequencer.participants.add(this);
+        }
+        else
+        {
+            priorities.add("source 1");
+            priorities.add("source 2");
+            sequencer.sources = sources;
+            sequencer.priorities = priorities;
+            sequencer.paths.add(this);
+        }
     }
 }

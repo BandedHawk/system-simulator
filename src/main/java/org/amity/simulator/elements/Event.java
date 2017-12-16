@@ -276,12 +276,18 @@ public class Event
     {
         if (this.component != null)
         {
-            final String name = this.component.getLabel();
-            this.component.simulate(this);
+            final Component current = this.component;
+            // Modifies self so component after may not be the same
+            current.simulate(this);
+            // Clear all predicted availability paths if active component
+            if (current instanceof Processor)
+            {
+                sequencer.clear();
+            }
             // Define the component executed to reach end of life
             if (this.component == null)
             {
-                this.last = name;
+                this.last = current.getLabel();
                 this.lifetime = this.completed - this.created;
             }
         }

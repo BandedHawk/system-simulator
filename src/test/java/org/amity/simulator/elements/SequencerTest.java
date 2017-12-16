@@ -61,7 +61,7 @@ public class SequencerTest
     {
         final List<Event> buffer = new ArrayList<>();
         final Sequencer sequencer = new Sequencer();
-        Component component = new DummyComponent("processor", 1.7);
+        final Component component = new DummyComponent("processor", 1.7);
         final Event current = new Event("test", "123", 1.0, sequencer);
         final Event priority1 = new Event("source 1", "234", 1.5, sequencer);
         final Event priority2 = new Event("source 2", "345", 1.5, sequencer);
@@ -100,14 +100,36 @@ public class SequencerTest
         source1.setComponent(component);
         source1.setValues(1.4, 1.5, 1.6);
         event = sequencer.prioritize(source1, buffer);
-        System.out.println("  Test when cuirrent event is highest priority");
+        System.out.println("  Test when current event is highest priority");
         assertTrue(event == source1);
         final Event source2 = new Event("source 2", "567", 1.1, sequencer);
         source2.setComponent(component);
         source2.setValues(1.4, 1.5, 1.6);
         event = sequencer.prioritize(source2, buffer);
-        System.out.println("  Test when cuirrent event is lower priority");
+        System.out.println("  Test when current event is lower priority");
         assertTrue(event == priority1);
         assertTrue(buffer.get(0) == source2);
+        final Component differentX = new DummyComponent("processor", 1.7);
+        final Component differentY = new DummyComponent("processor", 1.75);
+        final Event priorityX = new Event("source 1", "678", 1.5, sequencer);
+        priorityX.setComponent(differentX);
+        priorityX.setValues(1.2, 1.3, 1.4);
+        final Event priorityY = new Event("source 1", "789", 1.3, sequencer);
+        priorityY.setComponent(differentY);
+        priorityY.setValues(1.23, 1.33, 1.45);
+        buffer.clear();
+        buffer.add(priority1);
+        buffer.add(priority2);
+        buffer.add(priorityX);
+        buffer.add(priorityY);
+        buffer.sort(Comparator.comparingDouble(Event::getCompleted));
+        assertTrue(buffer.get(0) == priorityX);
+        System.out.println("  Test when event is high priority but unconnected component");
+        event = sequencer.prioritize(current, buffer);
+        assertFalse(sequencer.exclusions.isEmpty());
+        assertTrue(sequencer.exclusions.contains(differentX));
+        assertTrue(sequencer.exclusions.contains(differentY));
+        assertTrue(event != priorityX);
+        assertTrue(event != priorityY);
     }
 }

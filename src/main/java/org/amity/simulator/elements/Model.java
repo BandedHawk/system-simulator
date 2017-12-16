@@ -38,7 +38,7 @@ public class Model
 
     private final List<String> errors;
     private boolean compiled;
-    final List<Component> sources;
+    final List<Source> sources;
     final Map<String, Component> components;
 
     /**
@@ -70,7 +70,7 @@ public class Model
      * @param sources convenience list of event sources
      * @param components objects that represent the connected system
      */
-    public void addComponents(final Collection<Component> sources,
+    public void addComponents(final Collection<Source> sources,
             final Map<String, Component> components)
     {
         if (this.compiled)
@@ -170,7 +170,7 @@ public class Model
          * @param sources event generation components
          * @param generate end-point in ticks for the simulation completion
          */
-        private Simulator(final List<Component> sources, final double generate)
+        private Simulator(final List<Source> sources, final double generate)
         {
             this.capacity = Simulator.FILL;
             this.primary = new ArrayList<>();
@@ -178,8 +178,11 @@ public class Model
             this.completed = new ArrayList<>();
             this.highmark = 0;
             this.overrun = false;
-            for (final Component source : sources)
+            // Use only one sequencer for all events
+            final Sequencer sequencer = new Sequencer();
+            for (final Source source : sources)
             {
+                source.setSequencer(sequencer);
                 do
                 {
                     final Event event = source.simulate(null);

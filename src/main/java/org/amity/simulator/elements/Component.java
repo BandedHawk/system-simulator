@@ -21,7 +21,6 @@ package org.amity.simulator.elements;
 
 import java.util.List;
 import java.util.Map;
-import org.amity.simulator.generators.Generator;
 
 /**
  * Interface of a system component in the simulation
@@ -96,6 +95,7 @@ public interface Component
      * Find priority parameters for an active component
      * 
      * @param sequencer information to locate a priority event
+     * @param explore discovery mode if <code>true</code>
      */
-    void prioritize(Sequencer sequencer);
+    void prioritize(Sequencer sequencer, boolean explore);
 }

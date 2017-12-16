@@ -77,6 +77,7 @@ public interface Distributor extends Function
      * Find priority definitions for treatment of sources
      * 
      * @param sequencer algorithm and data to prioritize processing
+     * @param explore discovery mode if <code>true</code>
      */
-    void prioritize(Sequencer sequencer);
+    void prioritize(Sequencer sequencer, boolean explore);
 }

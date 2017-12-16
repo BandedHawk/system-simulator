@@ -432,7 +432,7 @@ class Compiler
                     else
                     {
                         local.components.put(source.getLabel(), source);
-                        local.sources.put(source.getLabel(), source);
+                        local.sources.put(source.getLabel(), (Source)source);
                     }
                 }
                 else if (generators.size() < 1)

@@ -19,6 +19,7 @@
  */
 package org.amity.simulator.elements;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,7 +27,7 @@ import org.amity.simulator.distributors.Distributor;
 
 /**
  * Algorithm to re-prioritize event processing sequence where events are waiting
- * in a queue
+ * in a queue - this is designed to be a global instance for all events
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
@@ -35,6 +36,9 @@ public class Sequencer
 
     double available;
     final Set<Component> paths;
+    final Set<Component> exclusions;
+    final Set<Component> participants;
+    final Set<Distributor> intelligentFunctions;
     String[] sources;
     Set<String> priorities;
 
@@ -44,24 +48,27 @@ public class Sequencer
     public Sequencer()
     {
         this.paths = new HashSet<>();
+        this.exclusions = new HashSet<>();
+        this.participants = new HashSet<>();
+        this.intelligentFunctions = new HashSet<>();
         this.available = Distributor.UNKNOWN;
         this.sources = new String[0];
     }
 
     /**
-     * Trace next active component for the event that called this, and locate
-     * priority event that would replace this order of execution.
+     * Trace next active component for the selected that called this, and locate
+     * priority selected that would replace this order of execution.
      *
-     * @param event first event on the schedule
-     * @param buffer working buffer for event schedules
-     * @return event to be processed after re-prioritization
+     * @param selected first selected on the schedule
+     * @param buffer working buffer for selected schedules
+     * @return selected to be processed after re-prioritization
      */
-    Event prioritize(final Event event, final List<Event> buffer)
+    Event prioritize(final Event selected, final List<Event> buffer)
     {
-        assert event != null : "Only called within event itself";
+        assert selected != null : "Only called within event itself";
         assert this.sources != null : "Should always be defined";
         boolean found = false;
-        Event selected = null;
+        Event prioritized = null;
         // priority of self
         int priority = Integer.MAX_VALUE;
         // Only do this if we have working buffer
@@ -70,14 +77,16 @@ public class Sequencer
             // Make sure system is ready for new run
             final int size = buffer.size();
             this.paths.clear();
+            this.exclusions.clear();
+            this.intelligentFunctions.clear();
             // Lock in availability path
-            this.available = event.getComponent().getAvailable();
+            this.available = selected.getComponent().getAvailable();
             // find path and priority sources
-            event.getComponent().prioritize(this);
+            selected.getComponent().prioritize(this, false);
             // Only if we have a priority list
             if (this.sources.length != 0)
             {
-                // Stores position where prioritized event is in list
+                // Stores position where prioritized selected is in list
                 final int[] position = new int[this.sources.length];
                 // initialize position storage
                 for (int i = 0; i < this.sources.length; i++)
@@ -95,23 +104,23 @@ public class Sequencer
                     {
                         break;
                     }
-                    // Check whether event is prioritized by active component
+                    // Check whether current is prioritized by active component
                     // and not same source we have
-                    if (!event.getSource().equals(current.getSource())
+                    if (!selected.getSource().equals(current.getSource())
                             && this.priorities.contains(current.getSource())
-                            && this.paths.contains(current.getComponent()))
+                            && this.inPath(current))
                     {
                         for (int i = 0; i < this.sources.length; i++)
                         {
                             // Don't care as priority is equivalent or lower
-                            // than that of current event
+                            // than that of current selected
                             if (i == priority)
                             {
                                 break;
                             }
-                            // Otherwise define priority of current selection
-                            if (priority == Integer.MAX_VALUE &&
-                                    this.sources[i].equals(event.getSource()))
+                            // Otherwise define priority of selection
+                            if (priority == Integer.MAX_VALUE
+                                    && this.sources[i].equals(selected.getSource()))
                             {
                                 priority = i;
                                 // Nothing can override this
@@ -134,9 +143,9 @@ public class Sequencer
                         }
                     }
                     // If we have filled priority 1 slot we can stop or
-                    // current event is highest priority
-                    if (priority == 0 ||
-                            (found && position[0] != Distributor.UNKNOWN))
+                    // selected is highest priority
+                    if (priority == 0
+                            || (found && position[0] != Distributor.UNKNOWN))
                     {
                         break;
                     }
@@ -149,17 +158,74 @@ public class Sequencer
                         final int index = position[i];
                         if (index != Distributor.UNKNOWN)
                         {
-                            // Remove prioritized event
-                            selected = buffer.remove(index);
+                            // Remove prioritized selected
+                            prioritized = buffer.remove(index);
                             // Add current one back to head of list to execute
                             // first next time
-                            buffer.add(0, event);
+                            buffer.add(0, selected);
                             break;
                         }
                     }
                 }
             }
         }
-        return found ? selected : event;
+        return found ? prioritized : selected;
+    }
+
+    /**
+     * Determines if current event being tested traverses the path to the
+     * next active component or otherwise ads the information for additional
+     * checks
+     *
+     * @param current event checked for pathway match
+     * @return 
+     */
+    private boolean inPath(final Event current)
+    {
+        boolean connects = this.paths.contains(current.getComponent());
+        // Not in current known path to active delay component
+        if (!connects)
+        {
+            final boolean excluded =
+                    this.exclusions.contains(current.getComponent());
+            // Not in known set of excluded components
+            if (!excluded)
+            {
+                // if not in direct registered path, check for deeper connection
+                this.participants.clear();
+                final double tick = current.getComponent().getAvailable();
+                current.getComponent().prioritize(this, true);
+                if (!this.participants.isEmpty())
+                {
+                    connects = !Collections.disjoint(this.paths,
+                            this.participants);
+                    // Add to known connections
+                    if (connects)
+                    {
+                        this.paths.addAll(this.participants);
+                    }
+                    // Add to exclusions
+                    else
+                    {
+                        this.exclusions.addAll(this.participants);
+                    }
+                }
+            }
+        }
+        return connects;
+    }
+
+    /**
+     * Clears predicted paths for availability for intelligent distributors
+     */
+    void clear()
+    {
+        if (this.intelligentFunctions.size() > 0)
+        {
+            for (final Distributor distributor : this.intelligentFunctions)
+            {
+                distributor.reset();
+            }
+        }
     }
 }

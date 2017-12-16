@@ -171,9 +171,9 @@ public class Smart implements Distributor
     }
 
     @Override
-    public void prioritize(Sequencer sequencer)
+    public void prioritize(final Sequencer sequencer, final boolean explore)
     {
-        this.next[this.peek].prioritize(sequencer);
+        this.next[this.peek].prioritize(sequencer, explore);
     }
 
     /**

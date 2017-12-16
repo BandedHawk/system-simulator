@@ -39,7 +39,7 @@ public class Source implements Component
     private final String label;
     private final Generator generator;
     private final Map<String, List<Function>> generators;
-    private final Sequencer sequencer;
+    private Sequencer sequencer;
     private final List<Event> local;
     private final boolean monitor;
     private int counter;
@@ -74,7 +74,7 @@ public class Source implements Component
         this.label = label;
         this.generator = generator;
         this.generators = new HashMap<>();
-        this.sequencer = new Sequencer();
+        this.sequencer = null;
         if (this.generator != null)
         {
             final List<Function> list = new ArrayList<>();
@@ -180,10 +180,17 @@ public class Source implements Component
     }
 
     @Override
-    public void prioritize(Sequencer sequencer)
+    public void prioritize(final Sequencer sequencer, final boolean explore)
     {
-        sequencer.sources = new String[0];
-        sequencer.paths.add(this);
+        if (explore)
+        {
+            sequencer.participants.add(this);
+        }
+        else
+        {
+            sequencer.sources = new String[0];
+            sequencer.paths.add(this);
+        }
     }
 
     /**
@@ -216,5 +223,14 @@ public class Source implements Component
         final Component source = new Source(label, generators.get(0),
                 monitor);
         return source;
+    }
+
+    /**
+     * 
+     * @param sequencer re-prioritization implementation for event to use
+     */
+    public void setSequencer(final Sequencer sequencer)
+    {
+        this.sequencer = sequencer;
     }
 }

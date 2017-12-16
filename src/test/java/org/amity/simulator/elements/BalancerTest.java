@@ -34,6 +34,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.amity.simulator.distributors.Distributor;
+import org.amity.simulator.distributors.Smart;
 import org.amity.simulator.generators.Generator;
 
 /**
@@ -529,6 +530,41 @@ public class BalancerTest
         assertTrue(processor1.getLocalEvents().size() == eventTotal);
         assertTrue(instance.getLocalEvents().size() == eventTotal);
         assertTrue(processor2.getLocalEvents().size() == eventTotal);
+    }
+
+    @Test
+    public void testPrioritize()
+    {
+        System.out.println("prioritize");
+        final String label1 = "delay 1";
+        final Component component = new DummyComponent(label1, 2.0);
+        final List<String> references = new ArrayList<>();
+        references.add(label1);
+        final Sequencer sequencer = new Sequencer();
+        final Distributor distributor = new Smart(references);
+        distributor.addNext(component);
+        final Component instance = new Balancer("balancer", distributor, false);
+        System.out.println("  Try cleared system for no match in component");
+        final double available = instance.getAvailable();
+        instance.prioritize(sequencer, true);
+        assertTrue(sequencer.exclusions.isEmpty());
+        assertTrue(sequencer.paths.isEmpty());
+        assertTrue(sequencer.participants.contains(instance));
+        System.out.println("  Try system with match in paths");
+        sequencer.paths.add(instance);
+        sequencer.participants.clear();
+        instance.prioritize(sequencer, true);
+        assertFalse(sequencer.paths.isEmpty());
+        assertTrue(sequencer.exclusions.isEmpty());
+        assertFalse(sequencer.participants.contains(instance));
+        System.out.println("  Try system with match in exclusions");
+        sequencer.exclusions.add(instance);
+        sequencer.participants.clear();
+        sequencer.paths.clear();
+        instance.prioritize(sequencer, true);
+        assertTrue(sequencer.paths.isEmpty());
+        assertFalse(sequencer.exclusions.isEmpty());
+        assertFalse(sequencer.participants.contains(instance));
     }
 
     /**

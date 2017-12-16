@@ -26,6 +26,7 @@ import java.util.Map;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
 import org.amity.simulator.distributors.Distributor;
+import org.amity.simulator.distributors.Smart;
 
 /**
  * Component that takes event and delivers it to one of a selection of
@@ -40,6 +41,7 @@ public class Balancer implements Component
     private final List<Event> local;
     private final List<Integer> depths;
     private final boolean monitor;
+    private final boolean intelligent;
 
     /**
      * Hidden default constructor to avoid implicit creation
@@ -49,6 +51,7 @@ public class Balancer implements Component
         this.label = "dummy";
         this.distributor = null;
         this.monitor = false;
+        this.intelligent = false;
         this.local = new ArrayList<>();
         this.depths = new ArrayList<>();
     }
@@ -65,6 +68,7 @@ public class Balancer implements Component
     {
         this.label = label;
         this.distributor = distributor;
+        this.intelligent = distributor instanceof Smart;
         this.monitor = monitor;
         this.local = new ArrayList<>();
         this.depths = new ArrayList<>();
@@ -168,10 +172,37 @@ public class Balancer implements Component
     }
 
     @Override
-    public void prioritize(final Sequencer sequencer)
+    public void prioritize(final Sequencer sequencer, final boolean explore)
     {
-        sequencer.paths.add(this);
-        this.distributor.prioritize(sequencer);
+        boolean matched = false;
+        // Finding which set the event belongs
+        if (explore)
+        {
+            // Have we matched path
+            matched = sequencer.exclusions.contains(this)
+                    || sequencer.paths.contains(this);
+            System.out.println(matched);
+            System.out.println(sequencer.paths.size());
+            System.out.println(sequencer.exclusions.size());
+            System.out.println(sequencer.participants.size());
+            if (!matched)
+            {
+                sequencer.participants.add(this);
+            }
+        }
+        // We are obtaining prioritization information
+        else
+        {
+            sequencer.paths.add(this);
+        }
+        if (this.intelligent)
+        {
+            sequencer.intelligentFunctions.add(distributor);
+        }
+        if (!matched)
+        {
+            this.distributor.prioritize(sequencer, explore);
+        }
     }
 
     @Override

@@ -263,11 +263,18 @@ public class Processor implements Component
     }
 
     @Override
-    public void prioritize(final Sequencer sequencer)
+    public void prioritize(final Sequencer sequencer, final boolean explore)
     {
-        sequencer.sources = this.sources;
-        sequencer.priorities = this.priorities;
-        sequencer.paths.add(this);
+        if (explore)
+        {
+            sequencer.participants.add(this);
+        }
+        else
+        {
+            sequencer.sources = this.sources;
+            sequencer.priorities = this.priorities;
+            sequencer.paths.add(this);
+        }
     }
 
     /**
