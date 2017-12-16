@@ -195,6 +195,8 @@ public class Balancer implements Component
         {
             sequencer.intelligentFunctions.add(distributor);
         }
+        // Go downstream if we are prioritizing or if exploring and we
+        // did not find any information on this current path
         if (!matched)
         {
             this.distributor.prioritize(sequencer, explore);

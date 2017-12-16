@@ -267,7 +267,13 @@ public class Processor implements Component
     {
         if (explore)
         {
-            sequencer.participants.add(this);
+            // Has the component been noted anywhere already
+            final boolean included = sequencer.paths.contains(this)
+                    || sequencer.exclusions.contains(this);
+            if (!included)
+            {
+                sequencer.participants.add(this);
+            }
         }
         else
         {

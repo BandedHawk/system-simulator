@@ -174,7 +174,7 @@ public class Sequencer
 
     /**
      * Determines if current event being tested traverses the path to the
-     * next active component or otherwise ads the information for additional
+     * next active component or otherwise adds the information for additional
      * checks
      *
      * @param current event checked for pathway match
@@ -216,7 +216,7 @@ public class Sequencer
     }
 
     /**
-     * Clears predicted paths for availability for intelligent distributors
+     * Clears predicted paths on availability for intelligent distributors
      */
     void clear()
     {

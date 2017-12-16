@@ -282,7 +282,7 @@ public class Event
             // Clear all predicted availability paths if active component
             if (current instanceof Processor)
             {
-                sequencer.clear();
+                this.sequencer.clear();
             }
             // Define the component executed to reach end of life
             if (this.component == null)
@@ -293,6 +293,14 @@ public class Event
         }
     }
 
+    /**
+     * Select event for simulation based on current conditions and priority
+     * information as may exist
+     * 
+     * @param buffer ordered schedule of events not including self
+     * @param locked <code>true</code> if traversing non-active components
+     * @return this event if locked into execution or a higher priority event
+     */
     public Event prioritize(final List<Event> buffer, final boolean locked)
     {
         return locked ? this : this.sequencer.prioritize(this, buffer);
