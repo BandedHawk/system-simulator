@@ -181,10 +181,6 @@ public class Balancer implements Component
             // Have we matched path
             matched = sequencer.exclusions.contains(this)
                     || sequencer.paths.contains(this);
-            System.out.println(matched);
-            System.out.println(sequencer.paths.size());
-            System.out.println(sequencer.exclusions.size());
-            System.out.println(sequencer.participants.size());
             if (!matched)
             {
                 sequencer.participants.add(this);
