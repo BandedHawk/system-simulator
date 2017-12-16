@@ -422,6 +422,51 @@ public class ProcessorTest
         assertEquals(generator1, map.get(reference).get(0));
         assertEquals(generator2, map.get(reference2).get(0));
     }
+    @Test
+    public void testPrioritize()
+    {
+        System.out.println("prioritize");
+        final String reference = "delay 1";
+        final String label = "source";
+        final List<Generator> generators = new ArrayList<>();
+        final List<String> priorities = new ArrayList<>();
+        priorities.add(label);
+        final Sequencer sequencer = new Sequencer();
+        final Generator generator = new Constant(1, "fixed", reference);
+        generators.add(generator);
+        final Component instance = new Processor("balancer", generators,
+                priorities, false);
+        System.out.println("  Try prioritize");
+        instance.prioritize(sequencer, false);
+        assertTrue(sequencer.exclusions.isEmpty());
+        assertFalse(sequencer.paths.isEmpty());
+        assertTrue(sequencer.paths.contains(instance));
+        assertTrue(sequencer.participants.isEmpty());
+        assertFalse(sequencer.priorities.isEmpty());
+        assertTrue(sequencer.priorities.contains(label));
+        assertTrue(sequencer.sources.length == 1);
+        System.out.println("  Try explore from cleared state");
+        sequencer.participants.clear();
+        sequencer.paths.clear();
+        sequencer.exclusions.clear();
+        instance.prioritize(sequencer, true);
+        assertFalse(sequencer.participants.isEmpty());
+        assertTrue(sequencer.participants.contains(instance));
+        System.out.println("  Try explore with path set");
+        sequencer.participants.clear();
+        sequencer.paths.clear();
+        sequencer.exclusions.clear();
+        sequencer.paths.add(instance);
+        instance.prioritize(sequencer, true);
+        assertTrue(sequencer.participants.isEmpty());
+        System.out.println("  Try explore with exclusion set");
+        sequencer.participants.clear();
+        sequencer.paths.clear();
+        sequencer.exclusions.clear();
+        sequencer.exclusions.add(instance);
+        instance.prioritize(sequencer, true);
+        assertTrue(sequencer.participants.isEmpty());
+    }
 
     /**
      * Test of instance method, of class Processor.

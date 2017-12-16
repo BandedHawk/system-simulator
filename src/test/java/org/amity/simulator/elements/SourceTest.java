@@ -245,6 +245,31 @@ public class SourceTest
         assertEquals(0, source.getReferences().size());
     }
 
+    @Test
+    public void testPrioritize()
+    {
+        System.out.println("prioritize - not expected to be used");
+        final String reference = "delay 1";
+        final Sequencer sequencer = new Sequencer();
+        final Generator generator = new Constant(1, "source", reference);
+        final Component instance = new Source("balancer", generator, false);
+        System.out.println("  Try prioritize");
+        final double available = instance.getAvailable();
+        instance.prioritize(sequencer, false);
+        assertTrue(sequencer.exclusions.isEmpty());
+        assertFalse(sequencer.paths.isEmpty());
+        assertTrue(sequencer.sources.length == 0);
+        assertTrue(sequencer.paths.contains(instance));
+        System.out.println("  Try explore");
+        sequencer.paths.clear();
+        sequencer.exclusions.clear();
+        instance.prioritize(sequencer, true);
+        assertTrue(sequencer.exclusions.isEmpty());
+        assertTrue(sequencer.paths.isEmpty());
+        assertFalse(sequencer.participants.isEmpty());
+        assertTrue(sequencer.participants.contains(instance));
+    }
+
     /**
      * Test of instance method, of class Source.
      */
