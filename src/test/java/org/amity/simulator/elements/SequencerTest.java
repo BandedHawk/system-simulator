@@ -148,6 +148,7 @@ public class SequencerTest
         buffer.sort(Comparator.comparingDouble(Event::getCompleted));
         event = sequencer.prioritize(current, buffer);
         assertTrue(sequencer.paths.contains(balancer));
+        assertTrue(event == priorityY);
         System.out.println("  Test when event is not priority");
         buffer.clear();
         buffer.add(priority1);
@@ -163,6 +164,26 @@ public class SequencerTest
         buffer.add(priority2);
         buffer.sort(Comparator.comparingDouble(Event::getCompleted));
         event = sequencer.prioritize(current, buffer);
+        assertTrue(event == priority2);
+        System.out.println("  Test when already in exclusion");
+        priorityY.setComponent(differentX);
+        buffer.clear();
+        buffer.add(priority1);
+        buffer.add(priority2);
+        buffer.add(priorityX);
+        buffer.add(priorityY);
+        buffer.sort(Comparator.comparingDouble(Event::getCompleted));
+        event = sequencer.prioritize(current, buffer);
+        assertTrue(sequencer.exclusions.size() == 1);
+        assertTrue(sequencer.exclusions.contains(differentX));
+        assertTrue(event != priorityY);
+        System.out.println("  Test for current of higher priority");
+        final Event priority3 = new Event("source 3", "345", 1.5, sequencer);
+        priority3.setComponent(component);
+        priority3.setValues(1.4, 1.5, 1.6);
+        buffer.clear();
+        buffer.add(priority3);
+        event = sequencer.prioritize(priority2, buffer);
         assertTrue(event == priority2);
     }
 }

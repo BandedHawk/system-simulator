@@ -112,9 +112,9 @@ public class Sequencer
                     {
                         for (int i = 0; i < this.sources.length; i++)
                         {
-                            // Don't care as priority is equivalent or lower
+                            // Don't care as priority is equivalent or higher
                             // than that of current selected
-                            if (i == priority)
+                            if (i >= priority)
                             {
                                 break;
                             }

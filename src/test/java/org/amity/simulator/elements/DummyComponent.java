@@ -102,7 +102,8 @@ public class DummyComponent implements Component
     @Override
     public void prioritize(final Sequencer sequencer, final boolean explore)
     {
-        final String[] sources = new String[]{"source 1", "source 2"};
+        final String[] sources = new String[]{"source 1", "source 2",
+            "source 3"};
         final Set<String> priorities = new HashSet<>();
         if (explore)
         {
@@ -112,6 +113,7 @@ public class DummyComponent implements Component
         {
             priorities.add("source 1");
             priorities.add("source 2");
+            priorities.add("source 3");
             sequencer.sources = sources;
             sequencer.priorities = priorities;
             sequencer.paths.add(this);
