@@ -112,22 +112,17 @@ public class Sequencer
                     {
                         for (int i = 0; i < this.sources.length; i++)
                         {
-                            // Don't care as priority is equivalent or higher
-                            // than that of current selected
-                            if (i >= priority)
-                            {
-                                break;
-                            }
                             // Otherwise define priority of selection
                             if (priority == Integer.MAX_VALUE
                                     && this.sources[i].equals(selected.getSource()))
                             {
                                 priority = i;
-                                // Nothing can override this
-                                if (priority == 0)
-                                {
-                                    break;
-                                }
+                            }
+                            // Don't care as priority is equivalent or higher
+                            // than that of current selected
+                            if (i >= priority)
+                            {
+                                break;
                             }
                             // Lock in possible re-sequence
                             if (this.sources[i].equals(current.getSource()))
