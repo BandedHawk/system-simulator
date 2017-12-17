@@ -320,7 +320,7 @@ public class Model
                 {
                     this.overrun = false;
                 }
-                // Copy events from main working into working working
+                // Copy events from main buffer into working buffer
                 for (int index = 0; index < this.capacity; index++)
                 {
                     if (this.primary.isEmpty())
