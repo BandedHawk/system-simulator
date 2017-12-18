@@ -190,6 +190,7 @@ public class Balancer implements Component
                 sequencer.exclusions.addAll(sequencer.participants);
                 matched = true;
             }
+            // Undecided so store until we are sure
             else
             {
                 sequencer.participants.add(this);
@@ -200,12 +201,14 @@ public class Balancer implements Component
         {
             sequencer.paths.add(this);
         }
+        // Intelligent function so need to reset prediction after event
+        // complete
         if (this.intelligent)
         {
             sequencer.intelligentFunctions.add(distributor);
         }
         // Go downstream if we are prioritizing or if exploring and we
-        // did not find any information on this current path
+        // did not find any decision information on this current path
         if (!matched)
         {
             this.distributor.prioritize(sequencer, explore);

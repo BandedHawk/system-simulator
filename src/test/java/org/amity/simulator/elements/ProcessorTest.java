@@ -353,6 +353,7 @@ public class ProcessorTest
     public void testDescription()
     {
         System.out.println("description");
+        System.out.println("  Test basic configuration");
         final double sourcePeriod = 1;
         final double period = 2;
         assertTrue(period > sourcePeriod);
@@ -373,6 +374,23 @@ public class ProcessorTest
         assertTrue(instance.description() != null);
         assertTrue(instance.description().endsWith("]"));
         assertTrue(instance.description().startsWith("["));
+        System.out.println("  Test empty generators list");
+        generators.clear();
+        Component broken = new Processor(label, generators,
+                priority, false);
+        assertTrue(broken.description() != null);
+        assertTrue(broken.description().endsWith("]"));
+        assertTrue(broken.description().startsWith("["));
+        assertTrue(broken.description()
+                .contains("No defined characteristic"));
+        System.out.println("  Test null generators list");
+        generators.clear();
+        broken = new Processor(label, null, priority, false);
+        assertTrue(broken.description() != null);
+        assertTrue(broken.description().endsWith("]"));
+        assertTrue(broken.description().startsWith("["));
+        assertTrue(broken.description()
+                .contains("No defined characteristic"));
     }
 
     /**
