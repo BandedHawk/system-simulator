@@ -177,6 +177,7 @@ public class Sequencer
      */
     private boolean inPath(final Event current)
     {
+        // test if component is known to lead to active target point
         boolean connects = this.paths.contains(current.getComponent());
         // Not in current known path to active delay component
         if (!connects)
@@ -188,23 +189,14 @@ public class Sequencer
             {
                 // if not in direct registered path, check for deeper connection
                 this.participants.clear();
+                // Current number of known elements leading to active target
+                // point
+                final int knownPath = this.paths.size();
+                // Lock in path
                 final double tick = current.getComponent().getAvailable();
                 current.getComponent().prioritize(this, true);
-                if (!this.participants.isEmpty())
-                {
-                    connects = !Collections.disjoint(this.paths,
-                            this.participants);
-                    // Add to known connections
-                    if (connects)
-                    {
-                        this.paths.addAll(this.participants);
-                    }
-                    // Add to exclusions
-                    else
-                    {
-                        this.exclusions.addAll(this.participants);
-                    }
-                }
+                // If we've changed path elements, then there is a connection
+                connects = knownPath != this.paths.size();
             }
         }
         return connects;

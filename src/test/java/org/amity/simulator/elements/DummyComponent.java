@@ -107,7 +107,23 @@ public class DummyComponent implements Component
         final Set<String> priorities = new HashSet<>();
         if (explore)
         {
-            sequencer.participants.add(this);
+            // If matched to path, add collected information
+            if (sequencer.paths.contains(this))
+            {
+                sequencer.paths.addAll(sequencer.participants);
+            }
+            // End-of-explore and not in path
+            else
+            {
+                if (!sequencer.participants.isEmpty())
+                {
+                    sequencer.exclusions.addAll(sequencer.participants);
+                }
+                if (!sequencer.exclusions.contains(this))
+                {
+                    sequencer.exclusions.add(this);
+                }
+            }
         }
         else
         {

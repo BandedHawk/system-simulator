@@ -536,35 +536,72 @@ public class BalancerTest
     public void testPrioritize()
     {
         System.out.println("prioritize");
-        final String label1 = "delay 1";
-        final Component component = new DummyComponent(label1, 2.0);
-        final List<String> references = new ArrayList<>();
-        references.add(label1);
+        final Component component = new DummyComponent("delay 1", 2.0);
+        final Component other = new DummyComponent("delay 2", 2.0);
+        final List<String> references1 = new ArrayList<>();
+        references1.add("delay 1");
+        final List<String> references2 = new ArrayList<>();
+        references2.add("delay 2");
         final Sequencer sequencer = new Sequencer();
-        final Distributor distributor = new Smart(references);
-        distributor.addNext(component);
-        final Component instance = new Balancer("balancer", distributor, false);
+        final Distributor distributor1 = new Smart(references1);
+        final Distributor distributor2 = new Smart(references2);
+        distributor1.addNext(component);
+        distributor2.addNext(other);
+        final Component instance = new Balancer("balancer 1", distributor1,
+                false);
+        final Component excluded = new Balancer("balancer 2", distributor2,
+                false);
         System.out.println("  Try cleared system for no match in component");
-        final double available = instance.getAvailable();
+        double available = component.getAvailable();
+        component.prioritize(sequencer, false);
+        assertTrue(sequencer.paths.contains(component));
+        available = instance.getAvailable();
         instance.prioritize(sequencer, true);
         assertTrue(sequencer.exclusions.isEmpty());
-        assertTrue(sequencer.paths.isEmpty());
-        assertTrue(sequencer.participants.contains(instance));
+        assertFalse(sequencer.paths.isEmpty());
+        assertTrue(sequencer.paths.contains(component));
+        System.out.println(sequencer.paths.size());
+        assertTrue(sequencer.paths.size() == 2);
+        assertTrue(sequencer.paths.contains(instance));
+        assertTrue(sequencer.paths.contains(component));
         System.out.println("  Try system with match in paths");
-        sequencer.paths.add(instance);
         sequencer.participants.clear();
         instance.prioritize(sequencer, true);
         assertFalse(sequencer.paths.isEmpty());
+        assertTrue(sequencer.paths.size() == 2);
         assertTrue(sequencer.exclusions.isEmpty());
-        assertFalse(sequencer.participants.contains(instance));
-        System.out.println("  Try system with match in exclusions");
-        sequencer.exclusions.add(instance);
+        assertTrue(sequencer.paths.contains(instance));
+        assertTrue(sequencer.intelligentFunctions.size() == 1);
+        assertTrue(sequencer.intelligentFunctions.contains(distributor1));
+        System.out.println("  Try system with no match in path");
+        assertTrue(sequencer.exclusions.isEmpty());
         sequencer.participants.clear();
-        sequencer.paths.clear();
-        instance.prioritize(sequencer, true);
-        assertTrue(sequencer.paths.isEmpty());
+        available = excluded.getAvailable();
+        excluded.prioritize(sequencer, true);
+        assertTrue(sequencer.paths.size() == 2);
         assertFalse(sequencer.exclusions.isEmpty());
-        assertFalse(sequencer.participants.contains(instance));
+        assertTrue(sequencer.exclusions.size() == 2);
+        assertTrue(sequencer.exclusions.contains(other));
+        assertTrue(sequencer.exclusions.contains(excluded));
+        assertTrue(sequencer.intelligentFunctions.size() == 2);
+        assertTrue(sequencer.intelligentFunctions.contains(distributor2));
+        System.out.println("  Try system with existing exclusion in path");
+        final List<String> references3 = new ArrayList<>();
+        references3.add("balancer 2");
+        final Distributor distributor3 = new Smart(references3);
+        distributor3.addNext(excluded);
+        final Component secondary = new Balancer("balancer 3", distributor3,
+                false);
+        available = secondary.getAvailable();
+        secondary.prioritize(sequencer, true);
+        assertTrue(sequencer.paths.size() == 2);
+        assertFalse(sequencer.exclusions.isEmpty());
+        assertTrue(sequencer.exclusions.size() == 3);
+        assertTrue(sequencer.exclusions.contains(other));
+        assertTrue(sequencer.exclusions.contains(excluded));
+        assertTrue(sequencer.exclusions.contains(secondary));
+        assertTrue(sequencer.intelligentFunctions.size() == 3);
+        assertTrue(sequencer.intelligentFunctions.contains(distributor3));
     }
 
     /**

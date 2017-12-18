@@ -111,8 +111,8 @@ public class SequencerTest
         System.out.println("  Test when current event is lower priority");
         assertTrue(event == priority1);
         assertTrue(buffer.get(0) == source2);
-        final Component differentX = new DummyComponent("processor", 1.7);
-        final Component differentY = new DummyComponent("processor", 1.75);
+        final Component differentX = new DummyComponent("processor X", 1.7);
+        final Component differentY = new DummyComponent("processor Y", 1.75);
         final Event priorityX = new Event("source 1", "678", 1.5, sequencer);
         priorityX.setComponent(differentX);
         priorityX.setValues(1.2, 1.3, 1.4);

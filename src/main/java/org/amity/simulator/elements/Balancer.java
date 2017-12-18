@@ -178,10 +178,19 @@ public class Balancer implements Component
         // Finding which set the event belongs
         if (explore)
         {
-            // Have we matched path
-            matched = sequencer.exclusions.contains(this)
-                    || sequencer.paths.contains(this);
-            if (!matched)
+            // If matched to path, add collected information
+            if (sequencer.paths.contains(this))
+            {
+                sequencer.paths.addAll(sequencer.participants);
+                matched = true;
+            }
+            // If matched to exclusions, add collected information
+            else if (sequencer.exclusions.contains(this))
+            {
+                sequencer.exclusions.addAll(sequencer.participants);
+                matched = true;
+            }
+            else
             {
                 sequencer.participants.add(this);
             }

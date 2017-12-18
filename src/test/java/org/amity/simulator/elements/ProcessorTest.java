@@ -436,6 +436,8 @@ public class ProcessorTest
         generators.add(generator);
         final Component instance = new Processor("balancer", generators,
                 priorities, false);
+        final Component other = new Processor("other-balancer", generators,
+                priorities, false);
         System.out.println("  Try prioritize");
         instance.prioritize(sequencer, false);
         assertTrue(sequencer.exclusions.isEmpty());
@@ -445,13 +447,18 @@ public class ProcessorTest
         assertFalse(sequencer.priorities.isEmpty());
         assertTrue(sequencer.priorities.contains(label));
         assertTrue(sequencer.sources.length == 1);
-        System.out.println("  Try explore from cleared state");
+        System.out.println("  Try explore with different end component");
         sequencer.participants.clear();
         sequencer.paths.clear();
         sequencer.exclusions.clear();
+        sequencer.paths.add(other);
         instance.prioritize(sequencer, true);
-        assertFalse(sequencer.participants.isEmpty());
-        assertTrue(sequencer.participants.contains(instance));
+        assertFalse(sequencer.paths.isEmpty());
+        assertTrue(sequencer.paths.size() == 1);
+        assertTrue(sequencer.paths.contains(other));
+        assertFalse(sequencer.paths.contains(instance));
+        assertFalse(sequencer.exclusions.isEmpty());
+        assertTrue(sequencer.exclusions.contains(instance));
         System.out.println("  Try explore with path set");
         sequencer.participants.clear();
         sequencer.paths.clear();
@@ -463,9 +470,16 @@ public class ProcessorTest
         sequencer.participants.clear();
         sequencer.paths.clear();
         sequencer.exclusions.clear();
+        sequencer.paths.add(other);
         sequencer.exclusions.add(instance);
         instance.prioritize(sequencer, true);
-        assertTrue(sequencer.participants.isEmpty());
+        assertFalse(sequencer.paths.isEmpty());
+        assertTrue(sequencer.paths.size() == 1);
+        assertTrue(sequencer.paths.contains(other));
+        assertFalse(sequencer.paths.contains(instance));
+        assertFalse(sequencer.exclusions.isEmpty());
+        assertTrue(sequencer.exclusions.size() == 1);
+        assertTrue(sequencer.exclusions.contains(instance));
     }
 
     /**
