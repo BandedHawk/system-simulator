@@ -23,10 +23,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import org.amity.simulator.distributors.IDistributor;
 import org.amity.simulator.distributors.RoundRobin;
 import org.amity.simulator.generators.Constant;
-import org.amity.simulator.generators.IGenerator;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
 import org.junit.After;
@@ -35,6 +33,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.amity.simulator.distributors.Distributor;
+import org.amity.simulator.distributors.Smart;
+import org.amity.simulator.generators.Generator;
 
 /**
  *
@@ -85,19 +86,22 @@ public class BalancerTest
         references.add(label1);
         references.add(label2);
         final int eventTotal = 4;
-        final IGenerator sourceGenerator = new Constant(sourcePeriod,
+        final Generator sourceGenerator = new Constant(sourcePeriod,
                 sourceLabel, label);
-        final IDistributor distributor = new RoundRobin(references);
-        final IComponent instance = new Balancer(label, distributor, false);
+        final Distributor distributor = new RoundRobin(references);
+        final Component instance = new Balancer(label, distributor, false);
         final LinkedList<Event> events = new LinkedList<>();
-        final IComponent source
+        final Component source
                 = new Source(sourceLabel, sourceGenerator, false);
         sourceGenerator.setNext(instance);
-        final IGenerator generator = new Constant(period, sourceLabel, null);
-        final List<IGenerator> generators = new ArrayList<>();
+        final Generator generator = new Constant(period, sourceLabel, null);
+        final List<Generator> generators = new ArrayList<>();
         generators.add(generator);
-        final IComponent processor1 = new Processor(label1, generators, false);
-        final IComponent processor2 = new Processor(label2, generators, false);
+        final List<String> priority = new ArrayList<>();
+        final Component processor1 = new Processor(label1, generators,
+                priority, false);
+        final Component processor2 = new Processor(label2, generators,
+                priority, false);
         distributor.addNext(processor1);
         distributor.addNext(processor2);
         for (int count = 0; count < eventTotal; count++)
@@ -140,19 +144,22 @@ public class BalancerTest
         references.add(label1);
         references.add(label2);
         final int eventTotal = 4;
-        final IGenerator sourceGenerator = new Constant(sourcePeriod,
+        final Generator sourceGenerator = new Constant(sourcePeriod,
                 sourceLabel, label);
-        final IDistributor distributor = new RoundRobin(references);
-        final IComponent instance = new Balancer(label, distributor, false);
+        final Distributor distributor = new RoundRobin(references);
+        final Component instance = new Balancer(label, distributor, false);
         final LinkedList<Event> events = new LinkedList<>();
-        final IComponent source
+        final Component source
                 = new Source(sourceLabel, sourceGenerator, false);
         sourceGenerator.setNext(instance);
-        final IGenerator generator = new Constant(period, sourceLabel, null);
-        final List<IGenerator> generators = new ArrayList<>();
+        final Generator generator = new Constant(period, sourceLabel, null);
+        final List<Generator> generators = new ArrayList<>();
         generators.add(generator);
-        final IComponent processor1 = new Processor(label1, generators, false);
-        final IComponent processor2 = new Processor(label2, generators, false);
+        final List<String> priority = new ArrayList<>();
+        final Component processor1 = new Processor(label1, generators,
+                priority, false);
+        final Component processor2 = new Processor(label2, generators,
+                priority, false);
         distributor.addNext(processor1);
         distributor.addNext(processor2);
         for (int count = 0; count < eventTotal; count++)
@@ -226,7 +233,7 @@ public class BalancerTest
         assertTrue(true); // nothing broke when we reset
         System.out.println("  check when broken distributor");
         references.clear();
-        final IDistributor round = new RoundRobin(references);
+        final Distributor round = new RoundRobin(references);
         broken = new Balancer(label, round, false);
         broken.reset();
         assertTrue(true); // nothing broke when we reset
@@ -250,19 +257,22 @@ public class BalancerTest
         references.add(label1);
         references.add(label2);
         final int eventTotal = 4;
-        final IGenerator sourceGenerator = new Constant(sourcePeriod,
+        final Generator sourceGenerator = new Constant(sourcePeriod,
                 sourceLabel, label);
-        final IDistributor distributor = new RoundRobin(references);
-        final IComponent instance = new Balancer(label, distributor, false);
+        final Distributor distributor = new RoundRobin(references);
+        final Component instance = new Balancer(label, distributor, false);
         final LinkedList<Event> events = new LinkedList<>();
-        final IComponent source
+        final Component source
                 = new Source(sourceLabel, sourceGenerator, false);
         sourceGenerator.setNext(instance);
-        final IGenerator generator = new Constant(period, sourceLabel, null);
-        final List<IGenerator> generators = new ArrayList<>();
+        final Generator generator = new Constant(period, sourceLabel, null);
+        final List<Generator> generators = new ArrayList<>();
         generators.add(generator);
-        final IComponent processor1 = new Processor(label1, generators, false);
-        final IComponent processor2 = new Processor(label2, generators, false);
+        final List<String> priority = new ArrayList<>();
+        final Component processor1 = new Processor(label1, generators,
+                priority, false);
+        final Component processor2 = new Processor(label2, generators,
+                priority, false);
         distributor.addNext(processor1);
         distributor.addNext(processor2);
         for (int count = 0; count < eventTotal; count++)
@@ -322,8 +332,8 @@ public class BalancerTest
         final List<String> references = new ArrayList<>();
         references.add(label1);
         references.add(label2);
-        final IDistributor distributor = new RoundRobin(references);
-        final IComponent instance = new Balancer(label, distributor, false);
+        final Distributor distributor = new RoundRobin(references);
+        final Component instance = new Balancer(label, distributor, false);
         assertEquals(label, instance.getLabel());
     }
 
@@ -341,8 +351,8 @@ public class BalancerTest
         references.add(label1);
         references.add(label2);
         System.out.println("  check normal operation");
-        final IDistributor distributor = new RoundRobin(references);
-        final IComponent instance = new Balancer(label, distributor, false);
+        final Distributor distributor = new RoundRobin(references);
+        final Component instance = new Balancer(label, distributor, false);
         assertEquals(references.size(), instance.getReferences().size());
         assertTrue(instance.getReferences().containsKey(label1));
         assertTrue(instance.getReferences().containsKey(label2));
@@ -372,19 +382,22 @@ public class BalancerTest
         references.add(label1);
         references.add(label2);
         final int eventTotal = 4;
-        final IGenerator sourceGenerator = new Constant(sourcePeriod,
+        final Generator sourceGenerator = new Constant(sourcePeriod,
                 sourceLabel, label);
-        final IDistributor distributor = new RoundRobin(references);
-        final IComponent instance = new Balancer(label, distributor, false);
+        final Distributor distributor = new RoundRobin(references);
+        final Component instance = new Balancer(label, distributor, false);
         final LinkedList<Event> events = new LinkedList<>();
-        final IComponent source
+        final Component source
                 = new Source(sourceLabel, sourceGenerator, false);
         sourceGenerator.setNext(instance);
-        final IGenerator generator = new Constant(period, sourceLabel, null);
-        final List<IGenerator> generators = new ArrayList<>();
+        final Generator generator = new Constant(period, sourceLabel, null);
+        final List<Generator> generators = new ArrayList<>();
         generators.add(generator);
-        final IComponent processor1 = new Processor(label1, generators, false);
-        final IComponent processor2 = new Processor(label2, generators, false);
+        final List<String> priority = new ArrayList<>();
+        final Component processor1 = new Processor(label1, generators,
+                priority, false);
+        final Component processor2 = new Processor(label2, generators,
+                priority, false);
         distributor.addNext(processor1);
         distributor.addNext(processor2);
         for (int count = 0; count < eventTotal; count++)
@@ -444,8 +457,8 @@ public class BalancerTest
         final List<String> references = new ArrayList<>();
         references.add(label1);
         references.add(label2);
-        final IDistributor distributor = new RoundRobin(references);
-        final IComponent instance = new Balancer(label, distributor, false);
+        final Distributor distributor = new RoundRobin(references);
+        final Component instance = new Balancer(label, distributor, false);
         assertTrue(instance.description() != null);
         assertTrue(instance.description().endsWith("]"));
         assertTrue(instance.description().startsWith("["));
@@ -467,21 +480,24 @@ public class BalancerTest
         final List<String> references = new ArrayList<>();
         references.add(label2);
         final int eventTotal = 4;
-        final IGenerator sourceGenerator = new Constant(sourcePeriod,
+        final Generator sourceGenerator = new Constant(sourcePeriod,
                 sourceLabel, label);
-        final IDistributor distributor = new RoundRobin(references);
-        final IComponent instance = new Balancer(label, distributor, false);
+        final Distributor distributor = new RoundRobin(references);
+        final Component instance = new Balancer(label, distributor, false);
         final LinkedList<Event> events = new LinkedList<>();
-        final IComponent source
+        final Component source
                 = new Source(sourceLabel, sourceGenerator, false);
-        final IGenerator generator1 = new Constant(period, sourceLabel, null);
-        final List<IGenerator> generators1 = new ArrayList<>();
-        final IGenerator generator2 = new Constant(period, sourceLabel, null);
-        final List<IGenerator> generators2 = new ArrayList<>();
+        final Generator generator1 = new Constant(period, sourceLabel, null);
+        final List<Generator> generators1 = new ArrayList<>();
+        final Generator generator2 = new Constant(period, sourceLabel, null);
+        final List<Generator> generators2 = new ArrayList<>();
         generators1.add(generator1);
         generators2.add(generator2);
-        final IComponent processor1 = new Processor(label1, generators1, false);
-        final IComponent processor2 = new Processor(label2, generators2, false);
+        final List<String> priority = new ArrayList<>();
+        final Component processor1 = new Processor(label1, generators1,
+                priority, false);
+        final Component processor2 = new Processor(label2, generators2,
+                priority, false);
         distributor.addNext(processor2);
         generator1.setNext(instance);
         sourceGenerator.setNext(processor1);
@@ -516,6 +532,78 @@ public class BalancerTest
         assertTrue(processor2.getLocalEvents().size() == eventTotal);
     }
 
+    @Test
+    public void testPrioritize()
+    {
+        System.out.println("prioritize");
+        final Component component = new DummyComponent("delay 1", 2.0);
+        final Component other = new DummyComponent("delay 2", 2.0);
+        final List<String> references1 = new ArrayList<>();
+        references1.add("delay 1");
+        final List<String> references2 = new ArrayList<>();
+        references2.add("delay 2");
+        final Sequencer sequencer = new Sequencer();
+        final Distributor distributor1 = new Smart(references1);
+        final Distributor distributor2 = new Smart(references2);
+        distributor1.addNext(component);
+        distributor2.addNext(other);
+        final Component instance = new Balancer("balancer 1", distributor1,
+                false);
+        final Component excluded = new Balancer("balancer 2", distributor2,
+                false);
+        System.out.println("  Try cleared system for no match in component");
+        double available = component.getAvailable();
+        component.prioritize(sequencer, false);
+        assertTrue(sequencer.paths.contains(component));
+        available = instance.getAvailable();
+        instance.prioritize(sequencer, true);
+        assertTrue(sequencer.exclusions.isEmpty());
+        assertFalse(sequencer.paths.isEmpty());
+        assertTrue(sequencer.paths.contains(component));
+        System.out.println(sequencer.paths.size());
+        assertTrue(sequencer.paths.size() == 2);
+        assertTrue(sequencer.paths.contains(instance));
+        assertTrue(sequencer.paths.contains(component));
+        System.out.println("  Try system with match in paths");
+        sequencer.participants.clear();
+        instance.prioritize(sequencer, true);
+        assertFalse(sequencer.paths.isEmpty());
+        assertTrue(sequencer.paths.size() == 2);
+        assertTrue(sequencer.exclusions.isEmpty());
+        assertTrue(sequencer.paths.contains(instance));
+        assertTrue(sequencer.intelligentFunctions.size() == 1);
+        assertTrue(sequencer.intelligentFunctions.contains(distributor1));
+        System.out.println("  Try system with no match in path");
+        assertTrue(sequencer.exclusions.isEmpty());
+        sequencer.participants.clear();
+        available = excluded.getAvailable();
+        excluded.prioritize(sequencer, true);
+        assertTrue(sequencer.paths.size() == 2);
+        assertFalse(sequencer.exclusions.isEmpty());
+        assertTrue(sequencer.exclusions.size() == 2);
+        assertTrue(sequencer.exclusions.contains(other));
+        assertTrue(sequencer.exclusions.contains(excluded));
+        assertTrue(sequencer.intelligentFunctions.size() == 2);
+        assertTrue(sequencer.intelligentFunctions.contains(distributor2));
+        System.out.println("  Try system with existing exclusion in path");
+        final List<String> references3 = new ArrayList<>();
+        references3.add("balancer 2");
+        final Distributor distributor3 = new Smart(references3);
+        distributor3.addNext(excluded);
+        final Component secondary = new Balancer("balancer 3", distributor3,
+                false);
+        available = secondary.getAvailable();
+        secondary.prioritize(sequencer, true);
+        assertTrue(sequencer.paths.size() == 2);
+        assertFalse(sequencer.exclusions.isEmpty());
+        assertTrue(sequencer.exclusions.size() == 3);
+        assertTrue(sequencer.exclusions.contains(other));
+        assertTrue(sequencer.exclusions.contains(excluded));
+        assertTrue(sequencer.exclusions.contains(secondary));
+        assertTrue(sequencer.intelligentFunctions.size() == 3);
+        assertTrue(sequencer.intelligentFunctions.contains(distributor3));
+    }
+
     /**
      * Test of instance method, of class Balancer.
      */
@@ -528,8 +616,8 @@ public class BalancerTest
         final List<String> references = new ArrayList<>();
         references.add(label1);
         references.add(label2);
-        final IDistributor distributor = new RoundRobin(references);
-        final List<IDistributor> distributors = new ArrayList<>();
+        final Distributor distributor = new RoundRobin(references);
+        final List<Distributor> distributors = new ArrayList<>();
         distributors.add(distributor);
         final List<NameValue> pairs = new ArrayList<>();
         final String name  = "Balancer";
@@ -539,7 +627,7 @@ public class BalancerTest
         pairs.add(pair);
         pair = new NameValue(name, name);
         pairs.add(pair);
-        IComponent instance = Balancer.instance(pairs, distributors);
+        Component instance = Balancer.instance(pairs, distributors);
         assertEquals(name, instance.getLabel());
         assertEquals(references.size(), instance.getReferences().size());
         assertTrue(instance.description() != null);

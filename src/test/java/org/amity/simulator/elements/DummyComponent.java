@@ -19,14 +19,16 @@
  */
 package org.amity.simulator.elements;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public class DummyComponent implements IComponent
+public class DummyComponent implements Component
 {
     private final double available;
     private final String label;
@@ -68,7 +70,7 @@ public class DummyComponent implements IComponent
     }
 
     @Override
-    public Map<String, List<IFunction>> getReferences()
+    public Map<String, List<Function>> getReferences()
     {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -96,5 +98,41 @@ public class DummyComponent implements IComponent
     {
         return this.available;
     }
-    
+
+    @Override
+    public void prioritize(final Sequencer sequencer, final boolean explore)
+    {
+        final String[] sources = new String[]{"source 1", "source 2",
+            "source 3"};
+        final Set<String> priorities = new HashSet<>();
+        if (explore)
+        {
+            // If matched to path, add collected information
+            if (sequencer.paths.contains(this))
+            {
+                sequencer.paths.addAll(sequencer.participants);
+            }
+            // End-of-explore and not in path
+            else
+            {
+                if (!sequencer.participants.isEmpty())
+                {
+                    sequencer.exclusions.addAll(sequencer.participants);
+                }
+                if (!sequencer.exclusions.contains(this))
+                {
+                    sequencer.exclusions.add(this);
+                }
+            }
+        }
+        else
+        {
+            priorities.add("source 1");
+            priorities.add("source 2");
+            priorities.add("source 3");
+            sequencer.sources = sources;
+            sequencer.priorities = priorities;
+            sequencer.paths.add(this);
+        }
+    }
 }

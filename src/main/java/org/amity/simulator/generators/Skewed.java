@@ -20,13 +20,13 @@
 package org.amity.simulator.generators;
 
 import java.util.List;
-import org.amity.simulator.elements.IComponent;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
 import org.apache.commons.math3.random.GaussianRandomGenerator;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.util.FastMath;
+import org.amity.simulator.elements.Component;
 
 /**
  * Implements generation of values that have a skewed Gaussian random
@@ -34,7 +34,7 @@ import org.apache.commons.math3.util.FastMath;
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public class Skewed implements IGenerator
+public class Skewed implements Generator
 {
     private final double factor;
     private final double middle;
@@ -45,7 +45,7 @@ public class Skewed implements IGenerator
     private final double bias;
     private final String source;
     private final String reference;
-    private IComponent next;
+    private Component next;
     private final RandomGenerator generator = new JDKRandomGenerator();
     private final GaussianRandomGenerator gaussian
             = new GaussianRandomGenerator(generator);
@@ -130,13 +130,13 @@ public class Skewed implements IGenerator
     }
 
     @Override
-    public IComponent getNext()
+    public Component getNext()
     {
         return next;
     }
 
     @Override
-    public void setNext(IComponent next)
+    public void setNext(Component next)
     {
         this.next = next;
     }
@@ -147,7 +147,7 @@ public class Skewed implements IGenerator
      * @param pairs list of name-values to convert into variables
      * @return manufactured skewed probability generator
      */
-    public final static IGenerator instance(final List<NameValue> pairs)
+    public final static Generator instance(final List<NameValue> pairs)
     {
         double maximum = 0;
         double minimum = 0;
@@ -180,7 +180,7 @@ public class Skewed implements IGenerator
                     break;
             }
         }
-        final IGenerator generator = new Skewed(minimum, maximum, skew, bias,
+        final Generator generator = new Skewed(minimum, maximum, skew, bias,
                 source, reference);
         return generator;
     }

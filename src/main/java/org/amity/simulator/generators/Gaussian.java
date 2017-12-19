@@ -20,20 +20,20 @@
 package org.amity.simulator.generators;
 
 import java.util.List;
-import org.amity.simulator.elements.IComponent;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
 import org.apache.commons.math3.random.GaussianRandomGenerator;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.util.FastMath;
+import org.amity.simulator.elements.Component;
 
 /**
  * Implements generation of values that have a Gaussian random distribution.
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public class Gaussian implements IGenerator
+public class Gaussian implements Generator
 {
 
     private final double offset;
@@ -42,7 +42,7 @@ public class Gaussian implements IGenerator
     private final double maximum;
     private final String source;
     private final String reference;
-    private IComponent next;
+    private Component next;
     private final RandomGenerator generator = new JDKRandomGenerator();
     private final GaussianRandomGenerator gaussian
             = new GaussianRandomGenerator(generator);
@@ -116,13 +116,13 @@ public class Gaussian implements IGenerator
     }
 
     @Override
-    public IComponent getNext()
+    public Component getNext()
     {
         return next;
     }
 
     @Override
-    public void setNext(IComponent next)
+    public void setNext(Component next)
     {
         this.next = next;
     }
@@ -133,7 +133,7 @@ public class Gaussian implements IGenerator
      * @param pairs list of name-values to convert into variables
      * @return manufactured Gaussian probability generator
      */
-    public final static IGenerator instance(final List<NameValue> pairs)
+    public final static Generator instance(final List<NameValue> pairs)
     {
         double maximum = 0;
         double minimum = 0;
@@ -158,7 +158,7 @@ public class Gaussian implements IGenerator
                     break;
             }
         }
-        final IGenerator generator = new Gaussian(minimum, maximum, source,
+        final Generator generator = new Gaussian(minimum, maximum, source,
                 reference);
         return generator;
     }

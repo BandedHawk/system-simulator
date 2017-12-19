@@ -1,5 +1,5 @@
 /*
- * IComponent.java
+ * Component.java
  *
  * (C) Copyright 2017 Jon Barnett.
  *
@@ -21,14 +21,13 @@ package org.amity.simulator.elements;
 
 import java.util.List;
 import java.util.Map;
-import org.amity.simulator.generators.IGenerator;
 
 /**
  * Interface of a system component in the simulation
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public interface IComponent
+public interface Component
 {
     /**
      * Access event information for events that passed through component
@@ -64,7 +63,7 @@ public interface IComponent
      * 
      * @return list of named references and associated generators
      */
-    Map<String, List<IFunction>> getReferences();
+    Map<String, List<Function>> getReferences();
 
     /**
      * 
@@ -91,4 +90,12 @@ public interface IComponent
      * @return next time component can process something
      */
     double getAvailable();
+
+    /**
+     * Find priority parameters for an active component
+     * 
+     * @param sequencer information to locate a priority event
+     * @param explore discovery mode if <code>true</code>
+     */
+    void prioritize(Sequencer sequencer, boolean explore);
 }

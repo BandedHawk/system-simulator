@@ -23,9 +23,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.amity.simulator.distributors.IDistributor;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
+import org.amity.simulator.distributors.Distributor;
+import org.amity.simulator.distributors.Smart;
 
 /**
  * Component that takes event and delivers it to one of a selection of
@@ -33,13 +34,14 @@ import org.amity.simulator.language.Vocabulary;
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public class Balancer implements IComponent
+public class Balancer implements Component
 {
     private final String label;
-    private final IDistributor distributor;
+    private final Distributor distributor;
     private final List<Event> local;
     private final List<Integer> depths;
     private final boolean monitor;
+    private final boolean intelligent;
 
     /**
      * Hidden default constructor to avoid implicit creation
@@ -49,6 +51,7 @@ public class Balancer implements IComponent
         this.label = "dummy";
         this.distributor = null;
         this.monitor = false;
+        this.intelligent = false;
         this.local = new ArrayList<>();
         this.depths = new ArrayList<>();
     }
@@ -60,11 +63,12 @@ public class Balancer implements IComponent
      * @param distributor algorithm implementation for balancing
      * @param monitor monitor if <code>true</code>
      */
-    public Balancer(final String label, final IDistributor distributor,
+    public Balancer(final String label, final Distributor distributor,
             final boolean monitor)
     {
         this.label = label;
         this.distributor = distributor;
+        this.intelligent = distributor instanceof Smart;
         this.monitor = monitor;
         this.local = new ArrayList<>();
         this.depths = new ArrayList<>();
@@ -83,10 +87,10 @@ public class Balancer implements IComponent
         if (this.distributor != null)
         {
             this.distributor.reset();
-            final IComponent[] components = this.distributor.connections();
+            final Component[] components = this.distributor.connections();
             if (components.length > 0)
             {
-                for (final IComponent component : components)
+                for (final Component component : components)
                 {
                     component.reset();
                 }
@@ -120,14 +124,14 @@ public class Balancer implements IComponent
     }
 
     @Override
-    public Map<String, List<IFunction>> getReferences()
+    public Map<String, List<Function>> getReferences()
     {
-        final Map<String, List<IFunction>> map = new HashMap<>();
+        final Map<String, List<Function>> map = new HashMap<>();
         if (this.distributor != null)
         {
             for (final String reference : this.distributor.getReferences())
             {
-                final List<IFunction> list = new ArrayList<>();
+                final List<Function> list = new ArrayList<>();
                 list.add(this.distributor);
                 map.put(reference, list);
             }
@@ -168,6 +172,50 @@ public class Balancer implements IComponent
     }
 
     @Override
+    public void prioritize(final Sequencer sequencer, final boolean explore)
+    {
+        boolean matched = false;
+        // Finding which set the event belongs
+        if (explore)
+        {
+            // If matched to path, add collected information
+            if (sequencer.paths.contains(this))
+            {
+                sequencer.paths.addAll(sequencer.participants);
+                matched = true;
+            }
+            // If matched to exclusions, add collected information
+            else if (sequencer.exclusions.contains(this))
+            {
+                sequencer.exclusions.addAll(sequencer.participants);
+                matched = true;
+            }
+            // Undecided so store until we are sure
+            else
+            {
+                sequencer.participants.add(this);
+            }
+        }
+        // We are obtaining prioritization information
+        else
+        {
+            sequencer.paths.add(this);
+        }
+        // Intelligent function so need to reset prediction after event
+        // complete
+        if (this.intelligent)
+        {
+            sequencer.intelligentFunctions.add(distributor);
+        }
+        // Go downstream if we are prioritizing or if exploring and we
+        // did not find any decision information on this current path
+        if (!matched)
+        {
+            this.distributor.prioritize(sequencer, explore);
+        }
+    }
+
+    @Override
     public double getAvailable()
     {
         return this.distributor.available();
@@ -180,8 +228,8 @@ public class Balancer implements IComponent
      * @param distributors list of distribution/balancing algorithms
      * @return manufactured balancer component
      */
-    public final static IComponent instance(final List<NameValue> pairs,
-            final List<IDistributor> distributors)
+    public final static Component instance(final List<NameValue> pairs,
+            final List<Distributor> distributors)
     {
         String label = null;
         boolean monitor = false;
@@ -199,7 +247,7 @@ public class Balancer implements IComponent
                     break;
             }
         }
-        final IComponent balancer
+        final Component balancer
                 = new Balancer(label, distributors.get(0), monitor);
         return balancer;
     }

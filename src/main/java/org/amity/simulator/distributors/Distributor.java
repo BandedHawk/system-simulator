@@ -1,5 +1,5 @@
 /*
- * IDistributor.java
+ * Distributor.java
  *
  * (C) Copyright 2017 Jon Barnett.
  *
@@ -21,15 +21,16 @@ package org.amity.simulator.distributors;
 
 import java.util.List;
 import org.amity.simulator.elements.Event;
-import org.amity.simulator.elements.IComponent;
-import org.amity.simulator.elements.IFunction;
+import org.amity.simulator.elements.Sequencer;
+import org.amity.simulator.elements.Component;
+import org.amity.simulator.elements.Function;
 
 /**
  * Interface for the distributor that sends events to other active components
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public interface IDistributor extends IFunction
+public interface Distributor extends Function
 {
     final static int UNKNOWN = -1;
 
@@ -57,14 +58,26 @@ public interface IDistributor extends IFunction
      * 
      * @param component downstream module for balancer
      */
-    void addNext(IComponent component);
+    void addNext(Component component);
 
     /**
      * Obtain a list of components participating in the balancing
      * 
      * @return list of downstream connections
      */
-    IComponent[] connections();
+    Component[] connections();
 
+    /**
+     * 
+     * @return next available processing of downstream component
+     */
     double available();
+
+    /**
+     * Find priority definitions for treatment of sources
+     * 
+     * @param sequencer algorithm and data to prioritize processing
+     * @param explore discovery mode if <code>true</code>
+     */
+    void prioritize(Sequencer sequencer, boolean explore);
 }

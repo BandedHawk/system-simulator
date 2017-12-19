@@ -21,23 +21,27 @@ package org.amity.simulator.elements;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import org.amity.simulator.generators.IGenerator;
+import java.util.Set;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
+import org.amity.simulator.generators.Generator;
 
 /**
  * Implements an active processing component in a system model
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public class Processor implements IComponent
+public class Processor implements Component
 {
 
     private final String label;
-    private final Map<String, IGenerator> generators;
-    private final Map<String, List<IFunction>> references;
+    private final Map<String, Generator> generators;
+    private final Map<String, List<Function>> references;
+    private final String[] sources;
+    private final Set<String> priorities;
     private final List<Event> local;
     private final boolean monitor;
     private double available;
@@ -57,6 +61,8 @@ public class Processor implements IComponent
         this.available = 0;
         this.depths = new ArrayList<>();
         this.depth = 0;
+        this.sources = new String[0];
+        this.priorities = new HashSet<>();
     }
 
     /**
@@ -67,8 +73,8 @@ public class Processor implements IComponent
      * distribution characteristic
      * @param monitor flag for generating component output information
      */
-    public Processor(final String label, final List<IGenerator> generators,
-            final boolean monitor)
+    public Processor(final String label, final List<Generator> generators,
+            final List<String> priorities, final boolean monitor)
     {
         this.label = label;
         this.generators = new HashMap<>();
@@ -81,24 +87,41 @@ public class Processor implements IComponent
         // Put the generators into the source lookup
         if (generators != null && !generators.isEmpty())
         {
-            for (final IGenerator generator : generators)
+            for (final Generator generator : generators)
             {
                 this.generators.put(generator.getSource(), generator);
             }
         }
         // Determine downstream references to resolve
-        for (final IGenerator generator : this.generators.values())
+        for (final Generator generator : this.generators.values())
         {
             final String reference = generator.getReference();
             if (reference != null)
             {
-                final List<IFunction> list
+                final List<Function> list
                         = this.references.containsKey(reference)
                         ? this.references.get(reference)
                         : new ArrayList<>();
                 list.add(generator);
                 references.putIfAbsent(reference, list);
             }
+        }
+        this.sources = priorities == null ? new String[0]
+                : new String[priorities.size()];
+        if (this.sources.length > 0)
+        {
+            int index = 0;
+            // Priority order array
+            for (final String source : priorities)
+            {
+                this.sources[index++] = source;
+            }
+            // Convenience to avoid downstream conversion
+            this.priorities = new HashSet<>(priorities);
+        }
+        else
+        {
+            this.priorities = new HashSet<>();
         }
     }
 
@@ -108,7 +131,7 @@ public class Processor implements IComponent
         if (event != null)
         {
             // Generate processing times for this event at this component
-            final IGenerator generator
+            final Generator generator
                     = generators.containsKey(event.getSource())
                     ? generators.get(event.getSource())
                     : generators.containsKey(Vocabulary.DEFAULT)
@@ -167,7 +190,7 @@ public class Processor implements IComponent
         this.local.clear();
         this.available = 0;
         // Reset downstream components
-        for (final IGenerator generator : this.generators.values())
+        for (final Generator generator : this.generators.values())
         {
             if (generator.getNext() != null)
             {
@@ -207,11 +230,11 @@ public class Processor implements IComponent
         }
         else
         {
-            for (final Map.Entry<String, IGenerator> entry
+            for (final Map.Entry<String, Generator> entry
                     : this.generators.entrySet())
             {
                 final String source = entry.getKey();
-                final IGenerator generator = entry.getValue();
+                final Generator generator = entry.getValue();
                 string.append("[").append(source).append(" := ");
                 if (generator != null)
                 {
@@ -228,9 +251,46 @@ public class Processor implements IComponent
     }
 
     @Override
-    public Map<String, List<IFunction>> getReferences()
+    public Map<String, List<Function>> getReferences()
     {
         return this.references;
+    }
+
+    @Override
+    public double getAvailable()
+    {
+        return this.available;
+    }
+
+    @Override
+    public void prioritize(final Sequencer sequencer, final boolean explore)
+    {
+        if (explore)
+        {
+            // If matched to path, add collected information
+            if (sequencer.paths.contains(this))
+            {
+                sequencer.paths.addAll(sequencer.participants);
+            }
+            // End-of-explore and not in path
+            else
+            {
+                if (!sequencer.participants.isEmpty())
+                {
+                    sequencer.exclusions.addAll(sequencer.participants);
+                }
+                if (!sequencer.exclusions.contains(this))
+                {
+                    sequencer.exclusions.add(this);
+                }
+            }
+        }
+        else
+        {
+            sequencer.sources = this.sources;
+            sequencer.priorities = this.priorities;
+            sequencer.paths.add(this);
+        }
     }
 
     /**
@@ -241,11 +301,12 @@ public class Processor implements IComponent
      * @param generators time functions for processing times
      * @return manufactured processor component
      */
-    public final static IComponent instance(final List<NameValue> pairs,
-            final List<IGenerator> generators)
+    public final static Component instance(final List<NameValue> pairs,
+            final List<Generator> generators)
     {
         String label = null;
         boolean monitor = false;
+        final List<String> priorities = new ArrayList<>();
         for (final NameValue parameter : pairs)
         {
             switch (parameter.name)
@@ -256,18 +317,14 @@ public class Processor implements IComponent
                 case Vocabulary.MONITOR:
                     monitor = parameter.value.toLowerCase().contains("y");
                     break;
+                case Vocabulary.PRIORITY:
+                    priorities.add(parameter.value);
                 default:
                     break;
             }
         }
-        final IComponent processor
-                = new Processor(label, generators, monitor);
+        final Component processor
+                = new Processor(label, generators, priorities, monitor);
         return processor;
-    }
-
-    @Override
-    public double getAvailable()
-    {
-        return this.available;
     }
 }

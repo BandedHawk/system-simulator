@@ -24,9 +24,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.amity.simulator.distributors.IDistributor;
-import org.amity.simulator.elements.IComponent;
-import org.amity.simulator.generators.IGenerator;
+import org.amity.simulator.distributors.Distributor;
+import org.amity.simulator.elements.Component;
+import org.amity.simulator.elements.Source;
+import org.amity.simulator.generators.Generator;
 
 /**
  * Scratch area for compilation tracking
@@ -41,10 +42,10 @@ class ScratchPad
     public Token labelToken;
     private boolean ok;
     private final Map<String, List<Pair>> pairs;
-    public final Map<String, IComponent> sources;
-    public final Map<String, IComponent> components;
-    public final List<IGenerator> generators;
-    public final List<IDistributor> distributors;
+    public final Map<String, Source> sources;
+    public final Map<String, Component> components;
+    public final List<Generator> generators;
+    public final List<Distributor> distributors;
     private final List<String> errors;
 
     /**
@@ -85,7 +86,7 @@ class ScratchPad
 
     /**
      * 
-     * @param error 
+     * @param error single message to be added
      */
     public void addError(final String error)
     {
@@ -95,7 +96,7 @@ class ScratchPad
 
     /**
      * 
-     * @param errors 
+     * @param errors messages to be added
      */
     public void addErrors(final List<String> errors)
     {
@@ -108,7 +109,7 @@ class ScratchPad
 
     /**
      * 
-     * @return 
+     * @return list of failure messages on parsing
      */
     public List<String> errors()
     {
@@ -117,7 +118,7 @@ class ScratchPad
 
     /**
      * 
-     * @return 
+     * @return <code>true</code> if parsing currently without errors
      */
     public boolean ok()
     {
@@ -125,7 +126,7 @@ class ScratchPad
     }
 
     /**
-     * 
+     * Clear name-value token pairs
      */
     public void clear()
     {
@@ -133,7 +134,7 @@ class ScratchPad
     }
 
     /**
-     * 
+     * Remove errors from scratchpad
      */
     public void clearErrors()
     {
@@ -142,7 +143,7 @@ class ScratchPad
     }
 
     /**
-     * 
+     * Clears scratchpad for re-use
      */
     public void reset()
     {
@@ -158,9 +159,10 @@ class ScratchPad
     }
 
     /**
+     * Convenience method to locate existing name-value data
      * 
-     * @param name
-     * @return 
+     * @param name identifier for name-value token pair
+     * @return <code>true</code> if the name is already defined
      */
     public boolean containsName(final String name)
     {
@@ -179,22 +181,28 @@ class ScratchPad
 
     /**
      * 
-     * @return 
+     * @return name-value token pairs
      */
     public Set<String> values()
     {
         return pairs.keySet();
     }
 
+    /**
+     * Store the name-value pair tokens
+     * 
+     * @param name token with name information
+     * @param value token with value information
+     */
     public void put(final Token name, final Token value)
     {
-        final String label = name.getValue();
+        final String tag = name.getValue();
         final Pair pair = new Pair(name, value);
         final List<Pair> list
-                = this.pairs.containsKey(label)
-                ? this.pairs.get(label)
+                = this.pairs.containsKey(tag)
+                ? this.pairs.get(tag)
                 : new ArrayList<>();
         list.add(pair);
-        pairs.putIfAbsent(label, list);
+        pairs.putIfAbsent(tag, list);
     }
 }

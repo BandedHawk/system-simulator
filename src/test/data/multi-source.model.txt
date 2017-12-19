@@ -145,6 +145,7 @@ component
         bias: -1.0
         next: database balancer
     }
+    priority: source 2
     monitor: Y
 }
 component
@@ -170,6 +171,7 @@ component
         bias: -1.0
         next: database balancer
     }
+    priority: source 2
     monitor: Y
 }
 component
@@ -195,6 +197,7 @@ component
         bias: -1.0
         next: database balancer
     }
+    priority: source 2
     monitor: Y
 }
 component

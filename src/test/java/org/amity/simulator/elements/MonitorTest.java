@@ -79,7 +79,7 @@ public class MonitorTest
         final double end = 10100;
         final Monitor instance = new Monitor(sampleStart, sampleEnd);
         final LinkedList<Event> events = new LinkedList<>();
-        for (final IComponent source : model.sources)
+        for (final Component source : model.sources)
         {
             do
             {
@@ -102,7 +102,7 @@ public class MonitorTest
                 events.sort(Comparator.comparingDouble(Event::getArrived));
             }
         }
-        for (final IComponent component : model.components.values())
+        for (final Component component : model.components.values())
         {
             component.generateStatistics(instance);
         }

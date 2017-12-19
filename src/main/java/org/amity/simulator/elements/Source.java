@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.amity.simulator.generators.IGenerator;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
+import org.amity.simulator.generators.Generator;
 
 /**
  * Implements an event source, generating events spread out in time as specified
@@ -33,12 +33,13 @@ import org.amity.simulator.language.Vocabulary;
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public class Source implements IComponent
+public class Source implements Component
 {
 
     private final String label;
-    private final IGenerator generator;
-    private final Map<String, List<IFunction>> generators;
+    private final Generator generator;
+    private final Map<String, List<Function>> generators;
+    private Sequencer sequencer;
     private final List<Event> local;
     private final boolean monitor;
     private int counter;
@@ -56,6 +57,7 @@ public class Source implements IComponent
         this.monitor = false;
         this.counter = 0;
         this.time = 0;
+        this.sequencer = null;
     }
 
     /**
@@ -66,15 +68,16 @@ public class Source implements IComponent
      * distribution characteristic
      * @param monitor flag for generating component output information
      */
-    public Source(final String label, final IGenerator generator,
+    public Source(final String label, final Generator generator,
             final boolean monitor)
     {
         this.label = label;
         this.generator = generator;
         this.generators = new HashMap<>();
+        this.sequencer = null;
         if (this.generator != null)
         {
-            final List<IFunction> list = new ArrayList<>();
+            final List<Function> list = new ArrayList<>();
             list.add(this.generator);
             this.generators.put(generator.getReference(), list);
         }
@@ -93,7 +96,7 @@ public class Source implements IComponent
             final double value = this.generator.generate();
             this.time += value;
             final Event event = new Event(this.label,
-                    Integer.toString(this.counter++), this.time);
+                    Integer.toString(this.counter++), this.time, this.sequencer);
             event.setValues(this.time, this.time, this.time);
             this.local.add(event);
         }
@@ -165,9 +168,29 @@ public class Source implements IComponent
     }
 
     @Override
-    public Map<String, List<IFunction>> getReferences()
+    public Map<String, List<Function>> getReferences()
     {
         return this.generators;
+    }
+
+    @Override
+    public double getAvailable()
+    {
+        return this.time;
+    }
+
+    @Override
+    public void prioritize(final Sequencer sequencer, final boolean explore)
+    {
+        if (explore)
+        {
+            sequencer.participants.add(this);
+        }
+        else
+        {
+            sequencer.sources = new String[0];
+            sequencer.paths.add(this);
+        }
     }
 
     /**
@@ -178,8 +201,8 @@ public class Source implements IComponent
      * @param generators time functions for event creation times
      * @return manufactured event source component
      */
-    public final static IComponent instance(final List<NameValue> pairs,
-            List<IGenerator> generators)
+    public final static Component instance(final List<NameValue> pairs,
+            List<Generator> generators)
     {
         String label = null;
         boolean monitor = false;
@@ -197,14 +220,17 @@ public class Source implements IComponent
                     break;
             }
         }
-        final IComponent source = new Source(label, generators.get(0),
+        final Component source = new Source(label, generators.get(0),
                 monitor);
         return source;
     }
 
-    @Override
-    public double getAvailable()
+    /**
+     * 
+     * @param sequencer re-prioritization implementation for event to use
+     */
+    public void setSequencer(final Sequencer sequencer)
     {
-        return this.time;
+        this.sequencer = sequencer;
     }
 }

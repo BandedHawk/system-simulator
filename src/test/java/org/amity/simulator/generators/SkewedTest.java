@@ -21,7 +21,6 @@ package org.amity.simulator.generators;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.amity.simulator.elements.IComponent;
 import org.amity.simulator.elements.Processor;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
@@ -32,6 +31,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.amity.simulator.elements.Component;
 
 /**
  * Tests that the resulting values follow a skewed Gaussian distribution
@@ -80,7 +80,7 @@ public class SkewedTest
         final double skew = 0.8;
         final String source = Vocabulary.DEFAULT;
         final String reference = "database";
-        IGenerator instance = new Skewed(minimum, maximum, skew, bias, source,
+        Generator instance = new Skewed(minimum, maximum, skew, bias, source,
                 reference);
         final DescriptiveStatistics statistics = new DescriptiveStatistics();
         for (int count = 0; count < eventTotal; count++)
@@ -141,7 +141,7 @@ public class SkewedTest
         final double skew = 0.8;
         final String source = Vocabulary.DEFAULT;
         final String reference = "database";
-        final IGenerator instance = new Skewed(minimum, maximum, skew, bias,
+        final Generator instance = new Skewed(minimum, maximum, skew, bias,
                 source, reference);
         assertTrue(instance.characteristics() != null);
     }
@@ -159,7 +159,7 @@ public class SkewedTest
         final double skew = 0.8;
         final String source = Vocabulary.DEFAULT;
         final String reference = "database";
-        final IGenerator instance = new Skewed(minimum, maximum, skew, bias,
+        final Generator instance = new Skewed(minimum, maximum, skew, bias,
                 source, reference);
         assertEquals(instance.getSource(), source);
     }
@@ -177,7 +177,7 @@ public class SkewedTest
         final double skew = 0.8;
         final String source = Vocabulary.DEFAULT;
         final String reference = "database";
-        final IGenerator instance = new Skewed(minimum, maximum, skew, bias,
+        final Generator instance = new Skewed(minimum, maximum, skew, bias,
                 source, reference);
         assertEquals(instance.getReference(), reference);
     }
@@ -195,12 +195,13 @@ public class SkewedTest
         final double skew = 0.8;
         final String source = Vocabulary.DEFAULT;
         final String reference = "database";
-        final IGenerator instance = new Skewed(minimum, maximum, skew, bias,
+        final Generator instance = new Skewed(minimum, maximum, skew, bias,
                 source, reference);
-        final List<IGenerator> generators = new ArrayList<>();
+        final List<Generator> generators = new ArrayList<>();
         generators.add(instance);
-        final IComponent component = new Processor("test", generators,
-                false);
+        final List<String> priority = new ArrayList<>();
+        final Component component = new Processor("test", generators,
+                priority, false);
         instance.setNext(component);
         assertEquals(instance.getNext(), component);
     }
@@ -221,7 +222,7 @@ public class SkewedTest
         pairs.add(pair);
         pair = new NameValue(Vocabulary.BIAS, "98.3");
         pairs.add(pair);
-        IGenerator result = Skewed.instance(pairs);
+        Generator result = Skewed.instance(pairs);
         assertTrue(result != null);
         assertEquals(result.getReference(), null);
         assertEquals(result.getSource(), Vocabulary.DEFAULT);

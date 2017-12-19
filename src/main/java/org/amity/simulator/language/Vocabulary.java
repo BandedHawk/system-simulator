@@ -56,13 +56,15 @@ public class Vocabulary
     public final static String BALANCER = "balancer";
     public final static String NEXT = "next";
     public final static String NAME = "name";
+    public final static String PRIORITY = "priority";
     public final static String COMPONENT = "component";
 
     static
     {
         TYPE_PATTERN = Pattern.compile("^\\s*[a-zA-Z][\\s\\w]*[\\-]*[\\s\\w]*$");
         final Map<String, Map<String, Definition>> blocks = new HashMap<>();
-        final Map<String, Definition> component = new HashMap<>();
+        final Map<String, Definition> source = new HashMap<>();
+        final Map<String, Definition> processor = new HashMap<>();
         final Map<String, Definition> balancer = new HashMap<>();
         final Pattern words = Pattern.compile("^\\s*[a-zA-Z][\\s|\\w]*$");
         final Pattern positiveDecimal = Pattern.compile("^\\+?\\d*\\.?\\d+$");
@@ -76,13 +78,17 @@ public class Vocabulary
         final Definition biasDecimal =
                 new Definition(decimal, true, false);
         final Definition multiWords = new Definition(words, true, true);
+        final Definition optionalMulti = new Definition(words, false, true);
         balancer.put(Vocabulary.NAME, mandatoryWords);
         balancer.put(Vocabulary.MONITOR, monitor);
-        component.put(Vocabulary.NAME, mandatoryWords);
-        component.put(Vocabulary.MONITOR, monitor);
+        source.put(Vocabulary.NAME, mandatoryWords);
+        source.put(Vocabulary.MONITOR, monitor);
+        processor.put(Vocabulary.NAME, mandatoryWords);
+        processor.put(Vocabulary.MONITOR, monitor);
+        processor.put(Vocabulary.PRIORITY, optionalMulti);
         blocks.put(Vocabulary.BALANCER, balancer);
-        blocks.put(Vocabulary.SOURCE, component);
-        blocks.put(Vocabulary.PROCESSOR, component);
+        blocks.put(Vocabulary.SOURCE, source);
+        blocks.put(Vocabulary.PROCESSOR, processor);
         final Map<String, Map<String, Definition>> functions = new HashMap<>();
         final Map<String, Definition> bounds = new HashMap<>();
         bounds.put(Vocabulary.MAXIMUM, mandatoryDecimal);

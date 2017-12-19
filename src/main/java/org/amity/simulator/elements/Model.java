@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,8 +38,8 @@ public class Model
 
     private final List<String> errors;
     private boolean compiled;
-    final List<IComponent> sources;
-    final Map<String, IComponent> components;
+    final List<Source> sources;
+    final Map<String, Component> components;
 
     /**
      * Default constructor for the system model
@@ -71,8 +70,8 @@ public class Model
      * @param sources convenience list of event sources
      * @param components objects that represent the connected system
      */
-    public void addComponents(final Collection<IComponent> sources,
-            final Map<String, IComponent> components)
+    public void addComponents(final Collection<Source> sources,
+            final Map<String, Component> components)
     {
         if (this.compiled)
         {
@@ -122,13 +121,13 @@ public class Model
                     + start + " and " + end);
             final boolean multisource = this.sources.size() > 1;
             monitor.displayStatistics(simulator.completed, multisource);
-            final Set<Map.Entry<String, IComponent>> set
+            final Set<Map.Entry<String, Component>> set
                     = new TreeSet<>(Map.Entry.comparingByKey());
             set.addAll(this.components.entrySet());
-            for (final Map.Entry<String, IComponent> entry
+            for (final Map.Entry<String, Component> entry
                     : set)
             {
-                final IComponent component = entry.getValue();
+                final Component component = entry.getValue();
                 component.generateStatistics(monitor);
             }
         }
@@ -145,8 +144,8 @@ public class Model
         private final static int MIN_BUFFER = 20;
         private final static int MAX_BUFFER = 2000;
         private final static int CYCLES = 50000;
-        private final LinkedList<Event> primary;
-        private final LinkedList<Event> working;
+        private final List<Event> primary;
+        private final List<Event> working;
         private final List<Event> completed;
         private int capacity;
         private double highmark;
@@ -158,8 +157,8 @@ public class Model
         private Simulator()
         {
             this.capacity = Simulator.FILL;
-            this.primary = new LinkedList<>();
-            this.working = new LinkedList<>();
+            this.primary = new ArrayList<>();
+            this.working = new ArrayList<>();
             this.completed = new ArrayList<>();
             this.highmark = 0;
             this.overrun = false;
@@ -171,16 +170,19 @@ public class Model
          * @param sources event generation components
          * @param generate end-point in ticks for the simulation completion
          */
-        private Simulator(final List<IComponent> sources, final double generate)
+        private Simulator(final List<Source> sources, final double generate)
         {
             this.capacity = Simulator.FILL;
-            this.primary = new LinkedList<>();
-            this.working = new LinkedList<>();
+            this.primary = new ArrayList<>();
+            this.working = new ArrayList<>();
             this.completed = new ArrayList<>();
             this.highmark = 0;
             this.overrun = false;
-            for (final IComponent source : sources)
+            // Use only one sequencer for all events
+            final Sequencer sequencer = new Sequencer();
+            for (final Source source : sources)
             {
+                source.setSequencer(sequencer);
                 do
                 {
                     final Event event = source.simulate(null);
@@ -188,7 +190,11 @@ public class Model
                     {
                         break;
                     }
-                    this.primary.add(event);
+                    // Only add event if it has a component to execute against
+                    if (event.getComponent() != null)
+                    {
+                        this.primary.add(event);
+                    }
                 }
                 while (true);
             }
@@ -210,9 +216,10 @@ public class Model
         {
             System.out.println("  Start simulation");
             int transitions = 0;
+            boolean locked = false;
             while (this.working.size() > 0)
             {
-                final Event event = this.working.removeFirst();
+                final Event event = this.working.remove(0);
                 // End of simulation time
                 if (event.getCompleted() > generate)
                 {
@@ -221,11 +228,15 @@ public class Model
                 // Check there is no delay with execution
                 final boolean zeroDelay
                         = event.getComponent() instanceof Balancer;
-                event.simulate();
+                final Event priority = event.prioritize(this.working,
+                        locked);
+                priority.simulate();
+                locked = false;
                 transitions++;
-                if (event.getComponent() == null)
+                // 
+                if (priority.getComponent() == null)
                 {
-                    this.completed.add(event);
+                    this.completed.add(priority);
                 }
                 // Load balancer with no execution delay so
                 // continue moving through event system state
@@ -234,27 +245,31 @@ public class Model
                     // Put this back on to execute first again on the next
                     // transition as availability may have been calculated
                     // for this event so we need to do it first
-                    this.working.addFirst(event);
+                    this.working.add(0, priority);
+                    // Don't re-check priority next iteration as we're
+                    // executing on this event
+                    locked = true;
                 }
                 // New completion time for current event so re-sort execution
                 // schedule
                 else
                 {
-                    this.working.add(event);
+                    // Add to end as we will reshuffle
+                    this.working.add(priority);
                     // Refill working buffer if modified event completion is
                     // higher than the high watermark or we are getting
                     // to a low working buffer and we still have events in the
                     // primary event buffer
                     if (!this.primary.isEmpty()
                             && (this.working.size() < Simulator.MIN_BUFFER
-                            || event.getCompleted() > this.highmark))
+                            || priority.getCompleted() > this.highmark))
                     {
-                        if (this.highmark < event.getCompleted()
+                        if (this.highmark < priority.getCompleted()
                                 && this.capacity < Simulator.MAX_BUFFER)
                         {
                             this.capacity += Simulator.FILL;
                         }
-                        this.highmark = event.getCompleted();
+                        this.highmark = priority.getCompleted();
                         this.fill();
                     }
                     // Re-sort working buffer after we have modified the list
@@ -264,7 +279,8 @@ public class Model
                 if (transitions % Simulator.CYCLES == 0)
                 {
                     System.out.println("    Transitions: " + transitions);
-                    System.out.println("      Time: " + event.getCompleted());
+                    System.out.println("      Time: "
+                            + priority.getCompleted());
                     System.out.println("      Events completed: "
                             + this.completed.size());
                     final int remaining = this.primary.size()
@@ -304,7 +320,7 @@ public class Model
                 {
                     this.overrun = false;
                 }
-                // Copy events from main working into working working
+                // Copy events from main buffer into working buffer
                 for (int index = 0; index < this.capacity; index++)
                 {
                     if (this.primary.isEmpty())
@@ -313,7 +329,7 @@ public class Model
                     }
                     else
                     {
-                        final Event event = primary.removeFirst();
+                        final Event event = primary.remove(0);
                         this.working.add(event);
                         current = event.getCompleted();
                     }

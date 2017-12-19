@@ -26,6 +26,8 @@ component
         maximum: 4
         source: default
     }
+    priority: generator
+    priority: other
 }
 component
 {

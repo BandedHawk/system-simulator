@@ -124,9 +124,9 @@ public class ModelTest
         double generate = 100.0;
         double start = 10.0;
         double end = 90.0;
-        final File file = new File("src/test/data/balancer.example.txt");
+        File file = new File("src/test/data/balancer.example.txt");
         final Lexer lexer = new Lexer();
-        final Token token = lexer.analyze(file);
+        Token token = lexer.analyze(file);
         Model model = token.parse();
         assertTrue(model.getErrors().isEmpty());
         assertTrue(model.isCompiled());
@@ -142,5 +142,12 @@ public class ModelTest
         model = new Model();
         assertFalse(model.isCompiled());
         assertFalse(model.execute(generate, start, end));
+        System.out.println("  Test with complex definition");
+        file = new File("src/test/data/multi-source.model.txt");
+        token = lexer.analyze(file);
+        model = token.parse();
+        assertTrue(model.getErrors().isEmpty());
+        assertTrue(model.isCompiled());
+        assertTrue(model.execute(generate, start, end));
     }
 }

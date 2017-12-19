@@ -21,22 +21,22 @@
 package org.amity.simulator.generators;
 
 import java.util.List;
-import org.amity.simulator.elements.IComponent;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
+import org.amity.simulator.elements.Component;
 
 /**
  *  Implements generation of a constant name.
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
-public class Constant implements IGenerator
+public class Constant implements Generator
 {
 
     private final double period;
     private final String source;
     private final String reference;
-    private IComponent next;
+    private Component next;
 
     /**
      * Hidden default constructor to avoid implicit creation
@@ -93,13 +93,13 @@ public class Constant implements IGenerator
     }
 
     @Override
-    public IComponent getNext()
+    public Component getNext()
     {
         return next;
     }
 
     @Override
-    public void setNext(IComponent next)
+    public void setNext(Component next)
     {
         this.next = next;
     }
@@ -110,7 +110,7 @@ public class Constant implements IGenerator
      * @param pairs list of name-values to convert into variables
      * @return manufactured constant period generator
      */
-    public final static IGenerator instance(final List<NameValue> pairs)
+    public final static Generator instance(final List<NameValue> pairs)
     {
         double period = 0;
         String reference = null;
@@ -131,7 +131,7 @@ public class Constant implements IGenerator
                     break;
             }
         }
-        final IGenerator generator = new Constant(period, source, reference);
+        final Generator generator = new Constant(period, source, reference);
         return generator;
     }
 }
