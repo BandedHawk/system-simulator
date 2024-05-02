@@ -67,7 +67,7 @@ public class EventTest
     public void testSetValues()
     {
         System.out.println("setValues");
-        final Event instance = new Event("generator", "test", 0, sequencer);
+        final Event instance = new Event("generator", "test", 0);
         final double arrival = 10.0;
         final double start = 15.0;
         final double complete = 20.0;
@@ -94,7 +94,7 @@ public class EventTest
         System.out.println("  Test source initialize");
         final String source = "source";
         final String label = "test";
-        final Event instance = new Event(source, label, 0, sequencer);
+        final Event instance = new Event(source, label, 0);
         assertEquals(source, instance.getSource());
         System.out.println("  Test source set");
         final String update = "other";
@@ -116,7 +116,7 @@ public class EventTest
         System.out.println("  Test label initialize");
         final String source = "source";
         final String label = "test";
-        final Event instance = new Event(source, label, 0, sequencer);
+        final Event instance = new Event(source, label, 0);
         assertEquals(label, instance.getLabel());
         System.out.println("  Test label set");
         final String update = "other";
@@ -136,7 +136,7 @@ public class EventTest
     {
         System.out.println("getArrival");
         System.out.println("  Test arrival initialize");
-        final Event instance = new Event("source", "test", 0, sequencer);
+        final Event instance = new Event("source", "test", 0);
         double expResult = 0.0;
         double result = instance.getArrived();
         assertEquals(expResult, result, 0.0);
@@ -155,7 +155,7 @@ public class EventTest
     {
         System.out.println("getStart");
         System.out.println("  Test start initialize");
-        final Event instance = new Event("source", "test", 0, sequencer);
+        final Event instance = new Event("source", "test", 0);
         double expResult = 0.0;
         double result = instance.getStarted();
         assertEquals(expResult, result, 0.0);
@@ -174,7 +174,7 @@ public class EventTest
     {
         System.out.println("getComplete");
         System.out.println("  Test complete initialize");
-        final Event instance = new Event("source", "test", 0, sequencer);
+        final Event instance = new Event("source", "test", 0);
         double expResult = 0.0;
         double result = instance.getCompleted();
         assertEquals(expResult, result, 0.0);
@@ -193,7 +193,7 @@ public class EventTest
     {
         System.out.println("getExecuted");
         System.out.println("  Test executed initialize");
-        final Event instance = new Event("source", "test", 0, sequencer);
+        final Event instance = new Event("source", "test", 0);
         double expResult = 0.0;
         double result = instance.getExecuted();
         assertEquals(expResult, result, 0.0);
@@ -212,7 +212,7 @@ public class EventTest
     {
         System.out.println("simulate");
         System.out.println("  check event unchanged with no component");
-        final Event instance = new Event("generator", "test", 0, sequencer);
+        final Event instance = new Event("generator", "test", 0);
         final double arrival = 10.0;
         final double start = 15.0;
         final double complete = 20.0;

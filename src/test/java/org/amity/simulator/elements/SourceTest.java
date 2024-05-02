@@ -100,7 +100,7 @@ public class SourceTest
         final String source = "source";
         tick = 1000;
         final Sequencer sequencer = new Sequencer();
-        Event event = new Event(source, label, tick, sequencer);
+        Event event = new Event(source, label, tick);
         event.setValues(tick, tick, tick);
         event = instance.simulate(event);
         assertEquals(source, event.getSource());

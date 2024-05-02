@@ -101,7 +101,7 @@ public class RandomTest
         distributor.addNext(component5);
         final double[] count = new double[references.size()];
         System.out.println("  check for standard operation");
-        Event event = new Event(sourceLabel, sourceLabel, 1.0, sequencer);
+        Event event = new Event(sourceLabel, sourceLabel, 1.0);
         final int total = 2000000;
         for (int index = 0; index < total; index++)
         {
@@ -170,7 +170,7 @@ public class RandomTest
         distributor.addNext(component3);
         distributor.addNext(component2);
         distributor.addNext(component1);
-        Event event = new Event(sourceLabel, sourceLabel, 1.0, sequencer);
+        Event event = new Event(sourceLabel, sourceLabel, 1.0);
         boolean mismatch = false;
         for (int count = 0; count < 20; count++)
         {
@@ -289,7 +289,7 @@ public class RandomTest
         distributor.addNext(component3);
         distributor.addNext(component2);
         distributor.addNext(component1);
-        Event event = new Event(sourceLabel, sourceLabel, 1.0, sequencer);
+        Event event = new Event(sourceLabel, sourceLabel, 1.0);
         System.out.println("  check available changes with assignment");
         int changed = 0;
         double last = 0;

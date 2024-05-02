@@ -89,7 +89,7 @@ public class SmartTest
         distributor.addNext(component3);
         distributor.addNext(component2);
         distributor.addNext(component1);
-        Event event = new Event(sourceLabel, sourceLabel, 1.0, sequencer);
+        Event event = new Event(sourceLabel, sourceLabel, 1.0);
         event = distributor.assign(event);
         System.out.println("  Check basic expectation");
         assertEquals(event.getComponent(), component3);
@@ -135,7 +135,7 @@ public class SmartTest
         final Sequencer sequencer = new Sequencer();
         distributor.addNext(component2);
         distributor.addNext(component1);
-        Event event = new Event(sourceLabel, sourceLabel, 1.0, sequencer);
+        Event event = new Event(sourceLabel, sourceLabel, 1.0);
         event = distributor.assign(event);
         assertEquals(event.getComponent(), component2);
         distributor.reset();

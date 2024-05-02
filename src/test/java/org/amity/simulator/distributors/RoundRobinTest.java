@@ -89,7 +89,7 @@ public class RoundRobinTest
         distributor.addNext(component3);
         distributor.addNext(component2);
         distributor.addNext(component1);
-        Event event = new Event(sourceLabel, sourceLabel, 1.0, sequencer);
+        Event event = new Event(sourceLabel, sourceLabel, 1.0);
         event = distributor.assign(event);
         assertEquals(event.getComponent(), component1);
         event = distributor.assign(event);
@@ -175,7 +175,7 @@ public class RoundRobinTest
         distributor.addNext(component3);
         distributor.addNext(component2);
         distributor.addNext(component1);
-        Event event = new Event(sourceLabel, sourceLabel, 1.0, sequencer);
+        Event event = new Event(sourceLabel, sourceLabel, 1.0);
         event = distributor.assign(event);
         assertEquals(event.getComponent(), component1);
         event = distributor.assign(event);
