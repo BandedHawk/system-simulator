@@ -32,7 +32,7 @@ import org.amity.simulator.elements.Function;
  */
 public interface Distributor extends Function
 {
-    final static int UNKNOWN = -1;
+    int UNKNOWN = -1;
 
     /**
      * Assigns event to downstream component

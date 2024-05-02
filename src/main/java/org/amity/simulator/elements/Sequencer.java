@@ -124,15 +124,12 @@ public class Sequencer
                                 break;
                             }
                             // Lock in possible re-sequence
-                            if (this.sources[i].equals(current.getSource()))
+                            if (this.sources[i].equals(current.getSource())
+                                    && position[i] == Distributor.UNKNOWN)
                             {
-                                // Only store if first at that priority
-                                if (position[i] == Distributor.UNKNOWN)
-                                {
-                                    position[i] = index;
-                                    found = true;
-                                    break;
-                                }
+                                position[i] = index;
+                                found = true;
+                                break;
                             }
                         }
                     }
@@ -192,7 +189,7 @@ public class Sequencer
                 // point
                 final int knownPath = this.paths.size();
                 // Lock in path
-                final double tick = current.getComponent().getAvailable();
+                current.getComponent().getAvailable();
                 current.getComponent().prioritize(this, true);
                 // If we've changed path elements, then there is a connection
                 connects = knownPath != this.paths.size();

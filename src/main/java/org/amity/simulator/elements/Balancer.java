@@ -111,7 +111,7 @@ public class Balancer implements Component
             // Copy current event to local records
             final Event current = new Event(event);
             current.setComponent(null);
-            final boolean result = this.local.add(current);
+            this.local.add(current);
             this.depths.add(0);
         }
         return event == null ? event : distributor.assign(event);

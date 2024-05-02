@@ -157,7 +157,7 @@ public class Processor implements Component
             // Copy current event to local stats
             final Event current = new Event(event);
             current.setComponent(null);
-            final boolean result = this.local.add(current);
+            this.local.add(current);
             // Modify global event to next component to pass through
             event.setComponent(generator.getNext());
             // Check how many events are waiting to execute to find queue depth

@@ -45,7 +45,7 @@ public class Lexer
     public Token analyze(final File file)
     {
         Token token = null;
-        try (final Scanner scanner = new Scanner(file, "UTF-8"))
+        try (Scanner scanner = new Scanner(file, "UTF-8"))
         {
             final ParseTracker tracker = new ParseTracker();
             parse(scanner, tracker);

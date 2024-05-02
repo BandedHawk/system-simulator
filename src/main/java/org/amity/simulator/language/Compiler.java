@@ -268,7 +268,7 @@ class Compiler
             if (types.size() == 1)
             {
                 final Token value = types.get(0).value;
-                final Token name = types.get(0).name;
+                // final Token name = types.get(0).name; //Unused
                 // Get type declared
                 final String type = value.getValue();
                 final List<NameValue> pairs = new ArrayList<>();

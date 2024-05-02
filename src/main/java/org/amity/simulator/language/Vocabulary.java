@@ -1,5 +1,5 @@
 /*
- * Vocabulary.java
+ * java
  *
  * (C) Copyright 2017 Jon Barnett.
  *
@@ -79,48 +79,48 @@ public class Vocabulary
                 new Definition(decimal, true, false);
         final Definition multiWords = new Definition(words, true, true);
         final Definition optionalMulti = new Definition(words, false, true);
-        balancer.put(Vocabulary.NAME, mandatoryWords);
-        balancer.put(Vocabulary.MONITOR, monitor);
-        source.put(Vocabulary.NAME, mandatoryWords);
-        source.put(Vocabulary.MONITOR, monitor);
-        processor.put(Vocabulary.NAME, mandatoryWords);
-        processor.put(Vocabulary.MONITOR, monitor);
-        processor.put(Vocabulary.PRIORITY, optionalMulti);
-        blocks.put(Vocabulary.BALANCER, balancer);
-        blocks.put(Vocabulary.SOURCE, source);
-        blocks.put(Vocabulary.PROCESSOR, processor);
+        balancer.put(NAME, mandatoryWords);
+        balancer.put(MONITOR, monitor);
+        source.put(NAME, mandatoryWords);
+        source.put(MONITOR, monitor);
+        processor.put(NAME, mandatoryWords);
+        processor.put(MONITOR, monitor);
+        processor.put(PRIORITY, optionalMulti);
+        blocks.put(BALANCER, balancer);
+        blocks.put(SOURCE, source);
+        blocks.put(PROCESSOR, processor);
         final Map<String, Map<String, Definition>> functions = new HashMap<>();
         final Map<String, Definition> bounds = new HashMap<>();
-        bounds.put(Vocabulary.MAXIMUM, mandatoryDecimal);
-        bounds.put(Vocabulary.MINIMUM, mandatoryDecimal);
+        bounds.put(MAXIMUM, mandatoryDecimal);
+        bounds.put(MINIMUM, mandatoryDecimal);
         final Map<String, Definition> complex = new HashMap<>();
-        complex.put(Vocabulary.MAXIMUM, mandatoryDecimal);
-        complex.put(Vocabulary.MINIMUM, mandatoryDecimal);
-        complex.put(Vocabulary.BIAS, biasDecimal);
-        complex.put(Vocabulary.SKEW, mandatoryDecimal);
+        complex.put(MAXIMUM, mandatoryDecimal);
+        complex.put(MINIMUM, mandatoryDecimal);
+        complex.put(BIAS, biasDecimal);
+        complex.put(SKEW, mandatoryDecimal);
         final Map<String, Definition> offset = new HashMap<>();
-        offset.put(Vocabulary.PERIOD, mandatoryDecimal);
+        offset.put(PERIOD, mandatoryDecimal);
         final Map<String, Definition> divert = new HashMap<>();
-        divert.put(Vocabulary.NEXT, multiWords);
+        divert.put(NEXT, multiWords);
         // Define vocabulary definitions for each function
-        functions.put(Vocabulary.UNIFORM, bounds);
-        functions.put(Vocabulary.CONSTANT, offset);
-        functions.put(Vocabulary.GAUSSIAN, bounds);
-        functions.put(Vocabulary.SKEWED, complex);
+        functions.put(UNIFORM, bounds);
+        functions.put(CONSTANT, offset);
+        functions.put(GAUSSIAN, bounds);
+        functions.put(SKEWED, complex);
         // Add these only to generators and not to balancers
         for (final Map<String, Definition> generator : functions.values())
         {
-            generator.put(Vocabulary.NEXT, optionalWords);
-            generator.put(Vocabulary.SOURCE, optionalWords);
+            generator.put(NEXT, optionalWords);
+            generator.put(SOURCE, optionalWords);
         }
         // These are for balancers
-        functions.put(Vocabulary.ROUNDROBIN, divert);
-        functions.put(Vocabulary.SMART, divert);
-        functions.put(Vocabulary.RANDOM, divert);
+        functions.put(ROUNDROBIN, divert);
+        functions.put(SMART, divert);
+        functions.put(RANDOM, divert);
         final List<String> components = new ArrayList<>();
-        components.add(Vocabulary.COMPONENT);
+        components.add(COMPONENT);
         final List<String> subcomponents = new ArrayList<>();
-        subcomponents.add(Vocabulary.FUNCTION);
+        subcomponents.add(FUNCTION);
         DEFINITIONS = (Map<String, Map<String, Definition>>[]) new Map[2];
         DEFINITIONS[0] = blocks;
         DEFINITIONS[1] = functions;
@@ -138,7 +138,7 @@ public class Vocabulary
     public static boolean containsDefinition(final String key,
             final int depth)
     {
-        return Vocabulary.DEFINITIONS[depth].containsKey(key);
+        return DEFINITIONS[depth].containsKey(key);
     }
 
     /**
@@ -150,7 +150,7 @@ public class Vocabulary
     public static Map<String, Definition> get(final String key,
             final int depth)
     {
-        return Vocabulary.DEFINITIONS[depth].get(key);
+        return DEFINITIONS[depth].get(key);
     }
 
     /**
@@ -162,6 +162,6 @@ public class Vocabulary
     public static boolean containsDeclaration(final String key,
             final int depth)
     {
-        return Vocabulary.DECLARATIONS[depth].contains(key);
+        return DECLARATIONS[depth].contains(key);
     }
 }

@@ -64,10 +64,8 @@ public class Event
      * @param source name of source
      * @param label distinguishing name of event
      * @param created time event was created
-     * @param sequencer
      */
-    public Event(final String source, final String label, final double created,
-            final Sequencer sequencer)
+    public Event(final String source, final String label, final double created)
     {
         this.source = source;
         this.label = label;

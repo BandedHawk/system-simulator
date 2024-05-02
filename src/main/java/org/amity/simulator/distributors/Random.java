@@ -53,7 +53,7 @@ public class Random implements Distributor
         this.modulus = 0;
         this.next = new Component[0];
         this.generator = null;
-        this.peek = Distributor.UNKNOWN;
+        this.peek = UNKNOWN;
     }
 
     /**
@@ -67,7 +67,7 @@ public class Random implements Distributor
         this.modulus = references != null ? references.size() : 0;
         this.next = new Component[this.modulus];
         this.generator = new JDKRandomGenerator();
-        this.peek = Distributor.UNKNOWN;
+        this.peek = UNKNOWN;
     }
 
     @Override
@@ -77,11 +77,11 @@ public class Random implements Distributor
         {
             // If we were asked for availability - we already generated
             // next target so we must honor that
-            final int selection = this.peek == Distributor.UNKNOWN
+            final int selection = this.peek == UNKNOWN
                     ? generator.nextInt(this.modulus)
                     : this.peek;
             // Reset peek value
-            this.peek = Distributor.UNKNOWN;
+            this.peek = UNKNOWN;
             event.setComponent(this.next[selection]);
         }
         return event;
@@ -90,7 +90,7 @@ public class Random implements Distributor
     @Override
     public void reset()
     {
-        this.peek = Distributor.UNKNOWN;
+        this.peek = UNKNOWN;
     }
 
     @Override
@@ -127,7 +127,7 @@ public class Random implements Distributor
     {
         // Lookahead at what next random selection is going to be
         // to get availability of that selection
-        if (this.peek == Distributor.UNKNOWN)
+        if (this.peek == UNKNOWN)
         {
             this.peek  = generator.nextInt(this.modulus);
         }
@@ -181,7 +181,7 @@ public class Random implements Distributor
     @Override
     public void prioritize(final Sequencer sequencer, final boolean explore)
     {
-        if (this.peek == Distributor.UNKNOWN)
+        if (this.peek == UNKNOWN)
         {
             this.peek  = generator.nextInt(this.modulus);
         }

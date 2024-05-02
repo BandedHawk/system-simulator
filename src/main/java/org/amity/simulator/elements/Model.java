@@ -156,7 +156,7 @@ public class Model
          */
         private Simulator()
         {
-            this.capacity = Simulator.FILL;
+            this.capacity = FILL;
             this.primary = new ArrayList<>();
             this.working = new ArrayList<>();
             this.completed = new ArrayList<>();
@@ -172,17 +172,14 @@ public class Model
          */
         private Simulator(final List<Source> sources, final double generate)
         {
-            this.capacity = Simulator.FILL;
+            this.capacity = FILL;
             this.primary = new ArrayList<>();
             this.working = new ArrayList<>();
             this.completed = new ArrayList<>();
             this.highmark = 0;
             this.overrun = false;
-            // Use only one sequencer for all events
-            final Sequencer sequencer = new Sequencer();
             for (final Source source : sources)
             {
-                source.setSequencer(sequencer);
                 do
                 {
                     final Event event = source.simulate(null);
@@ -217,7 +214,7 @@ public class Model
             System.out.println("  Start simulation");
             int transitions = 0;
             boolean locked = false;
-            while (this.working.size() > 0)
+            while (!this.working.isEmpty())
             {
                 final Event event = this.working.remove(0);
                 // End of simulation time
@@ -261,13 +258,13 @@ public class Model
                     // to a low working buffer and we still have events in the
                     // primary event buffer
                     if (!this.primary.isEmpty()
-                            && (this.working.size() < Simulator.MIN_BUFFER
+                            && (this.working.size() < MIN_BUFFER
                             || priority.getCompleted() > this.highmark))
                     {
                         if (this.highmark < priority.getCompleted()
-                                && this.capacity < Simulator.MAX_BUFFER)
+                                && this.capacity < MAX_BUFFER)
                         {
-                            this.capacity += Simulator.FILL;
+                            this.capacity += FILL;
                         }
                         this.highmark = priority.getCompleted();
                         this.fill();
@@ -276,7 +273,7 @@ public class Model
                     this.working.sort(Comparator
                             .comparingDouble(Event::getCompleted));
                 }
-                if (transitions % Simulator.CYCLES == 0)
+                if (transitions % CYCLES == 0)
                 {
                     System.out.println("    Transitions: " + transitions);
                     System.out.println("      Time: "
@@ -302,7 +299,7 @@ public class Model
             if (!primary.isEmpty())
             {
                 // Re-calculate timeline due to extreme out-of-order insertions
-                if (this.working.size() > Simulator.MAX_BUFFER)
+                if (this.working.size() > MAX_BUFFER)
                 {
                     if (!overrun)
                     {

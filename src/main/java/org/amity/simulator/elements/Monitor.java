@@ -268,25 +268,22 @@ public class Monitor
         for (final Event event : events)
         {
             // Can't guarantee events will finish in same order as creation
-            if (event.getCompleted() <= this.end)
+            if (event.getCompleted() <= this.end
+                && (counted || event.getCreated() >= this.start))
             {
-                // Short-circuit comparison
-                if (counted || event.getCreated() >= this.start)
+                if (!counted)
                 {
-                    if (!counted)
-                    {
-                        counted = true;
-                    }
-                    general.add(event);
-                    if (multisource)
-                    {
-                        final List<Event> list
-                                = sources.containsKey(event.getSource())
-                                ? sources.get(event.getSource())
-                                : new ArrayList<>();
-                        sources.putIfAbsent(event.getSource(), list);
-                        list.add(event);
-                    }
+                    counted = true;
+                }
+                general.add(event);
+                if (multisource)
+                {
+                    final List<Event> list
+                            = sources.containsKey(event.getSource())
+                            ? sources.get(event.getSource())
+                            : new ArrayList<>();
+                    sources.putIfAbsent(event.getSource(), list);
+                    list.add(event);
                 }
             }
         }

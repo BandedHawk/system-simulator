@@ -58,25 +58,25 @@ public class Main
         final Option startOption = Option.builder("s")
                 .required(true)
                 .hasArg(true)
-                .longOpt(Main.START)
+                .longOpt(START)
                 .desc("Sampling start time")
                 .build();
         final Option endOption = Option.builder("e")
                 .required(true)
                 .hasArg(true)
-                .longOpt(Main.END)
+                .longOpt(END)
                 .desc("Sampling end time")
                 .build();
         final Option generateOption = Option.builder("g")
                 .required(true)
                 .hasArg(true)
-                .longOpt(Main.GENERATE)
+                .longOpt(GENERATE)
                 .desc("Event generation time")
                 .build();
         final Option fileOption = Option.builder("f")
                 .required(true)
                 .hasArg(true)
-                .longOpt(Main.FILE)
+                .longOpt(FILE)
                 .desc("System definition file")
                 .build();
         final Options options = new Options();
@@ -154,7 +154,7 @@ public class Main
     public static void main(String[] arguments)
     {
         final Pattern pattern = Pattern.compile("^\\+?\\d*\\.?\\d+$");
-        final Options options = Main.generateOptions();
+        final Options options = generateOptions();
         if (arguments.length < 8)
         {
             printUsage(options);
@@ -162,18 +162,18 @@ public class Main
             System.exit(-1);
         }
         final CommandLine commandLine
-                = Main.parseCommandLine(options, arguments);
+                = parseCommandLine(options, arguments);
         boolean error = false;
         if (commandLine != null)
         {
             final String generateText
-                    = commandLine.getOptionValue(Main.GENERATE);
+                    = commandLine.getOptionValue(GENERATE);
             final String startText
-                    = commandLine.getOptionValue(Main.START);
+                    = commandLine.getOptionValue(START);
             final String endText
-                    = commandLine.getOptionValue(Main.END);
+                    = commandLine.getOptionValue(END);
             final String filename
-                    = commandLine.getOptionValue(Main.FILE);
+                    = commandLine.getOptionValue(FILE);
             Matcher matcher = pattern.matcher(generateText);
             if (!matcher.find())
             {
@@ -203,7 +203,7 @@ public class Main
                 double generate = Double.parseDouble(generateText);
                 double start = Double.parseDouble(startText);
                 double end = Double.parseDouble(endText);
-                error = Main.run(file, generate, start, end);
+                error = run(file, generate, start, end);
             }
         }
         if (error)

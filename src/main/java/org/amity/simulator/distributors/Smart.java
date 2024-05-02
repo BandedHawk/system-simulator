@@ -44,7 +44,7 @@ public class Smart implements Distributor
     {
         this.references = new ArrayList<>();
         this.next = new Component[0];
-        this.peek = Distributor.UNKNOWN;
+        this.peek = UNKNOWN;
     }
 
     /**
@@ -57,7 +57,7 @@ public class Smart implements Distributor
         this.references = references;
         final int size = references != null ? references.size() : 0;
         this.next = new Component[size];
-        this.peek = Distributor.UNKNOWN;
+        this.peek = UNKNOWN;
     }
 
     @Override
@@ -67,7 +67,7 @@ public class Smart implements Distributor
         double minimum = Double.MAX_VALUE;
         Component component = null;
         // Search if an availability check hasn't been performed
-        if (this.peek == Distributor.UNKNOWN)
+        if (this.peek == UNKNOWN)
         {
             for (final Component item : this.next)
             {
@@ -82,7 +82,7 @@ public class Smart implements Distributor
         else
         {
             component = this.next[this.peek];
-            this.peek = Distributor.UNKNOWN;
+            this.peek = UNKNOWN;
         }
         // Direct event to next available component
         event.setComponent(component);
@@ -92,7 +92,7 @@ public class Smart implements Distributor
     @Override
     public void reset()
     {
-        this.peek = Distributor.UNKNOWN;
+        this.peek = UNKNOWN;
     }
 
     @Override
@@ -150,7 +150,7 @@ public class Smart implements Distributor
     {
         double minimum = Double.MAX_VALUE;
         // Search if we haven't already done availability
-        if (this.peek == Distributor.UNKNOWN)
+        if (this.peek == UNKNOWN)
         {
             for (int index = 0; index < this.next.length; index++)
             {
