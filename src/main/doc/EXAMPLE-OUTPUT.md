@@ -1,6 +1,6 @@
 ## Reference model
 ![alt text](https://raw.githubusercontent.com/BandedHawk/system-simulator/master/src/main/doc/images/complex-system.png "System Model for Simulation")
-##Command line
+## Command line
 ``` 
 java -jar system-simulator-1.0-SNAPSHOT.jar -cp commons-math3-3.6.1.jar:commons-cli-1.4.jar -g 100000 -s 500 -e 95500 -f balancer.example.txt
 ``` 
