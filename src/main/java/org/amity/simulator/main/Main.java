@@ -43,6 +43,8 @@ import org.apache.commons.cli.ParseException;
 public class Main
 {
 
+    final static int BAD_EXIT = -1; 
+    final static int GOOD_EXIT = 0; 
     private final static String START = "start";
     private final static String END = "end";
     private final static String GENERATE = "generate";
@@ -151,7 +153,7 @@ public class Main
      *
      * @param arguments command line arguments
      */
-    public static void main(String[] arguments)
+    static int simulate(String[] arguments)
     {
         final Pattern pattern = Pattern.compile("^\\+?\\d*\\.?\\d+$");
         final Options options = generateOptions();
@@ -159,7 +161,7 @@ public class Main
         {
             printUsage(options);
             printHelp(options);
-            System.exit(-1);
+            return Main.BAD_EXIT;
         }
         final CommandLine commandLine
                 = parseCommandLine(options, arguments);
@@ -206,11 +208,15 @@ public class Main
                 error = run(file, generate, start, end);
             }
         }
-        if (error)
+        return error ? BAD_EXIT : GOOD_EXIT;
+    }
+
+    public final static void main(String[] arguments)
+    {
+        if (simulate(arguments) != GOOD_EXIT)
         {
-            System.exit(-1);
+            System.exit(BAD_EXIT);
         }
-        System.exit(0);
     }
 
     /**

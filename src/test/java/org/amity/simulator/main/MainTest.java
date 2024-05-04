@@ -17,11 +17,10 @@ package org.amity.simulator.main;
 
 import org.junit.After;
 import org.junit.AfterClass;
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.Rule;
-import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 
 /**
  *
@@ -29,10 +28,6 @@ import org.junit.contrib.java.lang.system.ExpectedSystemExit;
  */
 public class MainTest
 {
-
-    @Rule
-    public final ExpectedSystemExit exit = ExpectedSystemExit.none();
-
     public MainTest()
     {
     }
@@ -65,8 +60,8 @@ public class MainTest
     {
         System.out.println("  Execute with no parameters");
         String[] arguments = new String[0];
-        exit.expectSystemExitWithStatus(-1);
-        Main.main(arguments);
+        final int statusCode = Main.simulate(arguments);
+        assertEquals(Main.BAD_EXIT, statusCode);
     }
 
     /**
@@ -76,10 +71,10 @@ public class MainTest
     public void testUnderArgs()
     {
         System.out.println("  Execute with 1 too few parameters");
-        final String[] arguments
-                = new String[]{"-s", "a", "-e", "b", "-g", "d", "-f"};
-        exit.expectSystemExitWithStatus(-1);
-        Main.main(arguments);
+        String[] arguments
+            = new String[]{"-s", "a", "-e", "b", "-g", "d", "-f"};
+        final int statusCode = Main.simulate(arguments);
+        assertEquals(Main.BAD_EXIT, statusCode);
     }
 
     /**
@@ -92,8 +87,8 @@ public class MainTest
         final String[] arguments
                 = new String[]{"-g", "-100", "-s", "1", "-e", "5", "-f",
                     "src/test/data/test.example.txt"};
-        exit.expectSystemExitWithStatus(-1);
-        Main.main(arguments);
+        final int statusCode = Main.simulate(arguments);
+        assertEquals(Main.BAD_EXIT, statusCode);
     }
 
     /**
@@ -104,10 +99,10 @@ public class MainTest
     {
         System.out.println("  Execute with illegal start value");
         final String[] arguments
-                = new String[]{"-g", "100", "-s", "-1", "-e", "5", "-f",
-                    "src/test/data/test.example.txt"};
-        exit.expectSystemExitWithStatus(-1);
-        Main.main(arguments);
+            = new String[]{"-g", "100", "-s", "-1", "-e", "5", "-f",
+                "src/test/data/test.example.txt"};
+        final int statusCode = Main.simulate(arguments);
+        assertEquals(Main.BAD_EXIT, statusCode);
     }
 
     /**
@@ -118,10 +113,10 @@ public class MainTest
     {
         System.out.println("  Execute with illegal end value");
         final String[] arguments
-                = new String[]{"-g", "100", "-s", "1", "-e", "-5", "-f",
-                    "src/test/data/test.example.txt"};
-        exit.expectSystemExitWithStatus(-1);
-        Main.main(arguments);
+            = new String[]{"-g", "100", "-s", "1", "-e", "-5", "-f",
+                "src/test/data/test.example.txt"};
+        final int statusCode = Main.simulate(arguments);
+        assertEquals(Main.BAD_EXIT, statusCode);
     }
 
     /**
@@ -132,10 +127,10 @@ public class MainTest
     {
         System.out.println("  Execute with wrong file reference");
         final String[] arguments
-                = new String[]{"-g", "100", "-s", "1", "-e", "5", "-f",
-                    "test.example.txt"};
-        exit.expectSystemExitWithStatus(-1);
-        Main.main(arguments);
+            = new String[]{"-g", "100", "-s", "1", "-e", "5", "-f",
+                "test.example.txt"};
+        final int statusCode = Main.simulate(arguments);
+        assertEquals(Main.BAD_EXIT, statusCode);
     }
 
     /**
@@ -146,24 +141,24 @@ public class MainTest
     {
         System.out.println("  Execute with start larger than end value");
         final String[] arguments
-                = new String[]{"-g", "100", "-s", "10", "-e", "5", "-f",
-                    "src/test/data/test.example.txt"};
-        exit.expectSystemExitWithStatus(-1);
-        Main.main(arguments);
+            = new String[]{"-g", "100", "-s", "10", "-e", "5", "-f",
+                "src/test/data/test.example.txt"};
+        final int statusCode = Main.simulate(arguments);
+        assertEquals(Main.BAD_EXIT, statusCode);
     }
 
     /**
      * Test with generate and end not valid range in main method.
      */
     @Test
-    public void testIllegalGenerateRange()
+    public void testIllegalGenerateRange() throws Exception
     {
         System.out.println("  Execute with end larger than generate value");
         final String[] arguments
                 = new String[]{"-g", "15", "-s", "5", "-e", "20", "-f",
                     "src/test/data/test.example.txt"};
-        exit.expectSystemExitWithStatus(-1);
-        Main.main(arguments);
+        final int statusCode = Main.simulate(arguments);
+        assertEquals(Main.BAD_EXIT, statusCode);
     }
 
     /**
@@ -174,10 +169,10 @@ public class MainTest
     {
         System.out.println("  Execute with lexer failure");
         final String[] arguments
-                = new String[]{"-g", "20", "-s", "5", "-e", "15", "-f",
-                    "src/test/data/bad.lexer.example.txt"};
-        exit.expectSystemExitWithStatus(-1);
-        Main.main(arguments);
+            = new String[]{"-g", "20", "-s", "5", "-e", "15", "-f",
+                "src/test/data/bad.lexer.example.txt"};
+        final int statusCode = Main.simulate(arguments);
+        assertEquals(Main.BAD_EXIT, statusCode);
     }
 
     /**
@@ -188,23 +183,23 @@ public class MainTest
     {
         System.out.println("  Execute with compiler failure");
         final String[] arguments
-                = new String[]{"-g", "20", "-s", "5", "-e", "15", "-f",
-                    "src/test/data/broken.example.txt"};
-        exit.expectSystemExitWithStatus(-1);
-        Main.main(arguments);
+            = new String[]{"-g", "20", "-s", "5", "-e", "15", "-f",
+                "src/test/data/broken.example.txt"};
+        final int statusCode = Main.simulate(arguments);
+        assertEquals(Main.BAD_EXIT, statusCode);
     }
 
     /**
-     * Test with good file.
+     * Test with acceptable arguments.
      */
     @Test
-    public void testExit0()
+    public void testAcceptableArguments()
     {
         System.out.println("  Execute with runnable model");
         final String[] arguments
-                = new String[]{"-g", "20", "-s", "5", "-e", "15", "-f",
-                    "src/test/data/test.example.txt"};
-        exit.expectSystemExitWithStatus(0);
-        Main.main(arguments);
+            = new String[]{"-g", "20", "-s", "5", "-e", "15", "-f",
+                "src/test/data/test.example.txt"};
+        final int statusCode = Main.simulate(arguments);
+        assertEquals(Main.GOOD_EXIT, statusCode);
     }
 }
