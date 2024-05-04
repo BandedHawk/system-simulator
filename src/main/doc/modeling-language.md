@@ -41,7 +41,7 @@ function
 ```
 Everything except <i>next</i> is mandatory.
 #### Uniform
-This produces a uniformally random distribution of values between <i>minimum</i> and <i>maximum</i>. For a source, events are separated by the generated value. For processors, the delay is the generated value.
+This produces a uniformly random distribution of values between <i>minimum</i> and <i>maximum</i>. For a source, events are separated by the generated value. For processors, the delay is the generated value.
 ```R
 function
 {
