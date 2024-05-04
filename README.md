@@ -7,9 +7,16 @@ The source is Java and there is a standard Maven build configuration for the cod
 ## Running the software
 You will need the Apache CLI 1.4 and Apache Math3 3.6.1 libraries to run the jar.
 ```Java
-java -jar system-simulator-1.0-SNAPSHOT.jar -cp commons-math3-3.6.1.jar:commons-cli-1.4.jar
+java -jar system-simulator-1.0-SNAPSHOT.jar -cp commons-math3-3.6.1.jar:commons-cli-1.4.jar [parameters]
 ```
 Help on parameters will be generated if no parameters are supplied.
+
+```
+-g <integer>    timespan to generate samples in ticks
+-s <integer>    time to start taking statistical sample in ticks
+-e <integer>    time to stop taking statistical sample in ticks
+-f <filename>   location of the file that contains the definition of the system model
+```
 ## To do
 * Capability to dump the raw simulation data for external analysis
 * Graphical modeling and output?
