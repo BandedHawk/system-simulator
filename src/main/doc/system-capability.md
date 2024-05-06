@@ -1,27 +1,27 @@
 ## Exercising the system for capability
-Simulation systems are always difficult to validate so you need to think of some difficult problems to solve for which you know the answers. The challenge I threw out was to simulate a system that randomly distributes an incoming event to 1 of 3 processing blocks. One of those blocks will terminate the event after processing. The other blocks will return the event back to the distributor for another attempt.
+Simulation systems are always difficult to validate so you need to think of some difficult problems to solve for which you know the answers. The challenge I attempted was to simulate a system that randomly distributes an incoming event to 1 of 3 processing blocks. One of those blocks will terminate the event after processing. The other blocks will return the event back to the distributor for another attempt.
 
 ###  Reference model
-The model forthis is shown here, with the assumption that the processors have infinite capacity so that events are not waiting to be processed.
+The model for this system is shown here, with the assumption that the processors have infinite capacity so that events are not waiting to be processed.
 ![alt text](https://github.com/BandedHawk/system-simulator/blob/master/src/main/doc/images/fun-throughput-simulation.png "Example model")
 
 ### Theoretical throughput characteristics
-For the implementation of this problem as a simulation model, we will make this more complex by having three event generators in parallel, and using the processor source operation to differentiate between termination and return to the start. To reduce the possibility of waiting queues, we will implement each blocks as a set of parallel processors with a smart balancer in the front. Each processor will take a constant 1 tick processing time - this equates then to the number of attempts before the event leaves the system, making our comparison to theoreticals easy. The simulation model is described in the file [fun.example.txt](https://github.com/BandedHawk/system-simulator/blob/master/src/test/data/fun.example.txt).
+For the implementation of this problem as a simulation model, we will make this more complex by having three event generators in parallel, and using the processor source operation to differentiate between termination and return to the start. To reduce the possibility of waiting queues, we will implement each block as a set of parallel processors with a smart balancer in the front. Each processor will take a constant 1 tick processing time - this equates then to the number of runs before the event leaves the system, making our comparison to theoreticals easy. The simulation model is described in the file [fun.example.txt](https://github.com/BandedHawk/system-simulator/blob/master/src/test/data/fun.example.txt).
 
 In terms of the problem itself, the theoretical calculations are straightfoward. On the first loop, an event has 1 in 3 chance of exiting. It will have 2 in 3 chance of not exiting on the first pass and then 1 in 3 chance of exiting on the second. The following shows the supporting probability model.
 
 ![alt text](https://github.com/BandedHawk/system-simulator/blob/master/src/main/doc/images/probability-simulation.png "Probability calculations")
 
-Based on this, we can say that the median will be 2, since the cumulative probability for exiting in 1 and 2 runs is 5 on 9 or approximately 55%. The probability distribution is skewed-right since we have a long-tail. In theory, an event might never exit the system although the probability of an event still being in the system after 60 trials is extremely small. The simulation will give an idea of the practical limit.
+The cumulative probability for exiting in 1 run and 2 runs is 5/9 or approximately 56%. Based on this, we can state that the median number of runs will be 2. The probability distribution is skewed-right since we have a long-tail. In theory, an event might never exit the system although the probability of an event still being in the system after 60 trials is extremely small. The simulation will give an idea of the practical limit.
 
-Since this is a geometric distribution, the expected number of trials is also straightforward. Given E(X) is the expected number of trials before success and this is memoryless, we can say that the expectation after 1 trial is the probability of success and the probability of failure multiplied by the expectation plus 1 trial as below, and solving:
+Since this is a geometric distribution, the expected number of runs is also straightforward. Given E(X) is the expected number of runs before success and this is memoryless, we can say that the expectation after 1 trial is the probability of success and the probability of failure multiplied by the expectation plus 1 trial as below, and solving:
 
 ![alt text](https://github.com/BandedHawk/system-simulator/blob/master/src/main/doc/images/expectation-probability.png "Expectation calculation")
 
-The average lifetime for an event should then tend to 3 for our simulation.
+The average lifetime for an event should then tend to 3 runs for our simulation, given that p is 1/3.
 ### Simulation results
-Given all of this, running the simulation gives us this:
-```R
+With the constructed model, the simulation gives us this:
+```
 Statistics for events that occurred between 500.0 and 299500.0
 General event information
   Events completed processing: 179399
