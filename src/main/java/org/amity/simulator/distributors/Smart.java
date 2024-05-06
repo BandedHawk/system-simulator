@@ -28,6 +28,8 @@ import org.amity.simulator.language.Vocabulary;
 import org.amity.simulator.elements.Component;
 
 /**
+ * Distribution function for sending an event to the next available processing
+ * component
  *
  * @author <a href="mailto:jonb@ieee.org">Jon Barnett</a>
  */
