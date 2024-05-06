@@ -3,7 +3,7 @@ Simulation systems are always difficult to validate so you need to think of some
 
 ###  Reference model
 The model forthis is shown here, with the assumption that the processors have infinite capacity so that events are not waiting to be processed.
-![alt text](https://github.com/BandedHawk/system-simulator/blob/master/src/main/doc/images/fun-throughput-simulation-simulation.png "Example model")
+![alt text](https://github.com/BandedHawk/system-simulator/blob/master/src/main/doc/images/fun-throughput-simulation.png "Example model")
 
 ### Theoretical throughput characteristics
 For the implementation of this problem as a simulation model, we will make this more complex by having three event generators in parallel, and using the processor source operation to differentiate between termination and return to the start. To reduce the possibility of waiting queues, we will implement each blocks as a set of parallel processors with a smart balancer in the front. Each processor will take a constant 1 tick processing time - this equates then to the number of attempts before the event leaves the system, making our comparison to theoreticals easy. The simulation model is described in the file [fun.example.txt](https://github.com/BandedHawk/system-simulator/blob/master/src/test/data/fun.example.txt).
