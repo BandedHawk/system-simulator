@@ -93,6 +93,6 @@ General event information
         Minimum time processing: 1.0 ticks
 
 ```
-The outcomes are in line with our theoreticals. Median is at 2 runs for all our sources, and therefore overall. The average lifetime of events is tending towards 3, which is equavalent to 3 runs. Additionally, the simulation shows that for practical purposes the maximum number of runs before exit would be around 25 to 30 - this could be more but it is difficult to achieve in simulation.
+The outcomes are in line with our theoreticals. Median is at 2 runs for all our sources, and therefore overall. The average lifetime of events is tending towards 3, which is equavalent to 3 runs. Additionally, the simulation shows that for practical purposes the maximum number of runs before exit would be around 25 to 30 - this value could be higher but it is difficult to achieve in simulation with limited events generated.
 
 With all this, we validate our simulation system. We've also shown that the balancers are working as expected, particularly as there is very little wait time involved in the event lifetimes as observed by the processing ratio.

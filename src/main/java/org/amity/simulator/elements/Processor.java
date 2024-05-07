@@ -71,6 +71,7 @@ public class Processor implements Component
      * @param label distinguishing name of processing component
      * @param generators models for the component based on processing time
      * distribution characteristic
+     * @param priorities list of source priorities for processing
      * @param monitor flag for generating component output information
      */
     public Processor(final String label, final List<Generator> generators,

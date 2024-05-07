@@ -99,7 +99,6 @@ public class SourceTest
         System.out.println("  check passage of injected event");
         final String source = "source";
         tick = 1000;
-        final Sequencer sequencer = new Sequencer();
         Event event = new Event(source, label, tick);
         event.setValues(tick, tick, tick);
         event = instance.simulate(event);
@@ -254,7 +253,6 @@ public class SourceTest
         final Generator generator = new Constant(1, "source", reference);
         final Component instance = new Source("balancer", generator, false);
         System.out.println("  Try prioritize");
-        final double available = instance.getAvailable();
         instance.prioritize(sequencer, false);
         assertTrue(sequencer.exclusions.isEmpty());
         assertFalse(sequencer.paths.isEmpty());

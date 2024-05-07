@@ -92,7 +92,7 @@ public class MonitorTest
             }
             while(true);
         }
-        while (events.size() > 0)
+        while (!events.isEmpty())
         {
             final Event event = events.removeFirst();
             event.simulate();

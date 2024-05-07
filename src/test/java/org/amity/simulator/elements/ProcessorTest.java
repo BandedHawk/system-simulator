@@ -100,7 +100,7 @@ public class ProcessorTest
         // sort events by arrival time
         events.sort(Comparator.comparingDouble(Event::getCompleted));
         assertTrue(events.size() == eventTotal);
-        while (events.size() > 0)
+        while (!events.isEmpty())
         {
             final Event event = events.removeFirst();
             event.simulate();
@@ -173,7 +173,7 @@ public class ProcessorTest
         // sort events by arrival time
         events.sort(Comparator.comparingDouble(Event::getCompleted));
         assertTrue(events.size() == eventTotal);
-        while (events.size() > 0)
+        while (!events.isEmpty())
         {
             final Event event = events.removeFirst();
             event.simulate();
@@ -197,7 +197,7 @@ public class ProcessorTest
         // sort events by arrival time
         events.sort(Comparator.comparingDouble(Event::getCompleted));
         assertTrue(events.size() == eventTotal);
-        while (events.size() > 0)
+        while (!events.isEmpty())
         {
             final Event event = events.removeFirst();
             event.simulate();
@@ -328,7 +328,7 @@ public class ProcessorTest
         // sort events by arrival time
         System.out.println("  Check basic statistics");
         events.sort(Comparator.comparingDouble(Event::getCompleted));
-        while (events.size() > 0)
+        while (!events.isEmpty())
         {
             final Event event = events.removeFirst();
             event.simulate();
@@ -367,9 +367,6 @@ public class ProcessorTest
         final List<String> priority = new ArrayList<>();
         final Component instance = new Processor(label, generators,
                 priority, false);
-        final LinkedList<Event> events = new LinkedList<>();
-        final Component source
-                = new Source(sourceLabel, sourceGenerator, false);
         sourceGenerator.setNext(instance);
         assertTrue(instance.description() != null);
         assertTrue(instance.description().endsWith("]"));
@@ -407,8 +404,6 @@ public class ProcessorTest
         final String label = "delay";
         final String reference = "end";
         final String reference2 = "bad end";
-        final Generator sourceGenerator = new Constant(sourcePeriod,
-                sourceLabel, label);
         final Generator generator1 = new Constant(period, sourceLabel,
                 reference);
         Generator generator2 = new Constant(period, Vocabulary.DEFAULT,
@@ -562,7 +557,7 @@ public class ProcessorTest
         assertTrue(events.size() == eventTotal);
         int[] state = {3, 5, 7, 9};
         int index = 0;
-        while (events.size() > 0)
+        while (!events.isEmpty())
         {
             final Event event = events.removeFirst();
             event.simulate();

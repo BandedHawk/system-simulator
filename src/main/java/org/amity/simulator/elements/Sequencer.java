@@ -203,7 +203,7 @@ public class Sequencer
      */
     void clear()
     {
-        if (this.intelligentFunctions.size() > 0)
+        if (!this.intelligentFunctions.isEmpty())
         {
             for (final Distributor distributor : this.intelligentFunctions)
             {

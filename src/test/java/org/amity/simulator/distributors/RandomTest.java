@@ -92,7 +92,6 @@ public class RandomTest
         final Component component3 = new DummyComponent(label3, 0.5);
         final Component component4 = new DummyComponent(label4, 2.5);
         final Component component5 = new DummyComponent(label5, 1.5);
-        final Sequencer sequencer = new Sequencer();
         Distributor distributor = new Random(references);
         distributor.addNext(component3);
         distributor.addNext(component2);
@@ -166,7 +165,6 @@ public class RandomTest
         final Component component1 = new DummyComponent(label1, 2.0);
         final Component component2 = new DummyComponent(label2, 1.0);
         final Component component3 = new DummyComponent(label3, 1.5);
-        final Sequencer sequencer = new Sequencer();
         distributor.addNext(component3);
         distributor.addNext(component2);
         distributor.addNext(component1);

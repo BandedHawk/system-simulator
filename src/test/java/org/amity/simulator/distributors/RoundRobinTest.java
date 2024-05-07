@@ -84,7 +84,6 @@ public class RoundRobinTest
         final Component component1 = new DummyComponent(label1, 2.0);
         final Component component2 = new DummyComponent(label2, 1.0);
         final Component component3 = new DummyComponent(label3, 0.5);
-        final Sequencer sequencer = new Sequencer();
         Distributor distributor = new RoundRobin(references);
         distributor.addNext(component3);
         distributor.addNext(component2);
@@ -171,7 +170,6 @@ public class RoundRobinTest
         final Component component1 = new DummyComponent(label1, 2.0);
         final Component component2 = new DummyComponent(label2, 1.0);
         final Component component3 = new DummyComponent(label3, 1.5);
-        final Sequencer sequencer = new Sequencer();
         distributor.addNext(component3);
         distributor.addNext(component2);
         distributor.addNext(component1);

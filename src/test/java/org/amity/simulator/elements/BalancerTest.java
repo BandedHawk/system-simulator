@@ -112,7 +112,7 @@ public class BalancerTest
         // sort events by arrival time
         events.sort(Comparator.comparingDouble(Event::getCompleted));
         assertTrue(events.size() == eventTotal);
-        while (events.size() > 0)
+        while (!events.isEmpty())
         {
             final Event event = events.removeFirst();
             event.simulate();
@@ -170,7 +170,7 @@ public class BalancerTest
         // sort events by arrival time
         events.sort(Comparator.comparingDouble(Event::getCompleted));
         assertTrue(events.size() == eventTotal);
-        while (events.size() > 0)
+        while (!events.isEmpty())
         {
             final Event event = events.removeFirst();
             event.simulate();
@@ -194,7 +194,7 @@ public class BalancerTest
         // sort events by arrival time
         events.sort(Comparator.comparingDouble(Event::getCompleted));
         assertTrue(events.size() == eventTotal);
-        while (events.size() > 0)
+        while (!events.isEmpty())
         {
             final Event event = events.removeFirst();
             event.simulate();
@@ -283,7 +283,7 @@ public class BalancerTest
         // sort events by arrival time
         events.sort(Comparator.comparingDouble(Event::getCompleted));
         assertTrue(events.size() == eventTotal);
-        while (events.size() > 0)
+        while (!events.isEmpty())
         {
             final Event event = events.removeFirst();
             event.simulate();
@@ -408,7 +408,7 @@ public class BalancerTest
         // sort events by arrival time
         events.sort(Comparator.comparingDouble(Event::getCompleted));
         assertTrue(events.size() == eventTotal);
-        while (events.size() > 0)
+        while (!events.isEmpty())
         {
             final Event event = events.removeFirst();
             event.simulate();
@@ -513,7 +513,7 @@ public class BalancerTest
         final int[] state1 = {2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 5, 5};
         final int[] state2 = {0, 0, 0, 3, 3, 3, 4, 4, 4, 5, 5, 6};
         int index = 0;
-        while (events.size() > 0)
+        while (!events.isEmpty())
         {
             final Event event = events.removeFirst();
             event.simulate();
@@ -552,10 +552,9 @@ public class BalancerTest
         final Component excluded = new Balancer("balancer 2", distributor2,
                 false);
         System.out.println("  Try cleared system for no match in component");
-        double available = component.getAvailable();
         component.prioritize(sequencer, false);
         assertTrue(sequencer.paths.contains(component));
-        available = instance.getAvailable();
+        double available = instance.getAvailable();
         instance.prioritize(sequencer, true);
         assertTrue(sequencer.exclusions.isEmpty());
         assertFalse(sequencer.paths.isEmpty());
