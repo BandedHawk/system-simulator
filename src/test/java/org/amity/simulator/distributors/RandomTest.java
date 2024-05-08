@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.amity.simulator.elements.DummyComponent;
 import org.amity.simulator.elements.Event;
-import org.amity.simulator.elements.Sequencer;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
 import org.apache.commons.math3.util.FastMath;
@@ -283,7 +282,6 @@ public class RandomTest
         final Component component1 = new DummyComponent(label1, 2.0);
         final Component component2 = new DummyComponent(label2, 1.0);
         final Component component3 = new DummyComponent(label3, 1.5);
-        final Sequencer sequencer = new Sequencer();
         distributor.addNext(component3);
         distributor.addNext(component2);
         distributor.addNext(component1);

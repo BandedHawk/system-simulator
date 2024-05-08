@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.amity.simulator.elements.DummyComponent;
 import org.amity.simulator.elements.Event;
-import org.amity.simulator.elements.Sequencer;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
 import org.junit.After;
