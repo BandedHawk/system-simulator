@@ -42,6 +42,7 @@ import org.amity.simulator.generators.Generator;
  */
 public class ProcessorTest
 {
+    final static double DELTA = 0.0000000001;
 
     public ProcessorTest()
     {
@@ -124,14 +125,15 @@ public class ProcessorTest
                     + ", start: " + event.getStarted() + ", complete: "
                     + event.getCompleted());
             sourceTick += sourcePeriod;
-            assertTrue(event.getArrived() == sourceTick);
-            assertTrue(event.getStarted() == tick);
+            assertTrue(Math.abs(event.getArrived() - sourceTick) < DELTA);
+            assertTrue(Math.abs(event.getStarted() - tick) < DELTA);
             final double completeTick = tick + period;
-            assertTrue(event.getCompleted() == completeTick);
+            assertTrue(Math.abs(event.getCompleted() - completeTick) < DELTA);
             final double elapsed = completeTick - sourceTick;
-            assertTrue(event.getCompleted() - event.getCreated() == elapsed);
+            assertTrue(Math.abs((event.getCompleted() - event.getCreated())
+                    - elapsed) < DELTA);
             final double executed = completeTick - tick;
-            assertTrue(event.getExecuted() == executed);
+            assertTrue(Math.abs(event.getExecuted() - executed) < DELTA);
             tick = completeTick;
         }
         System.out.println("  check null event");
@@ -219,14 +221,15 @@ public class ProcessorTest
                     + ", start: " + event.getStarted() + ", complete: "
                     + event.getCompleted());
             sourceTick += sourcePeriod;
-            assertTrue(event.getArrived() == sourceTick);
-            assertTrue(event.getStarted() == tick);
+            assertTrue(Math.abs(event.getArrived() - sourceTick) < DELTA);
+            assertTrue(Math.abs(event.getStarted() - tick) < DELTA);
             final double completeTick = tick + period;
-            assertTrue(event.getCompleted() == completeTick);
+            assertTrue(Math.abs(event.getCompleted() - completeTick) < DELTA);
             final double elapsed = completeTick - sourceTick;
-            assertTrue(event.getCompleted() - event.getCreated() == elapsed);
+            assertTrue(Math.abs((event.getCompleted() - event.getCreated())
+                    - elapsed) < DELTA);
             final double executed = completeTick - tick;
-            assertTrue(event.getExecuted() == executed);
+            assertTrue(Math.abs(event.getExecuted() - executed) < DELTA);
             tick = completeTick;
         }
     }
