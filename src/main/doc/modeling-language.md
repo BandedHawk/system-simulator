@@ -217,7 +217,7 @@ component
 }
 ```
 #### Throttle
-A throttle limits throughput without adding any processing. Throughput limitation is in the form of a cooldown period specified by the declared function. After an event passes through the component, the component is not available until the cooldown period has passed. It does not add to the processing time to the event. It is purely a wait time. The declaration for the throttle is the same form as for the processor. The simplest form of the throttle is provided below.
+A throttle limits throughput without adding any processing. Throughput limitation is in the form of a cooldown period specified by the declared function. After an event passes through the component, the component is not available until the cooldown period has passed. It does not add to the processing time of the event. It is purely a wait time. The declaration for the throttle is the same form as for the processor. The simplest form of the throttle is provided below.
 ```
 component
 {
