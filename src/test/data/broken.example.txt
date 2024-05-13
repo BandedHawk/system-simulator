@@ -161,6 +161,25 @@ component
 }
 component
 {
+    type: throttle
+    name: throttle
+    function
+    {
+        type: gaussian
+        minimum: 3.0
+        maximum: 4.0
+        next: delay
+    }
+    function
+    {
+        type: uniform
+        minimum: 1.0
+        maximum: 2.0
+        next: delay
+    }
+}
+component
+{
     type: balancer
     name: balancer 3
     function

@@ -38,6 +38,7 @@ import org.amity.simulator.generators.Uniform;
 import org.amity.simulator.distributors.Distributor;
 import org.amity.simulator.elements.Component;
 import org.amity.simulator.elements.Function;
+import org.amity.simulator.elements.Throttle;
 import org.amity.simulator.generators.Generator;
 
 /**
@@ -485,6 +486,33 @@ class Compiler
                     local.addError(error.toString());                                
                 }
                 break;
+            case Vocabulary.THROTTLE:
+                if (distributors.isEmpty())
+                {
+                    final Component throttle
+                            = Throttle.instance(pairs, generators);
+                    if (local.components.containsKey(throttle.getLabel()))
+                    {
+                        final StringBuilder error =
+                                new StringBuilder("Component with label '");
+                        error.append(throttle.getLabel());
+                        error.append("' already exists before ");
+                        error.append(this.location(token));
+                        local.addError(error.toString());                                
+                    }
+                    else
+                    {
+                        local.components.put(throttle.getLabel(), throttle);
+                    }
+                }
+                else
+                {
+                    final StringBuilder error =
+                            new StringBuilder("Balancer function cannot be used in a processor near ");
+                    error.append(this.location(token));
+                    local.addError(error.toString());                                
+                }
+                break;
             case Vocabulary.UNIFORM:
                 final Generator uniform
                         = Uniform.instance(pairs);
@@ -533,7 +561,7 @@ class Compiler
                     error.append(this.location(token));
                     local.addError(error.toString());                                
                 }
-                else if (generators.size() > 0)
+                else if (!generators.isEmpty())
                 {
                     final StringBuilder error =
                             new StringBuilder("Generation function cannot be used in a balancer near ");

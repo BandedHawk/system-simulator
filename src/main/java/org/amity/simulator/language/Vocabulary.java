@@ -53,6 +53,7 @@ public class Vocabulary
     public final static String SOURCE = "source";
     public final static String DEFAULT = "default";
     public final static String PROCESSOR = "processor";
+    public final static String THROTTLE = "throttle";
     public final static String BALANCER = "balancer";
     public final static String NEXT = "next";
     public final static String NAME = "name";
@@ -65,6 +66,7 @@ public class Vocabulary
         final Map<String, Map<String, Definition>> blocks = new HashMap<>();
         final Map<String, Definition> source = new HashMap<>();
         final Map<String, Definition> processor = new HashMap<>();
+        final Map<String, Definition> throttle = new HashMap<>();
         final Map<String, Definition> balancer = new HashMap<>();
         final Pattern words = Pattern.compile("^\\s*[a-zA-Z][\\s|\\w]*$");
         final Pattern positiveDecimal = Pattern.compile("^\\+?\\d*\\.?\\d+$");
@@ -86,9 +88,13 @@ public class Vocabulary
         processor.put(NAME, mandatoryWords);
         processor.put(MONITOR, monitor);
         processor.put(PRIORITY, optionalMulti);
+        throttle.put(NAME, mandatoryWords);
+        throttle.put(MONITOR, monitor);
+        throttle.put(PRIORITY, optionalMulti);
         blocks.put(BALANCER, balancer);
         blocks.put(SOURCE, source);
         blocks.put(PROCESSOR, processor);
+        blocks.put(THROTTLE, throttle);
         final Map<String, Map<String, Definition>> functions = new HashMap<>();
         final Map<String, Definition> bounds = new HashMap<>();
         bounds.put(MAXIMUM, mandatoryDecimal);
