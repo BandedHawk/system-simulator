@@ -6,7 +6,7 @@ A throughput system model can be built using connected combinations of 3 types o
 
 Events flow through the system, interacting with <i>processors</i>, <i>throttles</i> and <i>balancers</i>. A <i>source</i> generates events.
 
-<i>Sources</i>, <i>throttles</i> and <i>processors</i> can be described by functions called generators. Sources create events separated in time described by the characteristics of the generator. Similarly, processors delay events as described by the generator. A processing component can be characterised as a unit that is resource constrained. While it is processing an event, all other events must wait their turn at the <i>processor</i>. Throttles limit the passage events through the component.
+<i>Sources</i>, <i>throttles</i> and <i>processors</i> can be described by functions called generators. Sources create events separated in time described by the characteristics of the generator. Similarly, processors delay events as described by the generator. A processing component can be characterised as a unit that is resource constrained. While it is processing an event, all other events must wait their turn at the <i>processor</i>. Throttles limit the passage of events through the component.
 
 The <i>balancer</i> provides a mechanism to switch an event to a downstream component from a list of downstream components. The selection of the downstream component is based on the strategy of the function defined for the balancer. A balancer has no delay component in its interaction with an event.
 
