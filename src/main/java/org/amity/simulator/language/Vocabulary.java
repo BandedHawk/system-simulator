@@ -57,6 +57,8 @@ public class Vocabulary
     public final static String BALANCER = "balancer";
     public final static String NEXT = "next";
     public final static String NAME = "name";
+    public final static String START = "start";
+    public final static String END = "end";
     public final static String PRIORITY = "priority";
     public final static String COMPONENT = "component";
 
@@ -77,6 +79,8 @@ public class Vocabulary
         final Definition monitor = new Definition(binaryResponse, false, false);
         final Definition mandatoryDecimal =
                 new Definition(positiveDecimal, true, false);
+        final Definition optionalDecimal =
+                new Definition(positiveDecimal, false, false);
         final Definition biasDecimal =
                 new Definition(decimal, true, false);
         final Definition multiWords = new Definition(words, true, true);
@@ -84,6 +88,8 @@ public class Vocabulary
         balancer.put(NAME, mandatoryWords);
         balancer.put(MONITOR, monitor);
         source.put(NAME, mandatoryWords);
+        source.put(START, optionalDecimal);
+        source.put(END, optionalDecimal);
         source.put(MONITOR, monitor);
         processor.put(NAME, mandatoryWords);
         processor.put(MONITOR, monitor);

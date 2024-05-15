@@ -91,7 +91,7 @@ public class ProcessorTest
                 priority, false);
         final LinkedList<Event> events = new LinkedList<>();
         final Component source
-                = new Source(sourceLabel, sourceGenerator, false);
+                = new Source(sourceLabel, sourceGenerator, null, null, false);
         sourceGenerator.setNext(instance);
         for (int count = 0; count < eventTotal; count++)
         {
@@ -165,7 +165,7 @@ public class ProcessorTest
                 priority, false);
         final LinkedList<Event> events = new LinkedList<>();
         final Component source
-                = new Source(sourceLabel, sourceGenerator, false);
+                = new Source(sourceLabel, sourceGenerator, null, null, false);
         sourceGenerator.setNext(instance);
         for (int count = 0; count < eventTotal; count++)
         {
@@ -257,7 +257,7 @@ public class ProcessorTest
                 priority, false);
         final LinkedList<Event> events = new LinkedList<>();
         final Component source
-                = new Source(sourceLabel, sourceGenerator, false);
+                = new Source(sourceLabel, sourceGenerator, null, null, false);
         sourceGenerator.setNext(instance);
         assertEquals(0, instance.getLocalEvents().size());
         for (int count = 0; count < eventTotal; count++)
@@ -318,7 +318,7 @@ public class ProcessorTest
                 priority, false);
         final LinkedList<Event> events = new LinkedList<>();
         final Component source
-                = new Source(sourceLabel, sourceGenerator, false);
+                = new Source(sourceLabel, sourceGenerator, null, null, false);
         generator.setNext(processor);
         sourceGenerator.setNext(instance);
         for (int count = 0; count < eventTotal; count++)
@@ -548,7 +548,7 @@ public class ProcessorTest
                 priority, false);
         final LinkedList<Event> events = new LinkedList<>();
         final Component source
-                = new Source(sourceLabel, sourceGenerator, false);
+                = new Source(sourceLabel, sourceGenerator, null, null, false);
         sourceGenerator.setNext(instance);
         for (int count = 0; count < eventTotal; count++)
         {

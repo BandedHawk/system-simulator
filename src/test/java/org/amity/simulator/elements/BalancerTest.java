@@ -92,7 +92,7 @@ public class BalancerTest
         final Component instance = new Balancer(label, distributor, false);
         final LinkedList<Event> events = new LinkedList<>();
         final Component source
-                = new Source(sourceLabel, sourceGenerator, false);
+                = new Source(sourceLabel, sourceGenerator, null, null, false);
         sourceGenerator.setNext(instance);
         final Generator generator = new Constant(period, sourceLabel, null);
         final List<Generator> generators = new ArrayList<>();
@@ -150,7 +150,7 @@ public class BalancerTest
         final Component instance = new Balancer(label, distributor, false);
         final LinkedList<Event> events = new LinkedList<>();
         final Component source
-                = new Source(sourceLabel, sourceGenerator, false);
+                = new Source(sourceLabel, sourceGenerator, null, null, false);
         sourceGenerator.setNext(instance);
         final Generator generator = new Constant(period, sourceLabel, null);
         final List<Generator> generators = new ArrayList<>();
@@ -263,7 +263,7 @@ public class BalancerTest
         final Component instance = new Balancer(label, distributor, false);
         final LinkedList<Event> events = new LinkedList<>();
         final Component source
-                = new Source(sourceLabel, sourceGenerator, false);
+                = new Source(sourceLabel, sourceGenerator, null, null, false);
         sourceGenerator.setNext(instance);
         final Generator generator = new Constant(period, sourceLabel, null);
         final List<Generator> generators = new ArrayList<>();
@@ -388,7 +388,7 @@ public class BalancerTest
         final Component instance = new Balancer(label, distributor, false);
         final LinkedList<Event> events = new LinkedList<>();
         final Component source
-                = new Source(sourceLabel, sourceGenerator, false);
+                = new Source(sourceLabel, sourceGenerator, null, null, false);
         sourceGenerator.setNext(instance);
         final Generator generator = new Constant(period, sourceLabel, null);
         final List<Generator> generators = new ArrayList<>();
@@ -486,7 +486,7 @@ public class BalancerTest
         final Component instance = new Balancer(label, distributor, false);
         final LinkedList<Event> events = new LinkedList<>();
         final Component source
-                = new Source(sourceLabel, sourceGenerator, false);
+                = new Source(sourceLabel, sourceGenerator, null, null, false);
         final Generator generator1 = new Constant(period, sourceLabel, null);
         final List<Generator> generators1 = new ArrayList<>();
         final Generator generator2 = new Constant(period, sourceLabel, null);

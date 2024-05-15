@@ -443,7 +443,7 @@ class Compiler
                     error.append(this.location(token));
                     local.addError(error.toString());                                
                 }
-                else if (distributors.size() > 0)
+                else if (!distributors.isEmpty())
                 {
                     final StringBuilder error =
                             new StringBuilder("Balancer function cannot be used in a source near ");

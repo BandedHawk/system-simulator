@@ -175,7 +175,7 @@ function
 ```
 ### Components
 #### Source
-A <i>source</i> is the system entry point for events, and their arrival rate is modeled by the source function. The <i>source</i> can only have one function. The <i>monitor</i> name-value pair toggles monitoring output at the end of the simulation.
+A <i>source</i> is the system entry point for events, and their arrival rate is modeled by the source function. The <i>source</i> can only have one function. The <i>monitor</i> name-value pair toggles monitoring output at the end of the simulation. Optional declarations are <i>start</i> and <i>end</i>. These specify when the source generator starts and finishes generating events. This allows impulse load injection or other effects to determine impacts on a system.
 
 The <i>source</i> component cannot be connected downstream of any other component. Only a generator function can be declared in the <i>source</i>.
 ```
@@ -190,6 +190,8 @@ component
         maximum: 2.5
         next: network
     }
+    start: 0
+    end: 500
     monitor: Yes
 }
 ```

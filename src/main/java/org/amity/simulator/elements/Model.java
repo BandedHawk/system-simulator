@@ -183,7 +183,7 @@ public class Model
                 do
                 {
                     final Event event = source.simulate(null);
-                    if (event.getStarted() > generate)
+                    if (event == null || event.getStarted() > generate)
                     {
                         break;
                     }
