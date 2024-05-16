@@ -44,6 +44,7 @@ public class Source implements Component
     private int counter;
     private Double end;
     private double time;
+    private final boolean noLimit;
 
     /**
      * Hidden default constructor to avoid implicit creation
@@ -58,6 +59,7 @@ public class Source implements Component
         this.counter = 0;
         this.end = null;
         this.time = 0;
+        this.noLimit = true;
     }
 
     /**
@@ -88,32 +90,35 @@ public class Source implements Component
         this.counter = 0;
         // Set the start time for generation
         this.time = start == null ? 0 : start ;
+        this.noLimit = this.end == null;
     }
 
     @Override
     public Event simulate(final Event injectedEvent)
     {
-        boolean generated = false;
+        boolean generated = true;
         if (injectedEvent == null)
         {
             // Cumulative injectedEvent timeline
             final double value = this.generator.generate();
             this.time += value;
             // Only generate an event if it is within the time limit
-            if (this.end == null || this.end > this.time)
+            if (this.noLimit || this.end > this.time)
             {
                 final Event event = new Event(this.label,
                         Integer.toString(this.counter++), this.time);
                 event.setValues(this.time, this.time, this.time);
                 this.local.add(event);
-                generated = true;
+            }
+            else
+            {
+                generated = false;
             }
         }
         // Pass through an injected event
         else
         {
             this.local.add(injectedEvent);
-            generated = true;
         }
         // Make a global copy to pass on
         final Event global = generated ?
@@ -230,10 +235,10 @@ public class Source implements Component
                     label = parameter.value;
                     break;
                 case Vocabulary.START:
-                    start = Double.parseDouble(parameter.value);
+                    start = Double.valueOf(parameter.value);
                     break;
                 case Vocabulary.END:
-                    end = Double.parseDouble(parameter.value);
+                    end = Double.valueOf(parameter.value);
                     break;
                 case Vocabulary.MONITOR:
                     monitor = parameter.value.toLowerCase().contains("y");
