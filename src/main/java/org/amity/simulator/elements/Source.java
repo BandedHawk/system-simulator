@@ -42,7 +42,8 @@ public class Source implements Component
     private final List<Event> local;
     private final boolean monitor;
     private int counter;
-    private Double end;
+    private final Double start;
+    private final Double end;
     private double time;
     private final boolean noLimit;
 
@@ -57,6 +58,7 @@ public class Source implements Component
         this.generators = new HashMap<>();
         this.monitor = false;
         this.counter = 0;
+        this.start = null;
         this.end = null;
         this.time = 0;
         this.noLimit = true;
@@ -85,6 +87,7 @@ public class Source implements Component
             this.generators.put(generator.getReference(), list);
         }
         this.local = new ArrayList<>();
+        this.start = start;
         this.end = end;
         this.monitor = monitor;
         this.counter = 0;
@@ -141,7 +144,7 @@ public class Source implements Component
     {
         this.local.clear();
         this.counter = 0;
-        this.time = 0;
+        this.time = this.start == null ? 0 : this.start ;
         if (this.generator.getNext() != null)
         {
             this.generator.getNext().reset();
