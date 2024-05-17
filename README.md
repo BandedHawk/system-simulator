@@ -1,5 +1,5 @@
 # system-simulator
-This is code that allows modeling a system as a connection of blocks characterised by delay functions. The current modeler can represent reasonably complex systems by allowing parallel connection of blocks, and variation of delay characteristics based on the event source. This allows a better understnding of throughput in a system.
+This is code that allows modeling a system as a connection of blocks characterised by delay functions. The current modeler can represent reasonably complex systems by allowing parallel connection of blocks, and variation of delay characteristics based on the event source. This allows a better understanding of throughput in a system.
 
 Typically, you would use the modeler to understand and identify theoretical inflection points in the real system when variation in the rates of incoming requests cause a rapid deterioration in the responsiveness of the system. It is simpler than SciLab and Matlab to set up a model and run through what-if scenarios, and the modeling language is reasonably straight-forward.
 ## Building the software
