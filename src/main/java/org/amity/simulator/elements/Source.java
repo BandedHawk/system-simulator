@@ -124,11 +124,15 @@ public class Source implements Component
             this.local.add(injectedEvent);
         }
         // Make a global copy to pass on
-        final Event global = generated ?
-                new Event(this.local.get(this.local.size() - 1)) : null;
-        if (global != null)
+        final Event global;
+        if (generated)
         {
-            global.setComponent(this.generator.getNext());
+                global = new Event(this.local.get(this.local.size() - 1));
+                global.setComponent(this.generator.getNext());
+        }
+        else
+        {
+            global = null;
         }
         return global;
     }
