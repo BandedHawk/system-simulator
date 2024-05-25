@@ -51,6 +51,7 @@ public class Vocabulary
     public final static String GAUSSIAN = "gaussian";
     public final static String FUNCTION = "function";
     public final static String SOURCE = "source";
+    public final static String SINK = "sink";
     public final static String DEFAULT = "default";
     public final static String PROCESSOR = "processor";
     public final static String THROTTLE = "throttle";
@@ -67,6 +68,7 @@ public class Vocabulary
         TYPE_PATTERN = Pattern.compile("^\\s*[a-zA-Z][\\s\\w]*[\\-]*[\\s\\w]*$");
         final Map<String, Map<String, Definition>> blocks = new HashMap<>();
         final Map<String, Definition> source = new HashMap<>();
+        final Map<String, Definition> sink = new HashMap<>();
         final Map<String, Definition> processor = new HashMap<>();
         final Map<String, Definition> throttle = new HashMap<>();
         final Map<String, Definition> balancer = new HashMap<>();
@@ -91,6 +93,8 @@ public class Vocabulary
         source.put(START, optionalDecimal);
         source.put(END, optionalDecimal);
         source.put(MONITOR, monitor);
+        sink.put(NAME, mandatoryWords);
+        sink.put(MONITOR, monitor);
         processor.put(NAME, mandatoryWords);
         processor.put(MONITOR, monitor);
         processor.put(PRIORITY, optionalMulti);

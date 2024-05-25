@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.amity.simulator.data.QueueStatistics;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
 import org.amity.simulator.generators.Generator;
@@ -43,6 +44,8 @@ public class Processor implements Component
     private final String[] sources;
     private final Set<String> priorities;
     private final List<Event> local;
+    private final List<Event> queue;
+    private final List<QueueStatistics> statistics;
     private final boolean monitor;
     private double available;
     private final List<Integer> depths;
@@ -63,6 +66,8 @@ public class Processor implements Component
         this.depth = 0;
         this.sources = new String[0];
         this.priorities = new HashSet<>();
+        this.queue = new ArrayList<>();
+        this.statistics = new ArrayList<>();
     }
 
     /**
@@ -124,6 +129,10 @@ public class Processor implements Component
         {
             this.priorities = new HashSet<>();
         }
+        this.queue = new ArrayList<>();
+        this.statistics = new ArrayList<>();
+        final QueueStatistics value = new QueueStatistics(0, 0.0, 0.0);
+        this.statistics.add(value);
     }
 
     @Override
@@ -131,50 +140,96 @@ public class Processor implements Component
     {
         if (event != null)
         {
-            // Generate processing times for this event at this component
-            final Generator generator
-                    = generators.containsKey(event.getSource())
-                    ? generators.get(event.getSource())
-                    : generators.containsKey(Vocabulary.DEFAULT)
-                    ? generators.get(Vocabulary.DEFAULT)
-                    : null;
-            final double value = generator.generate();
-            // Arrival at this component is time event completed
-            // processing at last component
-            final double arrived = event.getCompleted();
             // Availability of this component depends on when it
             // finished processing last event in queue -
-            // it is either when the event arrived on queue or when
+            // it is either when the event arrived for processing or when
             // the component finished processing the last event
-            this.available = this.available > arrived ? this.available
-                    : arrived;
-            // Update the event for current component interaction
-            final double completed = this.available + value;
-            final double executed = event.getExecuted() + value;
-            event.setValues(arrived, this.available, completed);
-            event.setExecuted(executed);
-            // Set next component availability
-            this.available = completed;
-            // Copy current event to local stats
-            final Event current = new Event(event);
-            current.setComponent(null);
-            this.local.add(current);
-            // Modify global event to next component to pass through
-            event.setComponent(generator.getNext());
-            // Check how many events are waiting to execute to find queue depth
-            final int last = this.local.size() - 1;
-            final double joined = current.getArrived();
-            if (last > 0)
+            final double arrived = event.getArrived();
+            final double possible = event.getStarted();
+            // The processor is not available to process immediately
+            if (this.available > possible)
             {
-                this.depth = 0;
-                for (int i = last - 1; i > -1; i--)
+                // Set the possible start time for processing in the future
+                event.setStarted(this.available);
+                // Event not already noted to be in queue
+                if (!this.queue.contains(event))
                 {
-                    this.depth
-                            += this.local.get(i).getCompleted() > joined
-                            ? 1 : 0;
+                    if (!this.statistics.isEmpty())
+                    {
+                        // Update previous queue span statistics entry
+                        QueueStatistics stats = this.statistics.getLast();
+                        assert stats != null :
+                                "Unexpected null queue statistics";
+                        final double span = stats.getTime() - arrived;
+                        stats.setSpan(span);
+                        // Add new queue span statistics
+                        stats = new QueueStatistics(this.queue.size() + 1,
+                                arrived, 0.0);
+                        statistics.add(stats);
+                    }
+                    this.queue.add(event);
                 }
             }
-            depths.add(this.depth);
+            else
+            {
+                // Generate processing times for this event at this component
+                final Generator generator
+                        = generators.containsKey(event.getSource())
+                        ? generators.get(event.getSource())
+                        : generators.containsKey(Vocabulary.DEFAULT)
+                        ? generators.get(Vocabulary.DEFAULT)
+                        : null;
+                assert generator != null : "Should never be declared with no functions";
+                final double value = generator.generate();
+                // Update the processing start of event for current component
+                // interaction
+                final double start = this.available < arrived
+                        ? arrived : this.available;
+                // Completion time
+                final double completed = start + value;
+                // Cumulative event processing time
+                final double executed = event.getExecuted() + value;
+                event.setValues(arrived, start, completed);
+                event.setExecuted(executed);
+                // Set next component availability
+                this.available = completed;
+                // Copy current event to local stats
+                final Event current = new Event(event);
+                current.setComponent(null);
+                this.local.add(current);
+                // Set event arrival time for next component
+                event.setArrived(completed);
+                // Set possible start time for processing at next component
+                event.setStarted(completed);
+                // Modify global event to next component to pass through
+                event.setComponent(generator.getNext());
+                // Remove event from queue as it has been processed
+                if (!this.queue.isEmpty())
+                {
+                    this.queue.remove(event);
+                    if (!this.statistics.isEmpty())
+                    {
+                        // Update previous queue span statistics entry
+                        QueueStatistics stats = this.statistics.getLast();
+                        assert stats != null :
+                                "Unexpected null queue statistics";
+                        final double span = stats.getTime() - start;
+                        stats.setSpan(span);
+                        // Add new queue span statistics
+                        stats = new QueueStatistics(this.queue.size(),
+                                start, 0.0);
+                        statistics.add(stats);
+                    }
+                }
+                // Adjust queued events to possible available execution time
+                if (!this.queue.isEmpty())
+                {
+                    for (final Event queuedEvent : queue)
+                    {
+                        queuedEvent.setStarted(executed);
+                    }
+                }
+            }
         }
         return event;
     }
@@ -189,6 +244,10 @@ public class Processor implements Component
     public void reset()
     {
         this.local.clear();
+        this.queue.clear();
+        this.statistics.clear();
+        final QueueStatistics value = new QueueStatistics(0, 0.0, 0.0);
+        this.statistics.add(value);
         this.available = 0;
         // Reset downstream components
         for (final Generator generator : this.generators.values())

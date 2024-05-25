@@ -100,6 +100,7 @@ public class Monitor
         boolean counted = false;
         final boolean source = component instanceof Source;
         final boolean processor = component instanceof Processor;
+        final boolean sink = component instanceof Sink;
         if (!source)
         {
             this.waiting.clear();
@@ -110,7 +111,15 @@ public class Monitor
         // Collect data into statistical services
         assert component != null : "unexpected null component";
         final List<Event> events = component.getLocalEvents();
-        events.sort(Comparator.comparingDouble(Event::getArrived));
+        // Sort by arrival time if we're at a processor
+        if (processor)
+        {
+            events.sort(Comparator.comparingDouble(Event::getArrived));
+        }
+        else
+        {
+            events.sort(Comparator.comparingDouble(Event::getCreated));
+        }
         for (final Event event : component.getLocalEvents())
         {
             final double arrived = event.getArrived();
@@ -249,7 +258,7 @@ public class Monitor
      * Calculate statistics for events that completed processing in the system
      * 
      * @param events list of completed events
-     * @param multisource
+     * @param multisource indication of many sources to report
      */
     public void displayStatistics(final List<Event> events,
             final boolean multisource)

@@ -124,8 +124,7 @@ public class Model
             final Set<Map.Entry<String, Component>> set
                     = new TreeSet<>(Map.Entry.comparingByKey());
             set.addAll(this.components.entrySet());
-            for (final Map.Entry<String, Component> entry
-                    : set)
+            for (final Map.Entry<String, Component> entry : set)
             {
                 final Component component = entry.getValue();
                 component.generateStatistics(monitor);
@@ -195,13 +194,15 @@ public class Model
                 }
                 while (true);
             }
-            // Sort primary store for all events in order of completion
-            this.primary.sort(Comparator.comparingDouble(Event::getCompleted));
+            // Sort primary store for all events in order of estimated start time
+            this.primary.sort(Comparator.comparingDouble(Event::getStarted)
+                    .thenComparingDouble(Event::getArrived));
             // Copy a fractional part of the primary store
             // We do this as the working sort will take less time
             this.fill();
-            // Sort working in chronological order of last completion
-            this.working.sort(Comparator.comparingDouble(Event::getCompleted));
+            // Sort working in chronological order of estimated start
+            this.working.sort(Comparator.comparingDouble(Event::getStarted)
+                    .thenComparingDouble(Event::getArrived));
         }
 
         /**
@@ -271,7 +272,8 @@ public class Model
                     }
                     // Re-sort working buffer after we have modified the list
                     this.working.sort(Comparator
-                            .comparingDouble(Event::getCompleted));
+                            .comparingDouble(Event::getStarted)
+                            .thenComparingDouble(Event::getArrived));
                 }
                 if (transitions % CYCLES == 0)
                 {
@@ -311,7 +313,8 @@ public class Model
                     this.primary.addAll(this.working);
                     this.working.clear();
                     this.primary.sort(Comparator
-                            .comparingDouble(Event::getCompleted));
+                            .comparingDouble(Event::getStarted)
+                            .thenComparingDouble(Event::getArrived));
                 }
                 else
                 {

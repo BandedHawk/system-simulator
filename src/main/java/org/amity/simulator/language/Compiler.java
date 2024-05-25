@@ -38,6 +38,7 @@ import org.amity.simulator.generators.Uniform;
 import org.amity.simulator.distributors.Distributor;
 import org.amity.simulator.elements.Component;
 import org.amity.simulator.elements.Function;
+import org.amity.simulator.elements.Sink;
 import org.amity.simulator.elements.Throttle;
 import org.amity.simulator.generators.Generator;
 
@@ -456,6 +457,32 @@ class Compiler
                             new StringBuilder("Source generation function already exists near ");
                     error.append(this.location(token));
                     local.addError(error.toString());                                
+                }
+                break;
+            case Vocabulary.SINK:
+                if (generators != null || !distributors.isEmpty())
+                {
+                    final StringBuilder error =
+                            new StringBuilder("Unexpected declaration near");
+                    error.append(this.location(token));
+                    local.addError(error.toString());                                
+                }
+                else
+                {
+                    final Component sink = Sink.instance(pairs);
+                    if (local.components.containsKey(sink.getLabel()))
+                    {
+                        final StringBuilder error =
+                                new StringBuilder("Component with label '");
+                        error.append(sink.getLabel());
+                        error.append("' already exists before ");
+                        error.append(this.location(token));
+                        local.addError(error.toString());                                
+                    }
+                    else
+                    {
+                        local.components.put(sink.getLabel(), sink);
+                    }
                 }
                 break;
             case Vocabulary.PROCESSOR:
