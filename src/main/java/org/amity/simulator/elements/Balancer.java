@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.amity.simulator.data.QueueStatistics;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
 import org.amity.simulator.distributors.Distributor;
@@ -39,7 +40,6 @@ public class Balancer implements Component
     private final String label;
     private final Distributor distributor;
     private final List<Event> local;
-    private final List<Integer> depths;
     private final boolean monitor;
     private final boolean intelligent;
 
@@ -53,7 +53,6 @@ public class Balancer implements Component
         this.monitor = false;
         this.intelligent = false;
         this.local = new ArrayList<>();
-        this.depths = new ArrayList<>();
     }
 
     /**
@@ -71,7 +70,6 @@ public class Balancer implements Component
         this.intelligent = distributor instanceof Smart;
         this.monitor = monitor;
         this.local = new ArrayList<>();
-        this.depths = new ArrayList<>();
     }
 
     @Override
@@ -112,7 +110,6 @@ public class Balancer implements Component
             final Event current = new Event(event);
             current.setComponent(null);
             this.local.add(current);
-            this.depths.add(0);
         }
         return event == null ? event : distributor.assign(event);
     }
@@ -140,9 +137,9 @@ public class Balancer implements Component
     }
 
     @Override
-    public List<Integer> getDepths()
+    public List<QueueStatistics> getQueueStatistics()
     {
-        return this.depths;
+        return new ArrayList<>();
     }
 
     @Override

@@ -211,20 +211,20 @@ public class SourceTest
     }
 
     /**
-     * Test of getDepths method, of class Source.
+     * Test of getQueueStatistics method, of class Source.
      */
     @Test
-    public void testGetDepths()
+    public void testGetQueueStatistics()
     {
-        System.out.println("getDepths");
+        System.out.println("getQueueStatistics");
         final double period = 5;
         final String label = "test";
         final Generator generator = new Constant(period, "source", "next");
         final Component instance =
                 new Source(label, generator, null, null, false);
         // This is invariant as a source never has any wait times
-        assertTrue(instance.getDepths() != null);
-        assertEquals(0, instance.getDepths().size());
+        assertTrue(instance.getQueueStatistics() != null);
+        assertEquals(0, instance.getQueueStatistics().size());
     }
 
     /**

@@ -324,12 +324,12 @@ public class ThrottleTest
     }
 
     /**
-     * Test of getDepths method, of class Throttle.
+     * Test of getQueueStatistics method, of class Throttle.
      */
     @Test
-    public void testGetDepths()
+    public void testGetQueueStatistics()
     {
-        System.out.println("getDepths");
+        System.out.println("getQueueStatistics");
         final double sourcePeriod = 1;
         final double period = 2;
         assertTrue(period > sourcePeriod);
@@ -379,8 +379,8 @@ public class ThrottleTest
         assertTrue(throttle.getLocalEvents().size() == eventTotal);
         System.out.println("  Check depth");
         // No way to adequately test this except under load
-        assertTrue(instance.getDepths() != null);
-        assertEquals(eventTotal, instance.getDepths().size());
+        assertTrue(instance.getQueueStatistics() != null);
+        assertEquals(1, instance.getQueueStatistics().size());
     }
 
     /**

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.amity.simulator.data.QueueStatistics;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
 import org.amity.simulator.generators.Generator;
@@ -162,7 +163,7 @@ public class Source implements Component
     }
 
     @Override
-    public List<Integer> getDepths()
+    public List<QueueStatistics> getQueueStatistics()
     {
         return new ArrayList<>();
     }

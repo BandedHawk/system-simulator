@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.amity.simulator.data.QueueStatistics;
 
 /**
  *
@@ -76,7 +77,7 @@ public class DummyComponent implements Component
     }
 
     @Override
-    public List<Integer> getDepths()
+    public List<QueueStatistics> getQueueStatistics()
     {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }

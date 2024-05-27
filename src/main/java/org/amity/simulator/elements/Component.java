@@ -21,6 +21,7 @@ package org.amity.simulator.elements;
 
 import java.util.List;
 import java.util.Map;
+import org.amity.simulator.data.QueueStatistics;
 
 /**
  * Interface of a system component in the simulation
@@ -67,9 +68,9 @@ public interface Component
 
     /**
      * 
-     * @return queue lengths
+     * @return queue information
      */
-    List<Integer> getDepths();
+    List<QueueStatistics> getQueueStatistics();
 
     /**
      * Produce display statistics on component

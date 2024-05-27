@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.amity.simulator.data.QueueStatistics;
 import org.amity.simulator.generators.Generator;
 import org.amity.simulator.language.NameValue;
 import org.amity.simulator.language.Vocabulary;
@@ -40,8 +41,8 @@ public class Throttle implements Component
     private final List<Event> local;
     private final boolean monitor;
     private double available;
-    private final List<Integer> depths;
-    private int depth;
+    private final List<Event> queue;
+    private final List<QueueStatistics> statistics;
 
     /**
      * Hidden default constructor to avoid implicit creation
@@ -54,8 +55,8 @@ public class Throttle implements Component
         this.local = new ArrayList<>();
         this.monitor = false;
         this.available = 0;
-        this.depths = new ArrayList<>();
-        this.depth = 0;
+        this.queue = new ArrayList<>();
+        this.statistics = new ArrayList<>();
         this.sources = new String[0];
         this.priorities = new HashSet<>();
     }
@@ -69,8 +70,6 @@ public class Throttle implements Component
         this.references = new HashMap<>();
         this.monitor = monitor;
         this.available = 0;
-        this.depths = new ArrayList<>();
-        this.depth = 0;
         // Put the generators into the source lookup
         if (generators != null && !generators.isEmpty())
         {
@@ -110,6 +109,11 @@ public class Throttle implements Component
         {
             this.priorities = new HashSet<>();
         }
+        // Initialize the queue handling
+        this.queue = new ArrayList<>();
+        this.statistics = new ArrayList<>();
+        final QueueStatistics value = new QueueStatistics(0, 0.0, 0.0);
+        this.statistics.add(value);
     }
 
     @Override
@@ -117,48 +121,90 @@ public class Throttle implements Component
     {
         if (event != null)
         {
-            // Generate processing times for this event at this component
-            final Generator generator
-                    = generators.containsKey(event.getSource())
-                    ? generators.get(event.getSource())
-                    : generators.containsKey(Vocabulary.DEFAULT)
-                    ? generators.get(Vocabulary.DEFAULT)
-                    : null;
-            // Cool down time that is the throttle
-            final double value = generator.generate();
-            // Arrival at this component is time event completed
-            // processing at last component
-            final double arrived = event.getCompleted();
             // Availability of this component depends on when it
             // finished processing last event in queue -
-            // it is either when the event arrived on queue or when
-            // the component finished processing the last event including the
-            // cooldown period
-            this.available = this.available > arrived ? this.available
-                    : arrived;
-            event.setValues(arrived, this.available, this.available);
-            // Availability is set for after the cooldown time
-            this.available += value;
-            // Copy current event to local stats
-            final Event current = new Event(event);
-            current.setComponent(null);
-            this.local.add(current);
-            // Modify global event to next component to pass through
-            event.setComponent(generator.getNext());
-            // Check how many events are waiting to execute to find queue depth
-            final int last = this.local.size() - 1;
-            final double joined = current.getArrived();
-            if (last > 0)
+            // it is either when the event arrived for processing or when
+            // the component finished processing the last event
+            final double arrived = event.getArrived();
+            final double possible = event.getStarted();
+            // The processor is not available to process immediately
+            if (this.available > possible)
             {
-                this.depth = 0;
-                for (int i = last - 1; i > -1; i--)
+                // Set the possible start time for processing in the future
+                event.setStarted(this.available);
+                // Event not already noted to be in queue
+                if (!this.queue.contains(event))
                 {
-                    this.depth
-                            += this.local.get(i).getCompleted() > joined
-                            ? 1 : 0;
+                    if (this.monitor && !this.statistics.isEmpty())
+                    {
+                        // Update previous queue span statistics entry
+                        QueueStatistics stats = this.statistics.getLast();
+                        assert stats != null :
+                                "Unexpected null queue statistics";
+                        final double span = arrived - stats.getTime();
+                        stats.setSpan(span);
+                        // Add new queue span statistics
+                        stats = new QueueStatistics(this.queue.size() + 1,
+                                arrived, 0.0);
+                        statistics.add(stats);
+                    }
+                    this.queue.add(event);
                 }
             }
-            depths.add(this.depth);
+            else
+            {
+                // Generate processing times for this event at this component
+                final Generator generator
+                        = generators.containsKey(event.getSource())
+                        ? generators.get(event.getSource())
+                        : generators.containsKey(Vocabulary.DEFAULT)
+                        ? generators.get(Vocabulary.DEFAULT)
+                        : null;
+                assert generator != null : "Should never be declared with no functions";
+                // Cool down time that is the throttle
+                final double value = generator.generate();
+                // Arrival at this component is time event completed
+                // processing at last component
+                // Update the processing start of event for current component
+                // interaction
+                final double start = this.available < arrived
+                        ? arrived : this.available;
+                event.setValues(arrived, start, start);
+                // Availability is set for after the cooldown time
+                this.available += value;
+                // Copy current event to local stats
+                final Event current = new Event(event);
+                current.setComponent(null);
+                this.local.add(current);
+                // Modify global event to next component to pass through
+                event.setComponent(generator.getNext());
+                // Remove event from queue as it has been processed
+                if (!this.queue.isEmpty())
+                {
+                    this.queue.remove(event);
+                    if (this.monitor && !this.statistics.isEmpty())
+                    {
+                        // Update previous queue span statistics entry
+                        QueueStatistics stats = this.statistics.getLast();
+                        assert stats != null :
+                                "Unexpected null queue statistics";
+                        final double span = start - stats.getTime();
+                        stats.setSpan(span);
+                        // Add new queue span statistics
+                        stats = new QueueStatistics(this.queue.size(),
+                                start, 0.0);
+                        statistics.add(stats);
+                    }
+                }
+                // Adjust queued events to possible available execution time
+                if (!this.queue.isEmpty())
+                {
+                    for (final Event queuedEvent : queue)
+                    {
+                        queuedEvent.setStarted(start);
+                    }
+                }
+            }
         }
         return event;
     }
@@ -192,9 +238,9 @@ public class Throttle implements Component
     }
 
     @Override
-    public List<Integer> getDepths()
+    public List<QueueStatistics> getQueueStatistics()
     {
-        return this.depths;
+        return this.statistics;
     }
 
     @Override

@@ -366,12 +366,12 @@ public class BalancerTest
     }
 
     /**
-     * Test of getDepths method, of class Balancer.
+     * Test of getQueueStatistics method, of class Balancer.
      */
     @Test
-    public void testGetDepths()
+    public void testGetQueueStatistics()
     {
-        System.out.println("getDepths");
+        System.out.println("getQueueStatistics");
         final double sourcePeriod = 1;
         final double period = 1;
         final String sourceLabel = "source";
@@ -440,8 +440,8 @@ public class BalancerTest
         assertEquals(eventTotal / 2, processor1.getLocalEvents().size());
         assertEquals(eventTotal / 2, processor2.getLocalEvents().size());
         // No way to adequately test this except under load
-        assertTrue(instance.getDepths() != null);
-        assertEquals(eventTotal, instance.getDepths().size());
+        assertTrue(instance.getQueueStatistics() != null);
+        assertEquals(0, instance.getQueueStatistics().size());
     }
 
     /**

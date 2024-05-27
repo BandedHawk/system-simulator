@@ -48,8 +48,6 @@ public class Processor implements Component
     private final List<QueueStatistics> statistics;
     private final boolean monitor;
     private double available;
-    private final List<Integer> depths;
-    private int depth;
 
     /**
      * Hidden default constructor to avoid implicit creation
@@ -62,8 +60,6 @@ public class Processor implements Component
         this.local = new ArrayList<>();
         this.monitor = false;
         this.available = 0;
-        this.depths = new ArrayList<>();
-        this.depth = 0;
         this.sources = new String[0];
         this.priorities = new HashSet<>();
         this.queue = new ArrayList<>();
@@ -88,8 +84,6 @@ public class Processor implements Component
         this.references = new HashMap<>();
         this.monitor = monitor;
         this.available = 0;
-        this.depths = new ArrayList<>();
-        this.depth = 0;
         // Put the generators into the source lookup
         if (generators != null && !generators.isEmpty())
         {
@@ -129,6 +123,7 @@ public class Processor implements Component
         {
             this.priorities = new HashSet<>();
         }
+        // Initialize the queue handling
         this.queue = new ArrayList<>();
         this.statistics = new ArrayList<>();
         final QueueStatistics value = new QueueStatistics(0, 0.0, 0.0);
@@ -154,13 +149,13 @@ public class Processor implements Component
                 // Event not already noted to be in queue
                 if (!this.queue.contains(event))
                 {
-                    if (!this.statistics.isEmpty())
+                    if (this.monitor && !this.statistics.isEmpty())
                     {
                         // Update previous queue span statistics entry
                         QueueStatistics stats = this.statistics.getLast();
                         assert stats != null :
                                 "Unexpected null queue statistics";
-                        final double span = stats.getTime() - arrived;
+                        final double span = arrived - stats.getTime();
                         stats.setSpan(span);
                         // Add new queue span statistics
                         stats = new QueueStatistics(this.queue.size() + 1,
@@ -207,13 +202,13 @@ public class Processor implements Component
                 if (!this.queue.isEmpty())
                 {
                     this.queue.remove(event);
-                    if (!this.statistics.isEmpty())
+                    if (this.monitor && !this.statistics.isEmpty())
                     {
                         // Update previous queue span statistics entry
                         QueueStatistics stats = this.statistics.getLast();
                         assert stats != null :
                                 "Unexpected null queue statistics";
-                        final double span = stats.getTime() - start;
+                        final double span = start - stats.getTime();
                         stats.setSpan(span);
                         // Add new queue span statistics
                         stats = new QueueStatistics(this.queue.size(),
@@ -266,9 +261,9 @@ public class Processor implements Component
     }
 
     @Override
-    public List<Integer> getDepths()
+    public List<QueueStatistics> getQueueStatistics()
     {
-        return this.depths;
+        return this.statistics;
     }
 
     @Override

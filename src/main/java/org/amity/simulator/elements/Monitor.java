@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import org.amity.simulator.data.QueueStatistics;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.util.FastMath;
 
@@ -100,6 +101,7 @@ public class Monitor
         boolean counted = false;
         final boolean source = component instanceof Source;
         final boolean processor = component instanceof Processor;
+        final boolean throttle = component instanceof Throttle;
         final boolean sink = component instanceof Sink;
         if (!source)
         {
@@ -112,7 +114,7 @@ public class Monitor
         assert component != null : "unexpected null component";
         final List<Event> events = component.getLocalEvents();
         // Sort by arrival time if we're at a processor
-        if (processor)
+        if (processor || throttle)
         {
             events.sort(Comparator.comparingDouble(Event::getArrived));
         }
@@ -173,12 +175,6 @@ public class Monitor
         }
         else
         {
-            queue.clear();
-            final List<Integer> depths = component.getDepths();
-            for (final int depth : depths)
-            {
-                queue.addValue(depth);
-            }
             System.out.println("  Events processed: " + this.waiting.getN());
             final double utilization = (timespan - idle) / timespan;
             if (processor)
@@ -190,18 +186,81 @@ public class Monitor
                     + " events per tick");
             System.out.println("          Or: " + 1/throughput
                     + " ticks between events");
-            if (processor)
+            if (processor || throttle)
             {
+                final List<QueueStatistics> elements =
+                        component.getQueueStatistics();
+                // Check if last measurement period has a valid value set
+                // otherwise set it to the end of the period
+                final QueueStatistics lastElement = elements.getLast();
+                if (lastElement.getSpan() < 0.00000000001)
+                {
+                    lastElement.setSpan(this.end - lastElement.getTime() +1.0);
+                }
+                final List<QueueStatistics> statistics = new ArrayList<>();
+                // Add elements within the measurement period
+                for (final QueueStatistics value : elements)
+                {
+                    final double time = value.getTime();
+                    final double complete = time + value.getSpan();
+                    if (complete > this.start && complete < this.end)
+                        statistics.add(value);
+                }
+                statistics.sort(Comparator
+                        .comparingDouble(QueueStatistics::getTime));
+                int max = 0;
+                int min = Integer.MAX_VALUE;
+                double total = 0;
+                if (statistics.isEmpty())
+                {
+                    min = 0;
+                }
+                else
+                {
+                    for (final QueueStatistics value : statistics)
+                    {
+                        final double span;
+                        final double time = value.getTime();
+                        final double complete = time + value.getSpan();
+                        if (time < this.start)
+                        {
+                            span = value.getSpan() - (this.start - time);
+                        }
+                        else if (complete > this.end)
+                        {
+                            span = value.getSpan() - (complete - this.end);
+                        }
+                        else
+                        {
+                            span = value.getSpan();
+                        }
+                        final int depth = value.getDepth();
+                        total += span * depth;
+                        max = Math.max(max, depth);
+                        min = Math.min(min, depth);
+                    }
+                }
+                final double mean = total/(this.end - this.start);
+                final double half = (this.end - this.start)/ 2.0;
+                // Sort by queue depth to find median
+                statistics.sort(Comparator
+                        .comparingDouble(QueueStatistics::getDepth));
+                int median = 0;
+                for (final QueueStatistics value: statistics)
+                {
+                    final double complete = value.getTime() + value.getSpan();
+                    // Found median
+                    if (half < complete)
+                    {
+                        median = value.getDepth();
+                        break;
+                    }
+                }
                 System.out.println("  Queued events");
-                System.out.println("    Mean: " + this.queue.getMean());
-                System.out.println("    Standard deviation: "
-                        + this.queue.getStandardDeviation());
-                System.out.println("    Median: "
-                        + this.queue.getPercentile(50));
-                System.out.println("    Maximum: " + this.queue.getMax());
-                System.out.println("    Minimum: " + this.queue.getMin());
-                assert this.queue.getMin() >= 0
-                        : "Obtained minimum below 0";
+                System.out.println("    Mean: " + mean);
+                System.out.println("    Median: " + median);
+                System.out.println("    Maximum: " + max);
+                System.out.println("    Minimum: " + min);
                 System.out.println("  Wait time");
                 System.out.println("    Mean: " + this.waiting.getMean()
                         + " ticks");
@@ -215,6 +274,9 @@ public class Monitor
                         + " ticks");
                 assert this.waiting.getMin() >= 0
                         : "Obtained minimum below 0";
+            }
+            if (processor)
+            {
                 System.out.println("  Process time");
                 System.out.println("    Mean: " + this.processing.getMean()
                         + " ticks");
