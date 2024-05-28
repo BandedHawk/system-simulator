@@ -136,6 +136,9 @@ public class Monitor
                 if (arrival > 0)
                 {
                     this.arrivals.addValue(arrived - arrival);
+                    System.out.println("Arrived: " + arrived);
+                    System.out.println("Arrival: " + arrival);
+                    System.out.println("difference: " + (arrived - arrival));
                 }
                 if (!source)
                 {
@@ -173,6 +176,10 @@ public class Monitor
                     + " ticks between events");
             System.out.println("  Generation characteristics");
         }
+        else if (sink)
+        {
+            // Deal with sink statistics
+        }
         else
         {
             System.out.println("  Events processed: " + this.waiting.getN());
@@ -208,20 +215,25 @@ public class Monitor
                 }
                 statistics.sort(Comparator
                         .comparingDouble(QueueStatistics::getTime));
-                int max = 0;
                 int min = Integer.MAX_VALUE;
-                double total = 0;
+                int max = 0;
+                double variance = 0;
+                final double mean;
                 if (statistics.isEmpty())
                 {
                     min = 0;
+                    mean = 0;
                 }
                 else
                 {
+                    double total = 0;
+                    // Calculate mean
                     for (final QueueStatistics value : statistics)
                     {
                         final double span;
                         final double time = value.getTime();
                         final double complete = time + value.getSpan();
+                        // Adjust span for start and end measurement ppoints
                         if (time < this.start)
                         {
                             span = value.getSpan() - (this.start - time);
@@ -239,9 +251,36 @@ public class Monitor
                         max = Math.max(max, depth);
                         min = Math.min(min, depth);
                     }
+                    mean = total/(this.end - this.start);
+                    // Calculate standard deviation
+                    total = 0;
+                    for (final QueueStatistics value : statistics)
+                    {
+                        final double span;
+                        final double time = value.getTime();
+                        final double complete = time + value.getSpan();
+                        // Adjust span for start and end measurement ppoints
+                        if (time < this.start)
+                        {
+                            span = value.getSpan() - (this.start - time);
+                        }
+                        else if (complete > this.end)
+                        {
+                            span = value.getSpan() - (complete - this.end);
+                        }
+                        else
+                        {
+                            span = value.getSpan();
+                        }
+                        final int depth = value.getDepth();
+                        final double difference = (mean - Double.valueOf(depth));
+                        total += difference * difference * span;
+                    }
+                    variance = total/(this.end - this.start);
                 }
-                final double mean = total/(this.end - this.start);
                 final double half = (this.end - this.start)/ 2.0;
+                final double deviation = variance > 0.0 ? Math.sqrt(variance)
+                        : 0.0;
                 // Sort by queue depth to find median
                 statistics.sort(Comparator
                         .comparingDouble(QueueStatistics::getDepth));
@@ -258,6 +297,7 @@ public class Monitor
                 }
                 System.out.println("  Queued events");
                 System.out.println("    Mean: " + mean);
+                System.out.println("    Standard Deviation: " + deviation);
                 System.out.println("    Median: " + median);
                 System.out.println("    Maximum: " + max);
                 System.out.println("    Minimum: " + min);

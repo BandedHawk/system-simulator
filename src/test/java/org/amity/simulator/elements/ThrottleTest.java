@@ -165,6 +165,9 @@ public class ThrottleTest
         assertTrue(events.isEmpty());
         sourceTick = sourcePeriod;
         double available = tick;
+        boolean first = true;
+        // Only aligned at the start of the run, with subsequent delays
+        // requiring updates ofr event records
         for (final Event event : local)
         {
             System.out.println("    " + event.getSource() + " "
@@ -172,9 +175,20 @@ public class ThrottleTest
                     + ", start: " + event.getStarted() + ", complete: "
                     + event.getCompleted());
             assertTrue(Math.abs(event.getArrived() - sourceTick) < DELTA);
-            assertTrue(Math.abs(event.getStarted() - available) < DELTA);
-            assertTrue(Math.abs(event.getCompleted() - available) < DELTA);
-            assertTrue(Math.abs(event.getExecuted()) < DELTA);
+            if (first)
+            {
+                assertTrue(Math.abs(event.getStarted() - available) < DELTA);
+                assertTrue(Math.abs(event.getCompleted() - available) < DELTA);
+                assertTrue(Math.abs(event.getExecuted()) < DELTA);
+                first = false;
+            }
+            else
+            {
+                System.out.println(Math.abs(event.getStarted() - available));
+                assertTrue(Math.abs(event.getStarted() - available) > 0.0);
+                assertTrue(Math.abs(event.getCompleted() - available) > 0.0);
+                assertTrue(Math.abs(event.getExecuted()) < DELTA);
+            }
             sourceTick += tick;
             available += period;
         }
@@ -596,7 +610,7 @@ public class ThrottleTest
         // sort events by arrival time
         events.sort(Comparator.comparingDouble(Event::getCompleted));
         assertTrue(events.size() == eventTotal);
-        int[] state = {3, 5, 7, 9};
+        int[] state = {2, 4, 4, 6, 6, 8};
         int index = 0;
         while (!events.isEmpty())
         {

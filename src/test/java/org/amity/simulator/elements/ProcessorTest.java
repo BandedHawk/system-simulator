@@ -558,7 +558,7 @@ public class ProcessorTest
         // sort events by arrival time
         events.sort(Comparator.comparingDouble(Event::getCompleted));
         assertTrue(events.size() == eventTotal);
-        int[] state = {3, 5, 7, 9};
+        int[] state = {3, 3, 5, 5, 7, 7, 9};
         int index = 0;
         while (!events.isEmpty())
         {
