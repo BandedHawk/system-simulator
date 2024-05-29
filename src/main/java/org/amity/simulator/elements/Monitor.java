@@ -102,6 +102,7 @@ public class Monitor
         final boolean source = component instanceof Source;
         final boolean processor = component instanceof Processor;
         final boolean throttle = component instanceof Throttle;
+        final boolean balancer = component instanceof Balancer;
         final boolean sink = component instanceof Sink;
         if (!source)
         {
@@ -114,7 +115,7 @@ public class Monitor
         assert component != null : "unexpected null component";
         final List<Event> events = component.getLocalEvents();
         // Sort by arrival time if we're at a processor
-        if (processor || throttle)
+        if (processor || throttle || balancer)
         {
             events.sort(Comparator.comparingDouble(Event::getArrived));
         }
@@ -136,11 +137,8 @@ public class Monitor
                 if (arrival > 0)
                 {
                     this.arrivals.addValue(arrived - arrival);
-                    System.out.println("Arrived: " + arrived);
-                    System.out.println("Arrival: " + arrival);
-                    System.out.println("difference: " + (arrived - arrival));
                 }
-                if (!source)
+                if (!source && !sink)
                 {
                     if (!counted)
                     {

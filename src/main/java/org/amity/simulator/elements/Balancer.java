@@ -103,7 +103,7 @@ public class Balancer implements Component
         // processing at last component
         if (event != null)
         {
-            final double arrived = event.getCompleted();
+            final double arrived = event.getArrived();
             // Non-delay component so no associated wait time
             event.setValues(arrived, arrived, arrived);
             // Copy current event to local records
