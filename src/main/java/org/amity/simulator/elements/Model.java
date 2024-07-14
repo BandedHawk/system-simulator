@@ -139,14 +139,13 @@ public class Model
     private class Simulator
     {
 
-        private final static int FILL = 500;
-        private final static int MIN_BUFFER = 20;
-        private final static int MAX_BUFFER = 2000;
+        private final static int FILL_SIZE = 2000;
         private final static int CYCLES = 50000;
         private final List<Event> primary;
         private final List<Event> working;
         private final List<Event> completed;
-        private int capacity;
+        private double fillmark;
+        private double lowmark;
         private double highmark;
         private boolean overrun;
 
@@ -155,11 +154,12 @@ public class Model
          */
         private Simulator()
         {
-            this.capacity = FILL;
             this.primary = new ArrayList<>();
             this.working = new ArrayList<>();
             this.completed = new ArrayList<>();
+            this.lowmark = 0;
             this.highmark = 0;
+            this.fillmark = 0;
             this.overrun = false;
         }
 
@@ -171,12 +171,14 @@ public class Model
          */
         private Simulator(final List<Source> sources, final double generate)
         {
-            this.capacity = FILL;
             this.primary = new ArrayList<>();
             this.working = new ArrayList<>();
             this.completed = new ArrayList<>();
+            this.fillmark = 0;
+            this.lowmark = 0;
             this.highmark = 0;
             this.overrun = false;
+            // Generate all the events
             for (final Source source : sources)
             {
                 do
@@ -194,15 +196,7 @@ public class Model
                 }
                 while (true);
             }
-            // Sort primary store for all events in order of estimated start time
-            this.primary.sort(Comparator.comparingDouble(Event::getStarted)
-                    .thenComparingDouble(Event::getArrived));
-            // Copy a fractional part of the primary store
-            // We do this as the working sort will take less time
             this.fill();
-            // Sort working in chronological order of estimated start
-            this.working.sort(Comparator.comparingDouble(Event::getStarted)
-                    .thenComparingDouble(Event::getArrived));
         }
 
         /**
@@ -224,21 +218,21 @@ public class Model
                     break;
                 }
                 // Check there is no delay with execution
-                final boolean zeroDelay
+                final boolean balancer
                         = event.getComponent() instanceof Balancer;
                 final Event priority = event.prioritize(this.working,
                         locked);
                 priority.simulate();
                 locked = false;
                 transitions++;
-                // 
+                // Event has completed so move it to the completed queue
                 if (priority.getComponent() == null)
                 {
                     this.completed.add(priority);
                 }
                 // Load balancer with no execution delay so
                 // continue moving through event system state
-                else if (zeroDelay)
+                else if (balancer)
                 {
                     // Put this back on to execute first again on the next
                     // transition as availability may have been calculated
@@ -254,26 +248,23 @@ public class Model
                 {
                     // Add to end as we will reshuffle
                     this.working.add(priority);
-                    // Refill working buffer if modified event completion is
-                    // higher than the high watermark or we are getting
-                    // to a low working buffer and we still have events in the
-                    // primary event buffer
+                    // Refill working buffer if current event is higher than the
+                    // fill point
                     if (!this.primary.isEmpty()
-                            && (this.working.size() < MIN_BUFFER
-                            || priority.getCompleted() > this.highmark))
+                            && (priority.getStarted() > this.fillmark))
                     {
-                        if (this.highmark < priority.getCompleted()
-                                && this.capacity < MAX_BUFFER)
-                        {
-                            this.capacity += FILL;
-                        }
-                        this.highmark = priority.getCompleted();
+                        System.out.println("        Refill working buffer");
+                        System.out.println("          Current time:"
+                                + priority.getStarted());
                         this.fill();
                     }
-                    // Re-sort working buffer after we have modified the list
-                    this.working.sort(Comparator
-                            .comparingDouble(Event::getStarted)
-                            .thenComparingDouble(Event::getArrived));
+                    else
+                    {
+                        // Re-sort working buffer after we have modified the list
+                        this.working.sort(Comparator
+                                .comparingDouble(Event::getStarted)
+                                .thenComparingDouble(Event::getArrived));
+                    }
                 }
                 if (transitions % CYCLES == 0)
                 {
@@ -297,45 +288,35 @@ public class Model
          */
         private void fill()
         {
-            double current = this.highmark;
-            if (!primary.isEmpty())
+            if (!this.primary.isEmpty())
             {
-                // Re-calculate timeline due to extreme out-of-order insertions
-                if (this.working.size() > MAX_BUFFER)
+                this.primary.sort(Comparator
+                        .comparingDouble(Event::getStarted)
+                        .thenComparingDouble(Event::getArrived));
+                for (int index = 0; index < Simulator.FILL_SIZE; index++)
                 {
-                    if (!overrun)
-                    {
-                        System.err.println("        System arrivals faster than system exits");
-                        System.err.println("          Completed: "
-                                + this.completed.size());
-                        this.overrun = true;
-                    }
-                    this.primary.addAll(this.working);
-                    this.working.clear();
-                    this.primary.sort(Comparator
-                            .comparingDouble(Event::getStarted)
-                            .thenComparingDouble(Event::getArrived));
-                }
-                else
-                {
-                    this.overrun = false;
-                }
-                // Copy events from main buffer into working buffer
-                for (int index = 0; index < this.capacity; index++)
-                {
+                    final Event event = this.primary.remove(0);
+                    assert event.getArrived() > this.lowmark :
+                            "Below working time frame";
+                    this.working.add(event);
                     if (this.primary.isEmpty())
                     {
                         break;
                     }
-                    else
-                    {
-                        final Event event = primary.remove(0);
-                        this.working.add(event);
-                        current = event.getCompleted();
-                    }
                 }
-            }
-            this.highmark = current;
+                this.working.sort(Comparator.comparingDouble(Event::getStarted)
+                            .thenComparingDouble(Event::getArrived));
+                this.lowmark = this.working.getFirst().getArrived();
+                this.highmark = this.working.getLast().getArrived();
+                this.fillmark = (this.highmark + this.lowmark)/2;
+                System.out.println("          Working event buffer: "
+                        + this.working.size());
+                System.out.println("          Primary event buffer: "
+                        + this.primary.size());
+                System.out.println("          High Watermark: " + this.highmark);
+                System.out.println("          Low Watermark: " + this.lowmark);
+                System.out.println("          Fill Watermark: " + this.fillmark);
+           }
         }
     }
 }
