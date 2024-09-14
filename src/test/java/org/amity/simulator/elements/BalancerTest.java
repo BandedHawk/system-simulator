@@ -509,9 +509,9 @@ public class BalancerTest
         // sort events by arrival time
         events.sort(Comparator.comparingDouble(Event::getCompleted));
         assertTrue(events.size() == eventTotal);
-        final int[] balancer = {0, 0, 0, 3, 3, 3, 4, 4, 4, 5, 5, 6};
-        final int[] state1 = {2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 5, 5};
-        final int[] state2 = {0, 0, 0, 3, 3, 3, 4, 4, 4, 5, 5, 6};
+        final int[] balancer = {0, 0, 0, 2, 2, 2, 3, 3, 3, 4, 4, 5};
+        final int[] state1 =   {2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 5, 5};
+        final int[] state2 =   {0, 0, 0, 2, 2, 2, 3, 3, 3, 4, 4, 5};
         int index = 0;
         while (!events.isEmpty())
         {
@@ -554,7 +554,6 @@ public class BalancerTest
         System.out.println("  Try cleared system for no match in component");
         component.prioritize(sequencer, false);
         assertTrue(sequencer.paths.contains(component));
-        double available = instance.getAvailable();
         instance.prioritize(sequencer, true);
         assertTrue(sequencer.exclusions.isEmpty());
         assertFalse(sequencer.paths.isEmpty());
@@ -575,7 +574,6 @@ public class BalancerTest
         System.out.println("  Try system with no match in path");
         assertTrue(sequencer.exclusions.isEmpty());
         sequencer.participants.clear();
-        available = excluded.getAvailable();
         excluded.prioritize(sequencer, true);
         assertTrue(sequencer.paths.size() == 2);
         assertFalse(sequencer.exclusions.isEmpty());
@@ -591,7 +589,6 @@ public class BalancerTest
         distributor3.addNext(excluded);
         final Component secondary = new Balancer("balancer 3", distributor3,
                 false);
-        available = secondary.getAvailable();
         secondary.prioritize(sequencer, true);
         assertTrue(sequencer.paths.size() == 2);
         assertFalse(sequencer.exclusions.isEmpty());

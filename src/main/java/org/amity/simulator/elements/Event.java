@@ -36,6 +36,7 @@ public class Event
     private double completed;
     private double executed;
     private double lifetime;
+    private boolean calculated;
     private String last;
     private Component component;
     private final Sequencer sequencer;
@@ -54,6 +55,7 @@ public class Event
         this.executed = 0;
         this.lifetime = 0;
         this.component = null;
+        this.calculated = false;
         this.last = null;
         this.sequencer = new Sequencer();
     }
@@ -76,6 +78,7 @@ public class Event
         this.executed = 0;
         this.lifetime = 0;
         this.component = null;
+        this.calculated = false;
         this.last = null;
         this.sequencer = new Sequencer();
     }
@@ -97,6 +100,7 @@ public class Event
         this.lifetime = copy.lifetime;
         this.component = copy.component;
         this.sequencer = copy.sequencer;
+        this.calculated = copy.calculated;
     }
 
     /**

@@ -141,13 +141,23 @@ public class Processor implements Component
             // the component finished processing the last event
             final double arrived = event.getArrived();
             final double possible = event.getStarted();
-            // The processor is not available to process immediately
-            if (this.available > possible)
+            // Check if processing must be deferred
+            boolean defer = false;
+            // Generate processing times for this event at this component
+            final Generator generator
+                    = generators.containsKey(event.getSource())
+                    ? generators.get(event.getSource())
+                    : generators.containsKey(Vocabulary.DEFAULT)
+                    ? generators.get(Vocabulary.DEFAULT)
+                    : null;
+            assert generator != null : "Should never be declared with no functions";
+            // Event processing has not been calculated
+            if (!this.queue.contains(event))
             {
-                // Set the possible start time for processing in the future
-                event.setStarted(this.available);
-                // Event not already noted to be in queue
-                if (!this.queue.contains(event))
+                // Processing time
+                final double value = generator.generate();
+                // The processor is not available to process immediately
+                if (this.available > possible)
                 {
                     if (this.monitor && !this.statistics.isEmpty())
                     {
@@ -162,45 +172,42 @@ public class Processor implements Component
                                 arrived, 0.0);
                         statistics.add(stats);
                     }
+                    // Add event to the queue
                     this.queue.add(event);
+                    // Can't process event at this time
+                    defer = true;
                 }
-            }
-            else
-            {
-                // Generate processing times for this event at this component
-                final Generator generator
-                        = generators.containsKey(event.getSource())
-                        ? generators.get(event.getSource())
-                        : generators.containsKey(Vocabulary.DEFAULT)
-                        ? generators.get(Vocabulary.DEFAULT)
-                        : null;
-                assert generator != null : "Should never be declared with no functions";
-                final double value = generator.generate();
                 // Update the processing start of event for current component
                 // interaction
-                final double start = this.available < arrived
-                        ? arrived : this.available;
+                final double start = Math.max(this.available, possible);
+                event.setStarted(start);
                 // Completion time
                 final double completed = start + value;
+                event.setCompleted(completed);
                 // Cumulative event processing time
                 final double executed = event.getExecuted() + value;
-                event.setValues(arrived, start, completed);
                 event.setExecuted(executed);
-                // Set next component availability
+                // Set next component availability which is after this event
                 this.available = completed;
-                // Copy current event to local stats
+            }
+            // Process event
+            if (!defer)
+            {
                 final Event current = new Event(event);
                 current.setComponent(null);
                 this.local.add(current);
-                // Set event arrival time for next component
-                event.setArrived(completed);
-                // Set possible start time for processing at next component
-                event.setStarted(completed);
                 // Modify global event to next component to pass through
                 event.setComponent(generator.getNext());
-                // Remove event from queue as it has been processed
+                // Time when event completed being processed here
+                final double completed = event.getCompleted();
+                // Set event start time for next component
+                event.setArrived(completed);
+                // Possible time for when event can be processed
+                event.setStarted(completed);
+                // If the queue is not empty, this event must have been in queue
                 if (!this.queue.isEmpty())
                 {
+                    // Remove event from queue as it has been processed
                     this.queue.remove(event);
                     if (this.monitor && !this.statistics.isEmpty())
                     {
@@ -208,20 +215,13 @@ public class Processor implements Component
                         QueueStatistics stats = this.statistics.getLast();
                         assert stats != null :
                                 "Unexpected null queue statistics";
+                        final double start = event.getStarted();
                         final double span = start - stats.getTime();
                         stats.setSpan(span);
                         // Add new queue span statistics
                         stats = new QueueStatistics(this.queue.size(),
                                 start, 0.0);
                         statistics.add(stats);
-                    }
-                }
-                // Adjust queued events to possible available execution time
-                if (!this.queue.isEmpty())
-                {
-                    for (final Event queuedEvent : queue)
-                    {
-                        queuedEvent.setStarted(executed);
                     }
                 }
             }
